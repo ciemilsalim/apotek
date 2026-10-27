@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Modal from '@/Components/Modal';
+import BarcodeScannerModal from '@/Components/BarcodeScannerModal';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
     AlertTriangle,
@@ -7,10 +8,13 @@ import {
     ArrowUpRight,
     Boxes,
     Calendar,
+    Camera,
     CheckCircle2,
     ClipboardList,
     Clock,
+    Download,
     Edit,
+    FileSpreadsheet,
     Filter,
     Layers,
     MapPin,
@@ -22,6 +26,7 @@ import {
     SlidersHorizontal,
     Tag,
     Trash2,
+    UploadCloud,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -30,6 +35,15 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     const [search, setSearch] = useState(filters.search || '');
     const [categoryId, setCategoryId] = useState(filters.category_id || '');
     const [status, setStatus] = useState(filters.status || 'all');
+
+    // Camera Scanner & Excel Import States
+    const [cameraScannerOpen, setCameraScannerOpen] = useState(false);
+    const [importModalOpen, setImportModalOpen] = useState(false);
+
+    // Form for Excel Import
+    const importForm = useForm({
+        file: null,
+    });
 
     // Create / Edit Modal State
     const [modalOpen, setModalOpen] = useState(false);
@@ -111,6 +125,26 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             { search, category_id: categoryId, status: newStatus },
             { preserveState: true },
         );
+    };
+
+    const handleCameraScan = (scannedCode) => {
+        setSearch(scannedCode);
+        router.get(
+            route('medicines.index'),
+            { search: scannedCode, category_id: categoryId, status },
+            { preserveState: true },
+        );
+    };
+
+    const handleImportSubmit = (e) => {
+        e.preventDefault();
+        importForm.post(route('medicines.import'), {
+            forceFormData: true,
+            onSuccess: () => {
+                setImportModalOpen(false);
+                importForm.reset();
+            },
+        });
     };
 
     const generateBatchSuggestion = (medCode) => {
@@ -280,20 +314,28 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             Kelola persediaan obat, kontrol nomor batch, pantau kadaluarsa, dan alur FEFO
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Link
                             href={route('medicines.adjustments')}
                             className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
                             <ClipboardList className="h-4 w-4" />
-                            <span>Riwayat Mutasi</span>
+                            <span className="hidden sm:inline">Riwayat Mutasi</span>
                         </Link>
+                        <button
+                            type="button"
+                            onClick={() => setImportModalOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-3.5 py-2.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100 shadow-xs transition"
+                        >
+                            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                            <span>Import Excel</span>
+                        </button>
                         <button
                             onClick={openCreateModal}
                             className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Tambah Obat Baru</span>
+                            <span>Tambah Obat</span>
                         </button>
                     </div>
                 </div>
@@ -330,15 +372,39 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                     onSubmit={handleSearch}
                     className="flex flex-col sm:flex-row gap-3 items-center justify-between"
                 >
-                    <div className="relative w-full sm:flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                    <div className="relative w-full sm:flex-1 flex items-center">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
                         <input
                             type="text"
                             placeholder="Cari nama obat, kode, nomor batch, atau lokasi rak..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-4 py-2.5 text-xs sm:text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50/70"
+                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-24 py-2.5 text-xs sm:text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50/70"
                         />
+                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                            {search && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearch('');
+                                        router.get(route('medicines.index'), { search: '', category_id: categoryId, status }, { preserveState: true });
+                                    }}
+                                    className="rounded-full p-1 text-slate-400 hover:text-slate-600"
+                                    title="Bersihkan"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setCameraScannerOpen(true)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition"
+                                title="Scan Barcode via Kamera HP / Web"
+                            >
+                                <Camera className="h-3.5 w-3.5 text-emerald-600" />
+                                <span className="hidden sm:inline text-[11px]">Scan</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex w-full sm:w-auto items-center gap-2">
@@ -1254,6 +1320,133 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                     </div>
                 </div>
             </Modal>
+
+            {/* Excel / CSV Import Modal */}
+            <Modal
+                show={importModalOpen}
+                onClose={() => setImportModalOpen(false)}
+                maxWidth="md"
+            >
+                <form onSubmit={handleImportSubmit} className="flex flex-col">
+                    <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                <FileSpreadsheet className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-extrabold text-slate-900">
+                                    Import Data Stok Obat (Excel / CSV)
+                                </h3>
+                                <p className="text-xs text-slate-500 font-medium">
+                                    Unggah berkas spreadsheet untuk memperbarui atau menambah obat secara massal
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setImportModalOpen(false)}
+                            className="rounded-full p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <div className="p-6 space-y-4">
+                        {/* Download Template Banner */}
+                        <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <div className="text-xs font-bold text-emerald-900">
+                                    Unduh Format Template Standar
+                                </div>
+                                <div className="text-[11px] text-emerald-700 mt-0.5">
+                                    Gunakan format kolom yang sudah disesuaikan agar proses import berjalan lancar.
+                                </div>
+                            </div>
+                            <a
+                                href={route('medicines.import.template')}
+                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs font-bold shadow-xs hover:bg-emerald-100/50 transition shrink-0"
+                            >
+                                <Download className="h-3.5 w-3.5 text-emerald-600" />
+                                <span>Unduh Template .xlsx</span>
+                            </a>
+                        </div>
+
+                        {/* File Upload Box */}
+                        <div>
+                            <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
+                                Pilih Berkas Excel (.xlsx, .xls) atau CSV (.csv)
+                            </label>
+                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl hover:border-emerald-500 transition bg-slate-50/50">
+                                <div className="space-y-2 text-center">
+                                    <UploadCloud className="mx-auto h-10 w-10 text-emerald-600" />
+                                    <div className="flex text-xs text-slate-600 justify-center">
+                                        <label className="relative cursor-pointer rounded-md font-bold text-emerald-600 hover:text-emerald-700">
+                                            <span>Pilih dokumen</span>
+                                            <input
+                                                type="file"
+                                                accept=".xlsx,.xls,.csv,.txt"
+                                                onChange={(e) => importForm.setData('file', e.target.files[0])}
+                                                className="sr-only"
+                                                required
+                                            />
+                                        </label>
+                                        <p className="pl-1 text-slate-500">atau tarik ke sini</p>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400">
+                                        XLSX, XLS, atau CSV hingga 10MB
+                                    </p>
+                                    {importForm.data.file && (
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100/80 text-emerald-800 rounded-lg text-xs font-semibold">
+                                            <FileSpreadsheet className="h-3.5 w-3.5" />
+                                            <span>{importForm.data.file.name}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            {importForm.errors.file && (
+                                <p className="mt-1.5 text-xs text-rose-600 font-semibold">
+                                    {importForm.errors.file}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Info Note */}
+                        <div className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                            <p className="font-bold text-slate-700">Petunjuk Impor:</p>
+                            <ul className="list-disc list-inside space-y-0.5 text-slate-600">
+                                <li>Jika kode obat sudah terdaftar, data nama/harga/stok akan otomatis diperbarui.</li>
+                                <li>Jika kode obat baru, obat dan batch awal akan otomatis dibuat ke sistem.</li>
+                                <li>Kategori obat yang belum ada akan otomatis dibuatkan kategori baru.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setImportModalOpen(false)}
+                            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={importForm.processing || !importForm.data.file}
+                            className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50 transition"
+                        >
+                            {importForm.processing ? 'Mengunggah & Memproses...' : 'Mulai Import'}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Camera Barcode Scanner Modal */}
+            <BarcodeScannerModal
+                isOpen={cameraScannerOpen}
+                onClose={() => setCameraScannerOpen(false)}
+                onScan={handleCameraScan}
+                title="Scan Barcode Obat"
+            />
         </AuthenticatedLayout>
     );
 }

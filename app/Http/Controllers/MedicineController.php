@@ -403,4 +403,325 @@ class MedicineController extends Controller
 
         return redirect()->route('medicines.index')->with('success', 'Data obat berhasil dihapus.');
     }
+
+    /**
+     * Download Excel template for importing medicines.
+     */
+    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Import Obat');
+
+        // Headers
+        $headers = [
+            'kode_obat',
+            'nama_obat',
+            'nama_generik',
+            'kategori',
+            'satuan',
+            'harga_beli',
+            'harga_jual',
+            'stok',
+            'stok_minimum',
+            'nomor_batch',
+            'tanggal_kadaluarsa',
+            'lokasi_rak',
+            'deskripsi',
+        ];
+        $sheet->fromArray([$headers], null, 'A1');
+
+        // Styling header
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '059669'],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+        $sheet->getStyle('A1:M1')->applyFromArray($headerStyle);
+
+        // Sample Data Rows
+        $samples = [
+            [
+                'OBT-001',
+                'Paracetamol 500mg',
+                'Paracetamol',
+                'Analgesik & Antipiretik',
+                'Strip',
+                5000,
+                8000,
+                50,
+                10,
+                'B-PCT-2601',
+                date('Y-m-d', strtotime('+1 year')),
+                'Rak A-01',
+                'Obat penurun demam dan pereda nyeri',
+            ],
+            [
+                'OBT-002',
+                'Amoxicillin 500mg',
+                'Amoxicillin Trihydrate',
+                'Antibiotik',
+                'Strip',
+                12000,
+                18000,
+                30,
+                5,
+                'B-AMX-2602',
+                date('Y-m-d', strtotime('+18 months')),
+                'Rak B-02',
+                'Antibiotik spektrum luas dengan resep dokter',
+            ],
+            [
+                'OBT-003',
+                'Antasida Doen Tablet',
+                'Al(OH)3 & Mg(OH)2',
+                'Obat Lambung / Maag',
+                'Strip',
+                3500,
+                6000,
+                40,
+                10,
+                'B-ATD-2603',
+                date('Y-m-d', strtotime('+2 years')),
+                'Rak A-03',
+                'Mengurangi gejala sakit maag dan asam lambung',
+            ],
+        ];
+
+        $sheet->fromArray($samples, null, 'A2');
+
+        // Auto size columns
+        foreach (range('A', 'M') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'template_import_obat_' . date('Ymd_His') . '.xlsx';
+        $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save($tempPath);
+
+        return response()->download($tempPath, 'template_import_obat.xlsx')->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Import medicines and stock from Excel or CSV file.
+     */
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:10240'],
+        ]);
+
+        $file = $request->file('file');
+
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, true);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Gagal membaca berkas Excel: ' . $e->getMessage());
+        }
+
+        if (empty($rows) || count($rows) < 2) {
+            return back()->with('error', 'Berkas Excel kosong atau tidak memiliki baris data.');
+        }
+
+        // Header mapping (row 1)
+        $headerRow = array_shift($rows);
+        $columnMap = [];
+        foreach ($headerRow as $colLetter => $headerName) {
+            if ($headerName === null) continue;
+            $normalized = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '_', (string) $headerName)));
+            $columnMap[$normalized] = $colLetter;
+        }
+
+        $getVal = function ($row, array $keys, $default = null) use ($columnMap) {
+            foreach ($keys as $k) {
+                if (isset($columnMap[$k]) && isset($row[$columnMap[$k]])) {
+                    $val = trim((string) $row[$columnMap[$k]]);
+                    if ($val !== '') return $val;
+                }
+            }
+            return $default;
+        };
+
+        $createdCount = 0;
+        $updatedCount = 0;
+        $skippedCount = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach ($rows as $rowIndex => $row) {
+                $code = $getVal($row, ['kode_obat', 'kode', 'code', 'barcode', 'sku']);
+                $name = $getVal($row, ['nama_obat', 'nama', 'name', 'nama_produk']);
+
+                if (empty($code) && empty($name)) {
+                    continue; // Skip empty row
+                }
+
+                if (empty($code) || empty($name)) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $categoryName = $getVal($row, ['kategori', 'category', 'golongan', 'kategori_obat'], 'Umum');
+                $categorySlug = \Illuminate\Support\Str::slug($categoryName) ?: 'kat-' . substr(md5($categoryName), 0, 6);
+                $category = Category::firstOrCreate(
+                    ['name' => $categoryName],
+                    ['slug' => $categorySlug, 'description' => 'Dibuat otomatis dari impor data obat']
+                );
+
+                $genericName = $getVal($row, ['nama_generik', 'generik', 'generic_name']);
+                $unit = $getVal($row, ['satuan', 'unit', 'kemasan'], 'Pcs');
+                $buyPrice = (float) str_replace([',', ' '], '', $getVal($row, ['harga_beli', 'buy_price', 'modal', 'hpp'], 0));
+                $sellPrice = (float) str_replace([',', ' '], '', $getVal($row, ['harga_jual', 'sell_price', 'harga'], 0));
+                $stockInput = (int) $getVal($row, ['stok', 'stock', 'jumlah', 'qty'], 0);
+                $minStock = (int) $getVal($row, ['stok_minimum', 'min_stock', 'minimum'], 5);
+                $batchNumber = $getVal($row, ['nomor_batch', 'batch', 'batch_number', 'no_batch']);
+                $expiryDate = $getVal($row, ['tanggal_kadaluarsa', 'expiry_date', 'exp_date', 'kadaluarsa', 'expired']);
+                $location = $getVal($row, ['lokasi_rak', 'location', 'rak', 'lokasi']);
+                $description = $getVal($row, ['deskripsi', 'description', 'keterangan']);
+
+                // Parse expiry date if present
+                $parsedExpiry = null;
+                if (!empty($expiryDate)) {
+                    try {
+                        if (is_numeric($expiryDate)) {
+                            $parsedExpiry = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($expiryDate)->format('Y-m-d');
+                        } else {
+                            $parsedExpiry = Carbon::parse($expiryDate)->format('Y-m-d');
+                        }
+                    } catch (\Throwable $e) {
+                        $parsedExpiry = Carbon::now()->addYear()->format('Y-m-d');
+                    }
+                }
+
+                $medicine = Medicine::where('code', $code)->first();
+
+                if ($medicine) {
+                    // Update existing medicine
+                    $medicine->update([
+                        'name' => $name,
+                        'category_id' => $category->id,
+                        'generic_name' => $genericName ?? $medicine->generic_name,
+                        'unit' => $unit,
+                        'buy_price' => $buyPrice > 0 ? $buyPrice : $medicine->buy_price,
+                        'sell_price' => $sellPrice > 0 ? $sellPrice : $medicine->sell_price,
+                        'min_stock' => $minStock,
+                        'location' => $location ?? $medicine->location,
+                        'description' => $description ?? $medicine->description,
+                        'expiry_date' => $parsedExpiry ?? $medicine->expiry_date,
+                    ]);
+
+                    if ($stockInput > 0) {
+                        $batchNo = !empty($batchNumber)
+                            ? trim($batchNumber)
+                            : 'IMP-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $code), 0, 4)) . '-' . date('ymd');
+
+                        $batchExp = $parsedExpiry ?? Carbon::now()->addYear()->format('Y-m-d');
+
+                        $batch = MedicineBatch::create([
+                            'medicine_id' => $medicine->id,
+                            'batch_number' => $batchNo,
+                            'expiry_date' => $batchExp,
+                            'initial_stock' => $stockInput,
+                            'current_stock' => $stockInput,
+                            'buy_price' => $medicine->buy_price,
+                            'notes' => 'Tambahan stok via impor berkas',
+                        ]);
+
+                        $stockBefore = $medicine->stock;
+                        $medicine->increment('stock', $stockInput);
+
+                        StockAdjustment::create([
+                            'medicine_id' => $medicine->id,
+                            'batch_id' => $batch->id,
+                            'batch_number' => $batchNo,
+                            'user_id' => auth()->id(),
+                            'type' => 'in',
+                            'quantity' => $stockInput,
+                            'stock_before' => $stockBefore,
+                            'stock_after' => $stockBefore + $stockInput,
+                            'notes' => 'Stok masuk via impor data obat (Batch: ' . $batchNo . ')',
+                        ]);
+
+                        if (method_exists($medicine, 'syncStockFromBatches')) {
+                            $medicine->syncStockFromBatches();
+                        }
+                    }
+
+                    $updatedCount++;
+                } else {
+                    // Create new medicine
+                    $medicine = Medicine::create([
+                        'code' => $code,
+                        'name' => $name,
+                        'category_id' => $category->id,
+                        'generic_name' => $genericName,
+                        'unit' => $unit,
+                        'buy_price' => $buyPrice,
+                        'sell_price' => $sellPrice,
+                        'stock' => $stockInput,
+                        'min_stock' => $minStock,
+                        'expiry_date' => $parsedExpiry,
+                        'location' => $location,
+                        'description' => $description,
+                    ]);
+
+                    if ($stockInput > 0) {
+                        $batchNo = !empty($batchNumber)
+                            ? trim($batchNumber)
+                            : 'B-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $code), 0, 4)) . '-' . date('ym');
+
+                        $batchExp = $parsedExpiry ?? Carbon::now()->addYear()->format('Y-m-d');
+
+                        $batch = MedicineBatch::create([
+                            'medicine_id' => $medicine->id,
+                            'batch_number' => $batchNo,
+                            'expiry_date' => $batchExp,
+                            'initial_stock' => $stockInput,
+                            'current_stock' => $stockInput,
+                            'buy_price' => $medicine->buy_price,
+                            'notes' => 'Stok awal impor berkas',
+                        ]);
+
+                        StockAdjustment::create([
+                            'medicine_id' => $medicine->id,
+                            'batch_id' => $batch->id,
+                            'batch_number' => $batchNo,
+                            'user_id' => auth()->id(),
+                            'type' => 'in',
+                            'quantity' => $stockInput,
+                            'stock_before' => 0,
+                            'stock_after' => $stockInput,
+                            'notes' => 'Stok awal via impor berkas Excel (Batch: ' . $batchNo . ')',
+                        ]);
+
+                        if (method_exists($medicine, 'syncStockFromBatches')) {
+                            $medicine->syncStockFromBatches();
+                        }
+                    }
+
+                    $createdCount++;
+                }
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat memproses data impor: ' . $e->getMessage());
+        }
+
+        $msg = "Impor data selesai: {$createdCount} obat baru ditambahkan, {$updatedCount} obat diperbarui.";
+        if ($skippedCount > 0) {
+            $msg .= " ({$skippedCount} baris dilewati karena kode/nama tidak lengkap).";
+        }
+
+        return back()->with('success', $msg);
+    }
 }

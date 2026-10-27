@@ -326,17 +326,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     )}
                 </div>
 
-                {/* User Info Card (Clean Flat Design) */}
-                {sidebarCollapsed ? (
-                    <div className="py-3 px-2 flex justify-center border-b border-slate-100">
-                        <div
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-sm shadow-xs cursor-default"
-                            title={`${user.name} — ${currentRole.name}`}
-                        >
-                            {user.name.charAt(0).toUpperCase()}
-                        </div>
-                    </div>
-                ) : (
+                {/* User Info Card (Visible ONLY when sidebar is expanded) */}
+                {!sidebarCollapsed && (
                     <div className="p-3.5 mx-3 sm:mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-base">
@@ -356,10 +347,10 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 )}
 
-                {/* Sidebar Navigation Links */}
+                {/* Sidebar Navigation Links (Neat, clean vertical flow when collapsed) */}
                 <div
-                    className={`flex-1 overflow-y-auto py-2 space-y-3 ${
-                        sidebarCollapsed ? 'px-2' : 'px-4'
+                    className={`flex-1 overflow-y-auto ${
+                        sidebarCollapsed ? 'py-3.5 px-3 space-y-2' : 'py-2 px-4 space-y-3'
                     }`}
                 >
                     {sidebarNavItems.map((group, gIdx) => {
@@ -369,10 +360,8 @@ export default function AuthenticatedLayout({ header, children }) {
                         if (filtered.length === 0) return null;
 
                         return (
-                            <div key={gIdx} className="space-y-1">
-                                {sidebarCollapsed ? (
-                                    <div className="w-6 mx-auto border-t border-slate-200 my-2" />
-                                ) : (
+                            <div key={gIdx} className={sidebarCollapsed ? 'space-y-2' : 'space-y-1'}>
+                                {!sidebarCollapsed && (
                                     <div className="px-3 text-[11px] font-extrabold tracking-wider text-slate-400 uppercase">
                                         {group.section}
                                     </div>
@@ -383,22 +372,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <Link
                                             key={item.title}
                                             href={item.href}
-                                            title={sidebarCollapsed ? `${item.title} (${item.subtitle})` : undefined}
+                                            title={sidebarCollapsed ? `${item.title} — ${item.subtitle}` : undefined}
                                             className={`flex items-center transition-all ${
                                                 sidebarCollapsed
                                                     ? 'justify-center h-11 w-11 mx-auto rounded-xl'
                                                     : 'gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold'
                                             } ${
                                                 item.active
-                                                    ? 'bg-emerald-600 text-white shadow-sm'
-                                                    : 'text-slate-700 hover:bg-slate-100'
+                                                    ? 'bg-emerald-600 text-white shadow-xs'
+                                                    : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70'
                                             }`}
                                         >
                                             <Icon
                                                 className={`shrink-0 ${
                                                     sidebarCollapsed ? 'h-5 w-5' : 'h-5 w-5'
                                                 } ${
-                                                    item.active ? 'text-white' : 'text-slate-400'
+                                                    item.active ? 'text-white' : 'text-slate-500'
                                                 }`}
                                             />
                                             {!sidebarCollapsed && (

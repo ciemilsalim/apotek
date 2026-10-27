@@ -1,11 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Modal from '@/Components/Modal';
+import BarcodeScannerModal from '@/Components/BarcodeScannerModal';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     ArrowRight,
     Banknote,
     Barcode,
+    Camera,
     Check,
     CheckCircle2,
     CreditCard,
@@ -43,6 +45,7 @@ export default function PosIndex({
     const [lastCompletedSale, setLastCompletedSale] = useState(null);
     const [barcodeFeedback, setBarcodeFeedback] = useState(null);
     const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
+    const [cameraScannerOpen, setCameraScannerOpen] = useState(false);
     const [autoPrintThermal, setAutoPrintThermal] = useState(() => {
         const saved = localStorage.getItem('apotek_pos_auto_print');
         return saved !== null ? saved === 'true' : true;
@@ -273,6 +276,44 @@ export default function PosIndex({
                 setSearch('');
                 return;
             }
+        }
+    };
+
+    // Handler when barcode is scanned via Device Camera
+    const handleCameraBarcodeScanned = (scannedCode) => {
+        if (!scannedCode) return;
+        const query = scannedCode.trim().toLowerCase();
+
+        // 1. Exact match code
+        const exactCode = medicines.find(
+            (m) => m.code.toLowerCase() === query
+        );
+        if (exactCode) {
+            addToCart(exactCode, true);
+            setSearch('');
+            return;
+        }
+
+        // 2. Exact match name
+        const exactName = medicines.find(
+            (m) => m.name.toLowerCase() === query
+        );
+        if (exactName) {
+            addToCart(exactName, true);
+            setSearch('');
+            return;
+        }
+
+        // 3. Partial match
+        const partial = medicines.find(
+            (m) => m.code.toLowerCase().includes(query) || m.name.toLowerCase().includes(query)
+        );
+        if (partial) {
+            addToCart(partial, true);
+            setSearch('');
+        } else {
+            setSearch(scannedCode);
+            alert(`Obat dengan kode barcode "${scannedCode}" tidak ditemukan di database apotek.`);
         }
     };
 
@@ -808,27 +849,50 @@ export default function PosIndex({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={handleBarcodeKeyDown}
-                                className="w-full rounded-2xl border-2 border-slate-300 bg-slate-50 pl-11 pr-10 py-3 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none shadow-xs"
+                                className="w-full rounded-2xl border-2 border-slate-300 bg-slate-50 pl-11 pr-20 py-3 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none shadow-xs"
                                 autoFocus
                             />
-                            {search && (
+                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                                {search && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSearch('');
+                                            searchInputRef.current?.focus();
+                                        }}
+                                        className="rounded-full p-1 text-slate-400 hover:text-slate-600"
+                                        title="Hapus pencarian"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                )}
                                 <button
-                                    onClick={() => {
-                                        setSearch('');
-                                        searchInputRef.current?.focus();
-                                    }}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:text-slate-600"
+                                    type="button"
+                                    onClick={() => setCameraScannerOpen(true)}
+                                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition"
+                                    title="Scan Barcode via Kamera HP / Web"
                                 >
-                                    <X className="h-4 w-4" />
+                                    <Camera className="h-4 w-4 text-emerald-600" />
+                                    <span className="hidden sm:inline text-[11px]">Kamera</span>
                                 </button>
-                            )}
+                            </div>
                         </div>
 
                         {/* Scanner Status & Visual Feedback Badge */}
                         <div className="flex items-center justify-between text-xs text-slate-500">
-                            <div className="flex items-center gap-1.5 font-medium">
-                                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>Scanner Barcode Siap</span>
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5 font-medium">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span>Scanner Siap</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setCameraScannerOpen(true)}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 text-[11px] font-semibold transition"
+                                >
+                                    <Camera className="h-3 w-3 text-emerald-600" />
+                                    <span>Scan Kamera</span>
+                                </button>
                             </div>
 
                             {barcodeFeedback && (
@@ -1367,6 +1431,14 @@ export default function PosIndex({
                     </div>
                 </div>
             </Modal>
+
+            {/* Device Camera Barcode Scanner Modal */}
+            <BarcodeScannerModal
+                isOpen={cameraScannerOpen}
+                onClose={() => setCameraScannerOpen(false)}
+                onScan={handleCameraBarcodeScanned}
+                title="Scan Barcode Obat Kasir"
+            />
         </AuthenticatedLayout>
     );
 }

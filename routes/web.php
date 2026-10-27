@@ -57,6 +57,8 @@ Route::middleware(['auth'])->group(function () {
         // Medicines & Stock Adjustments
         Route::prefix('medicines')->name('medicines.')->group(function () {
             Route::get('/', [MedicineController::class, 'index'])->name('index');
+            Route::get('/import/template', [MedicineController::class, 'downloadTemplate'])->name('import.template');
+            Route::post('/import', [MedicineController::class, 'import'])->name('import');
             Route::post('/', [MedicineController::class, 'store'])->name('store');
             Route::put('/{medicine}', [MedicineController::class, 'update'])->name('update');
             Route::delete('/{medicine}', [MedicineController::class, 'destroy'])->name('destroy');

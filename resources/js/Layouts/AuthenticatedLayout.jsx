@@ -4,6 +4,7 @@ import {
     AlertCircle,
     AlertTriangle,
     CheckCircle2,
+    ChevronLeft,
     ChevronRight,
     ClipboardList,
     FileBarChart2,
@@ -15,6 +16,8 @@ import {
     LayoutGrid,
     LogOut,
     Menu,
+    PanelLeftClose,
+    PanelLeftOpen,
     Pill,
     Settings,
     ShoppingCart,
@@ -32,6 +35,23 @@ export default function AuthenticatedLayout({ header, children }) {
     const user = auth.user;
     const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
     const [dismissFlash, setDismissFlash] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('apotek_sidebar_collapsed');
+            if (saved !== null) return saved === 'true';
+        }
+        return true; // Default collapsed on desktop
+    });
+
+    const toggleSidebar = () => {
+        setSidebarCollapsed((prev) => {
+            const next = !prev;
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('apotek_sidebar_collapsed', String(next));
+            }
+            return next;
+        });
+    };
 
     // Prevent background scrolling and enable Escape to close when bottom sheet is active
     useEffect(() => {
@@ -241,53 +261,107 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800 flex flex-col pb-20 lg:pb-0">
             {/* Desktop Fixed Sidebar (>= 1024px) */}
-            <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 xl:w-72 flex-col border-r border-slate-200/90 bg-white">
+            <aside
+                className={`hidden lg:flex fixed inset-y-0 left-0 z-40 flex-col border-r border-slate-200/90 bg-white transition-all duration-200 ease-in-out ${
+                    sidebarCollapsed ? 'w-20' : 'w-64 xl:w-72'
+                }`}
+            >
                 {/* Brand Header */}
-                <div className="flex h-16 sm:h-20 items-center justify-between px-5 sm:px-6 border-b border-slate-100">
-                    <Link href={route('dashboard')} className="flex items-center gap-3 min-w-0">
-                        {pharmacy?.logo_url ? (
-                            <img
-                                src={pharmacy.logo_url}
-                                alt={pharmacy.name || 'Logo Apotek'}
-                                className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs shrink-0"
-                            />
-                        ) : (
-                            <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm shrink-0">
-                                <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
-                            </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                            <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight truncate">
-                                {pharmacy?.name || 'Apotek Sehat'}
-                            </div>
-                            <div className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
-                                {pharmacy?.tagline || 'Sistem Manajemen Mudah'}
-                            </div>
-                        </div>
-                    </Link>
+                <div
+                    className={`flex h-16 sm:h-20 items-center border-b border-slate-100 ${
+                        sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-5 sm:px-6'
+                    }`}
+                >
+                    {sidebarCollapsed ? (
+                        <button
+                            type="button"
+                            onClick={toggleSidebar}
+                            className="group flex flex-col items-center justify-center p-1.5 rounded-xl hover:bg-slate-100 text-slate-700 transition"
+                            title="Buka / Perlebar Sidebar"
+                        >
+                            {pharmacy?.logo_url ? (
+                                <img
+                                    src={pharmacy.logo_url}
+                                    alt={pharmacy.name || 'Logo Apotek'}
+                                    className="h-10 w-10 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs"
+                                />
+                            ) : (
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-lg shadow-sm">
+                                    <Pill className="h-5 w-5" />
+                                </div>
+                            )}
+                        </button>
+                    ) : (
+                        <>
+                            <Link href={route('dashboard')} className="flex items-center gap-3 min-w-0">
+                                {pharmacy?.logo_url ? (
+                                    <img
+                                        src={pharmacy.logo_url}
+                                        alt={pharmacy.name || 'Logo Apotek'}
+                                        className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs shrink-0"
+                                    />
+                                ) : (
+                                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm shrink-0">
+                                        <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
+                                    </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight truncate">
+                                        {pharmacy?.name || 'Apotek Sehat'}
+                                    </div>
+                                    <div className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
+                                        {pharmacy?.tagline || 'Sistem Manajemen Mudah'}
+                                    </div>
+                                </div>
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={toggleSidebar}
+                                className="p-1.5 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition shadow-xs"
+                                title="Ciutkan Sidebar"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {/* User Info Card (Clean Flat Design) */}
-                <div className="p-3.5 mx-3 sm:mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-base">
+                {sidebarCollapsed ? (
+                    <div className="py-3 px-2 flex justify-center border-b border-slate-100">
+                        <div
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-sm shadow-xs cursor-default"
+                            title={`${user.name} — ${currentRole.name}`}
+                        >
                             {user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs sm:text-sm font-bold text-slate-900 leading-tight">
-                                {user.name}
-                            </p>
-                            <span
-                                className={`inline-block mt-0.5 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-bold border ${currentRole.badge}`}
-                            >
-                                {currentRole.name}
-                            </span>
+                    </div>
+                ) : (
+                    <div className="p-3.5 mx-3 sm:mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-base">
+                                {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                                    {user.name}
+                                </p>
+                                <span
+                                    className={`inline-block mt-0.5 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-bold border ${currentRole.badge}`}
+                                >
+                                    {currentRole.name}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Sidebar Navigation Links */}
-                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+                <div
+                    className={`flex-1 overflow-y-auto py-2 space-y-3 ${
+                        sidebarCollapsed ? 'px-2' : 'px-4'
+                    }`}
+                >
                     {sidebarNavItems.map((group, gIdx) => {
                         const filtered = group.items.filter((item) =>
                             item.roles.includes(user.role),
@@ -296,39 +370,51 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         return (
                             <div key={gIdx} className="space-y-1">
-                                <div className="px-3 text-[11px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                    {group.section}
-                                </div>
+                                {sidebarCollapsed ? (
+                                    <div className="w-6 mx-auto border-t border-slate-200 my-2" />
+                                ) : (
+                                    <div className="px-3 text-[11px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                        {group.section}
+                                    </div>
+                                )}
                                 {filtered.map((item) => {
                                     const Icon = item.icon;
                                     return (
                                         <Link
                                             key={item.title}
                                             href={item.href}
-                                            onClick={() => setSidebarOpen(false)}
-                                            className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-all ${
+                                            title={sidebarCollapsed ? `${item.title} (${item.subtitle})` : undefined}
+                                            className={`flex items-center transition-all ${
+                                                sidebarCollapsed
+                                                    ? 'justify-center h-11 w-11 mx-auto rounded-xl'
+                                                    : 'gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold'
+                                            } ${
                                                 item.active
                                                     ? 'bg-emerald-600 text-white shadow-sm'
                                                     : 'text-slate-700 hover:bg-slate-100'
                                             }`}
                                         >
                                             <Icon
-                                                className={`h-5 w-5 shrink-0 ${
+                                                className={`shrink-0 ${
+                                                    sidebarCollapsed ? 'h-5 w-5' : 'h-5 w-5'
+                                                } ${
                                                     item.active ? 'text-white' : 'text-slate-400'
                                                 }`}
                                             />
-                                            <div className="min-w-0 flex-1">
-                                                <div className="truncate">{item.title}</div>
-                                                <div
-                                                    className={`text-[11px] font-normal truncate ${
-                                                        item.active
-                                                            ? 'text-emerald-100'
-                                                            : 'text-slate-400'
-                                                    }`}
-                                                >
-                                                    {item.subtitle}
+                                            {!sidebarCollapsed && (
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="truncate">{item.title}</div>
+                                                    <div
+                                                        className={`text-[11px] font-normal truncate ${
+                                                            item.active
+                                                                ? 'text-emerald-100'
+                                                                : 'text-slate-400'
+                                                        }`}
+                                                    >
+                                                        {item.subtitle}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </Link>
                                     );
                                 })}
@@ -338,21 +424,34 @@ export default function AuthenticatedLayout({ header, children }) {
                 </div>
 
                 {/* Sidebar Footer Logout */}
-                <div className="border-t border-slate-100 p-4">
+                <div
+                    className={`border-t border-slate-100 ${
+                        sidebarCollapsed ? 'p-2 flex justify-center' : 'p-4'
+                    }`}
+                >
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 hover:bg-rose-100 transition"
+                        title="Keluar Akun"
+                        className={`flex items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition ${
+                            sidebarCollapsed
+                                ? 'h-11 w-11'
+                                : 'w-full gap-2 px-4 py-3 text-sm font-bold'
+                        }`}
                     >
-                        <LogOut className="h-4 w-4" />
-                        <span>Keluar Akun</span>
+                        <LogOut className="h-4 w-4 shrink-0" />
+                        {!sidebarCollapsed && <span>Keluar Akun</span>}
                     </Link>
                 </div>
             </aside>
 
-            {/* Main Content Area (Mobile First: Full Width on mobile, offset on desktop) */}
-            <div className="flex-1 lg:pl-64 xl:pl-72 flex flex-col min-w-0">
+            {/* Main Content Area (Mobile First: Full Width on mobile, offset on desktop based on collapse state) */}
+            <div
+                className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ease-in-out ${
+                    sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64 xl:pl-72'
+                }`}
+            >
                 {/* Top Clean App Bar */}
                 <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
                     <div className="flex items-center gap-3">
@@ -373,7 +472,24 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {pharmacy?.name || 'Apotek Sehat'}
                             </span>
                         </div>
-                        <div className="hidden lg:block">{header}</div>
+
+                        {/* Desktop Sidebar Toggle & Page Header */}
+                        <div className="hidden lg:flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={toggleSidebar}
+                                className="p-2 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-emerald-700 transition shadow-xs"
+                                title={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
+                                aria-label={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
+                            >
+                                {sidebarCollapsed ? (
+                                    <PanelLeftOpen className="h-4 w-4" />
+                                ) : (
+                                    <PanelLeftClose className="h-4 w-4" />
+                                )}
+                            </button>
+                            {header}
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-3">
@@ -394,18 +510,6 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <span>Buka Kasir</span>
                             </Link>
                         )}
-
-                        {/* Quick Bottom Sheet Trigger for Mobile & Tablet */}
-                        <button
-                            type="button"
-                            onClick={() => setBottomSheetOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition lg:hidden shadow-xs active:scale-95"
-                            aria-label="Buka Semua Menu"
-                            title="Semua Menu"
-                        >
-                            <LayoutGrid className="h-4 w-4 text-emerald-600" />
-                            <span className="hidden sm:inline">Menu</span>
-                        </button>
 
                         {/* Quick Logout Button */}
                         <Link

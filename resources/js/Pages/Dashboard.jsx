@@ -187,22 +187,22 @@ export default function Dashboard({
             <Head title={`Beranda - ${pharmacy?.name || 'Apotek Sehat'}`} />
 
             <div className="py-2 sm:py-4 max-w-6xl mx-auto">
-                {/* Welcome Card Banner (Mobile First, Sleek on Desktop) */}
-                <div className="mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-4.5 sm:p-6 lg:p-6 shadow-xs relative overflow-hidden">
+                {/* Welcome Card Banner (Mobile First, Sleek & Precise) */}
+                <div className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden">
                     <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                     <div className="absolute -left-8 -bottom-8 w-44 h-44 rounded-full bg-white/5 blur-2xl pointer-events-none" />
 
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div className="relative z-10 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                             {pharmacy?.logo_url ? (
                                 <img
                                     src={pharmacy.logo_url}
                                     alt="Logo"
-                                    className="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-2xl bg-white p-1.5 shadow-xs shrink-0 border border-white/20"
+                                    className="h-11 w-11 sm:h-13 sm:w-13 object-contain rounded-xl sm:rounded-2xl bg-white p-1 shadow-xs shrink-0 border border-white/20"
                                 />
                             ) : (
-                                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0">
-                                    <Store className="h-6 w-6 sm:h-7 sm:w-7" />
+                                <div className="h-11 w-11 sm:h-13 sm:w-13 rounded-xl sm:rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0">
+                                    <Store className="h-5 w-5 sm:h-6 sm:w-6" />
                                 </div>
                             )}
                             <div className="min-w-0 flex-1">
@@ -215,39 +215,14 @@ export default function Dashboard({
                                         Online
                                     </span>
                                 </div>
-                                <h2 className="text-base sm:text-xl lg:text-2xl font-black text-white tracking-tight mt-1 truncate">
+                                <h2 className="text-sm sm:text-lg lg:text-xl font-black text-white tracking-tight mt-0.5 truncate">
                                     Selamat Datang, {user.name}
                                 </h2>
-                                <p className="text-xs text-emerald-100/90 font-medium mt-0.5 truncate">
+                                <p className="text-[11px] sm:text-xs text-emerald-100/90 font-medium truncate">
                                     {pharmacy?.name || 'Apotek Sehat'} • {todayFormatted}
                                 </p>
                             </div>
                         </div>
-
-                        {/* Quick alert badge if any issues require attention */}
-                        {(stats?.lowStockCount > 0 || (expiringBatches && expiringBatches.length > 0)) &&
-                            ['admin', 'operator'].includes(user.role) && (
-                                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                                    {stats?.lowStockCount > 0 && (
-                                        <Link
-                                            href={route('medicines.index', { status: 'low_stock' })}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/95 hover:bg-amber-500 text-white text-xs font-bold shadow-xs transition backdrop-blur-sm"
-                                        >
-                                            <AlertTriangle className="h-3.5 w-3.5" />
-                                            <span>{stats.lowStockCount} Menipis</span>
-                                        </Link>
-                                    )}
-                                    {expiringBatches && expiringBatches.length > 0 && (
-                                        <Link
-                                            href={route('expiries.index')}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/95 hover:bg-rose-500 text-white text-xs font-bold shadow-xs transition backdrop-blur-sm"
-                                        >
-                                            <ShieldAlert className="h-3.5 w-3.5" />
-                                            <span>{expiringBatches.length} Kadaluarsa</span>
-                                        </Link>
-                                    )}
-                                </div>
-                            )}
                     </div>
                 </div>
 
@@ -281,7 +256,7 @@ export default function Dashboard({
                                         {/* Notification / Alert Pill */}
                                         {item.badge && (
                                             <span
-                                                className={`absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black shadow-sm ${
+                                                className={`absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black shadow-xs ring-2 ring-white z-10 ${
                                                     item.badgeColor || 'bg-rose-600 text-white'
                                                 }`}
                                             >

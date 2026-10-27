@@ -18,6 +18,7 @@ import {
     ShoppingCart,
     User,
     Users,
+    Wallet,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -178,6 +179,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     href: route('reports.index'),
                     active: route().current('reports.*'),
                     icon: FileBarChart2,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Keuangan & Arus Kas',
+                    subtitle: 'Buku kas & pengeluaran',
+                    href: route('finance.index'),
+                    active: route().current('finance.*'),
+                    icon: Wallet,
                     roles: ['admin', 'operator'],
                 },
                 {

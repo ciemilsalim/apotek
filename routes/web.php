@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpiryController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrescriptionController;
@@ -78,6 +79,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');
             Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+        });
+
+        // Finance & Cash Flow (Manajemen Keuangan & Arus Kas)
+        Route::prefix('finance')->name('finance.')->group(function () {
+            Route::get('/', [FinanceController::class, 'index'])->name('index');
+            Route::post('/', [FinanceController::class, 'store'])->name('store');
+            Route::delete('/{transaction}', [FinanceController::class, 'destroy'])->name('destroy');
+            Route::get('/export/pdf', [FinanceController::class, 'exportPdf'])->name('export.pdf');
+            Route::get('/export/excel', [FinanceController::class, 'exportExcel'])->name('export.excel');
         });
     });
 

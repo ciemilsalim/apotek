@@ -56,4 +56,28 @@ class MedicineBatch extends Model
     {
         return $this->expiry_date && $this->expiry_date->isFuture() && $this->expiry_date->lte(Carbon::now()->addMonths($months));
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('current_stock', '>', 0);
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiry_date', '<', Carbon::today()->format('Y-m-d'));
+    }
+
+    public function scopeCritical($query, int $days = 30)
+    {
+        $today = Carbon::today()->format('Y-m-d');
+        $limit = Carbon::today()->addDays($days)->format('Y-m-d');
+        return $query->where('expiry_date', '>=', $today)->where('expiry_date', '<=', $limit);
+    }
+
+    public function scopeExpiringSoon($query, int $days = 90)
+    {
+        $today = Carbon::today()->format('Y-m-d');
+        $limit = Carbon::today()->addDays($days)->format('Y-m-d');
+        return $query->where('expiry_date', '>=', $today)->where('expiry_date', '<=', $limit);
+    }
 }

@@ -379,9 +379,19 @@ export default function Dashboard({
                                     <Clock className="h-4 w-4 text-rose-600" />
                                     <span>Batch Dekat Kadaluarsa</span>
                                 </h3>
-                                <span className="rounded-full bg-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-800">
-                                    {expiringBatches.length} Batch
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="rounded-full bg-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-800">
+                                        {expiringBatches.length} Batch
+                                    </span>
+                                    {['admin', 'operator'].includes(user.role) && (
+                                        <Link
+                                            href={route('expiries.index')}
+                                            className="text-xs font-bold text-rose-700 hover:underline"
+                                        >
+                                            Kelola
+                                        </Link>
+                                    )}
+                                </div>
                             </div>
                             <div className="space-y-2.5">
                                 {expiringBatches.map((batch) => {

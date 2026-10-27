@@ -90,7 +90,26 @@ class PosController extends Controller
                         throw new Exception("Obat dengan ID {$item['medicine_id']} tidak ditemukan.");
                     }
 
-                    if ($medicine->stock < $item['quantity']) {
+                    // Ensure legacy unbatched stock has a batch row
+                    if ($medicine->batches()->count() === 0 && $medicine->stock > 0) {
+                        MedicineBatch::create([
+                            'medicine_id' => $medicine->id,
+                            'batch_number' => 'LOT-INIT-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $medicine->code), 0, 4)),
+                            'expiry_date' => $medicine->expiry_date ?: Carbon::now()->addYear()->format('Y-m-d'),
+                            'initial_stock' => $medicine->stock,
+                            'current_stock' => $medicine->stock,
+                            'buy_price' => $medicine->buy_price,
+                            'notes' => 'Batch inisialisasi otomatis kasir',
+                        ]);
+                    }
+
+                    // Verify saleable (non-expired) stock
+                    $saleableStock = (int) $medicine->saleableBatches()->sum('current_stock');
+                    if ($saleableStock < $item['quantity']) {
+                        $expiredCount = (int) $medicine->expiredBatches()->sum('current_stock');
+                        if ($expiredCount > 0) {
+                            throw new Exception("Stok layak jual untuk '{$medicine->name}' tidak mencukupi (stok layak jual: {$saleableStock}, terdapat {$expiredCount} unit kadaluarsa).");
+                        }
                         throw new Exception("Stok untuk {$medicine->name} tidak mencukupi (sisa: {$medicine->stock}, diminta: {$item['quantity']}).");
                     }
 
@@ -162,8 +181,8 @@ class PosController extends Controller
                         ]);
                     }
 
-                    // Fetch active batches sorted by earliest expiry date (FEFO)
-                    $batches = $med->activeBatches()->lockForUpdate()->get();
+                    // Fetch saleable (non-expired) batches sorted by earliest expiry date (FEFO)
+                    $batches = $med->saleableBatches()->lockForUpdate()->get();
 
                     if ($batches->isNotEmpty()) {
                         foreach ($batches as $batch) {

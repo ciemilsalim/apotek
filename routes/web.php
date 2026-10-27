@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpiryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProfileController;
@@ -51,6 +52,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{medicine}/adjust-stock', [MedicineController::class, 'adjustStock'])->name('adjust-stock');
             Route::post('/{medicine}/batches', [MedicineController::class, 'storeBatch'])->name('batches.store');
             Route::get('/adjustments/history', [MedicineController::class, 'adjustmentsHistory'])->name('adjustments');
+        });
+
+        // Expiry Monitoring & Alerts (Peringatan & Karantina Obat Kadaluarsa)
+        Route::prefix('expiries')->name('expiries.')->group(function () {
+            Route::get('/', [ExpiryController::class, 'index'])->name('index');
+            Route::post('/{batch}/quarantine', [ExpiryController::class, 'quarantine'])->name('quarantine');
+            Route::get('/export', [ExpiryController::class, 'export'])->name('export');
         });
 
         // Reports (Daily, Monthly, PDF, Excel)

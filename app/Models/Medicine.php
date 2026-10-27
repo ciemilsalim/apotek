@@ -62,6 +62,22 @@ class Medicine extends Model
         return $this->hasMany(MedicineBatch::class)->where('current_stock', '>', 0)->orderBy('expiry_date', 'asc');
     }
 
+    public function saleableBatches(): HasMany
+    {
+        return $this->hasMany(MedicineBatch::class)
+            ->where('current_stock', '>', 0)
+            ->where('expiry_date', '>=', \Carbon\Carbon::today()->format('Y-m-d'))
+            ->orderBy('expiry_date', 'asc');
+    }
+
+    public function expiredBatches(): HasMany
+    {
+        return $this->hasMany(MedicineBatch::class)
+            ->where('current_stock', '>', 0)
+            ->where('expiry_date', '<', \Carbon\Carbon::today()->format('Y-m-d'))
+            ->orderBy('expiry_date', 'asc');
+    }
+
     public function syncStockFromBatches(): void
     {
         $total = (int) $this->batches()->sum('current_stock');

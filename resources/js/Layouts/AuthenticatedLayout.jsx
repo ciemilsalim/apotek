@@ -2,6 +2,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
+    AlertTriangle,
     CheckCircle2,
     ClipboardList,
     FileBarChart2,
@@ -139,6 +140,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     href: route('categories.index'),
                     active: route().current('categories.index'),
                     icon: Layers,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Monitoring Kadaluarsa',
+                    subtitle: 'Peringatan & karantina batch',
+                    href: route('expiries.index'),
+                    active: route().current('expiries.*'),
+                    icon: AlertTriangle,
                     roles: ['admin', 'operator'],
                 },
                 {

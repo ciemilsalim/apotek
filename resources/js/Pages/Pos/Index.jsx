@@ -43,6 +43,10 @@ export default function PosIndex({
     const [lastCompletedSale, setLastCompletedSale] = useState(null);
     const [barcodeFeedback, setBarcodeFeedback] = useState(null);
     const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
+    const [autoPrintThermal, setAutoPrintThermal] = useState(() => {
+        const saved = localStorage.getItem('apotek_pos_auto_print');
+        return saved !== null ? saved === 'true' : true;
+    });
 
     const searchInputRef = useRef(null);
 
@@ -81,8 +85,29 @@ export default function PosIndex({
         if (flash?.completed_sale) {
             setLastCompletedSale(flash.completed_sale);
             setReceiptModalOpen(true);
+
+            // 1. Bersihkan seluruh layar kasir dari transaksi tersebut
             setCart([]);
+            setSelectedPrescription(null);
+            setSearch('');
+            setData({
+                customer_name: 'Pelanggan Umum',
+                payment_method: 'cash',
+                cash_paid: '',
+                discount: 0,
+                notes: '',
+                prescription_id: null,
+                items: [],
+            });
             setCartDrawerOpen(false);
+
+            // 2. Otomatis cetak nota/kwitansi di printer termal saat berhasil bayar
+            if (autoPrintThermal) {
+                const printTimer = setTimeout(() => {
+                    window.print();
+                }, 350);
+                return () => clearTimeout(printTimer);
+            }
         }
     }, [flash]);
 
@@ -344,16 +369,39 @@ export default function PosIndex({
                 cash_paid: data.payment_method === 'cash' ? cashPaid : totalAmount,
                 discount: discount,
                 notes: data.notes,
+                prescription_id: data.prescription_id,
                 items: formattedItems,
             },
             {
-                onSuccess: () => {},
+                onSuccess: () => {
+                    // Bersihkan layar kasir seketika
+                    setCart([]);
+                    setSelectedPrescription(null);
+                    setSearch('');
+                    setData({
+                        customer_name: 'Pelanggan Umum',
+                        payment_method: 'cash',
+                        cash_paid: '',
+                        discount: 0,
+                        notes: '',
+                        prescription_id: null,
+                        items: [],
+                    });
+                    setCartDrawerOpen(false);
+                },
             },
         );
     };
 
     const handlePrintThermal = () => {
         window.print();
+    };
+
+    const handleCloseReceiptModal = () => {
+        setReceiptModalOpen(false);
+        setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 150);
     };
 
     // Shared Cart & Payment Component (Handles both Desktop Sidebar and Mobile Checkout Modal)
@@ -993,14 +1041,44 @@ export default function PosIndex({
             {/* Instant Receipt Popup Modal with Thermal Printer Support */}
             <Modal
                 show={receiptModalOpen}
-                onClose={() => {
-                    setReceiptModalOpen(false);
-                    searchInputRef.current?.focus();
-                }}
+                onClose={handleCloseReceiptModal}
                 maxWidth="sm"
             >
                 {lastCompletedSale && (
                     <div className="flex flex-col max-h-[88vh] text-slate-900">
+                        {/* Thermal Print CSS */}
+                        <style dangerouslySetInnerHTML={{ __html: `
+                            @media print {
+                                @page {
+                                    size: ${paperSize === '80mm' ? '80mm auto' : '58mm auto'};
+                                    margin: 0;
+                                }
+                                body {
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                    background: #fff !important;
+                                }
+                                /* Sembunyikan seluruh UI layar saat mencetak */
+                                body * {
+                                    visibility: hidden !important;
+                                }
+                                #thermal-receipt, #thermal-receipt * {
+                                    visibility: visible !important;
+                                }
+                                #thermal-receipt {
+                                    position: fixed !important;
+                                    left: 0 !important;
+                                    top: 0 !important;
+                                    width: ${paperSize === '80mm' ? '80mm' : '58mm'} !important;
+                                    margin: 0 !important;
+                                    padding: 2mm !important;
+                                    box-shadow: none !important;
+                                    border: none !important;
+                                    background: white !important;
+                                }
+                            }
+                        ` }} />
+
                         {/* Header & Thermal Printer Paper Size Selector */}
                         <div className="shrink-0 p-4 border-b border-slate-200 bg-white">
                             <div className="flex items-center justify-between mb-3">
@@ -1008,16 +1086,18 @@ export default function PosIndex({
                                     <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
                                         <CheckCircle2 className="h-4 w-4" />
                                     </div>
-                                    <span className="font-extrabold text-sm text-slate-900">
-                                        Transaksi Berhasil
-                                    </span>
+                                    <div>
+                                        <span className="font-extrabold text-sm text-slate-900 block leading-tight">
+                                            Transaksi Berhasil!
+                                        </span>
+                                        <span className="text-[10px] text-emerald-600 font-bold">
+                                            {autoPrintThermal ? 'Struk otomatis dicetak ke printer termal' : 'Struk siap dicetak'}
+                                        </span>
+                                    </div>
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setReceiptModalOpen(false);
-                                        searchInputRef.current?.focus();
-                                    }}
+                                    onClick={handleCloseReceiptModal}
                                     className="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                                 >
                                     <X className="h-4 w-4" />
@@ -1052,6 +1132,28 @@ export default function PosIndex({
                                         80 mm (Standar)
                                     </button>
                                 </div>
+                            </div>
+
+                            {/* Auto-print Toggle Switch */}
+                            <div className="no-print mt-2 flex items-center justify-between px-1">
+                                <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600">
+                                    <input
+                                        type="checkbox"
+                                        checked={autoPrintThermal}
+                                        onChange={(e) => {
+                                            const val = e.target.checked;
+                                            setAutoPrintThermal(val);
+                                            localStorage.setItem('apotek_pos_auto_print', val);
+                                        }}
+                                        className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                    />
+                                    <span>Cetak Otomatis saat Bayar</span>
+                                </label>
+                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                    autoPrintThermal ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                                }`}>
+                                    {autoPrintThermal ? 'Aktif' : 'Manual'}
+                                </span>
                             </div>
                         </div>
 
@@ -1163,10 +1265,7 @@ export default function PosIndex({
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setReceiptModalOpen(false);
-                                    searchInputRef.current?.focus();
-                                }}
+                                onClick={handleCloseReceiptModal}
                                 className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-black text-white hover:bg-emerald-700 active:scale-95 transition"
                             >
                                 Transaksi Baru

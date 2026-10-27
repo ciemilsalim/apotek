@@ -18,19 +18,28 @@ import {
     Receipt,
     Search,
     ShoppingCart,
+    Stethoscope,
     Trash2,
     Volume2,
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function PosIndex({ medicines, categories, recentSales, filters }) {
+export default function PosIndex({
+    medicines,
+    categories,
+    recentSales,
+    filters,
+    readyPrescriptions = [],
+}) {
     const { flash } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [selectedCategory, setSelectedCategory] = useState(filters.category_id || '');
     const [cart, setCart] = useState([]);
     const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
     const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+    const [prescriptionModalOpen, setPrescriptionModalOpen] = useState(false);
+    const [selectedPrescription, setSelectedPrescription] = useState(null);
     const [lastCompletedSale, setLastCompletedSale] = useState(null);
     const [barcodeFeedback, setBarcodeFeedback] = useState(null);
     const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
@@ -83,8 +92,58 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
         cash_paid: '',
         discount: 0,
         notes: '',
+        prescription_id: null,
         items: [],
     });
+
+    const loadPrescriptionToCart = (rx) => {
+        setSelectedPrescription(rx);
+        setData((prev) => ({
+            ...prev,
+            customer_name: rx.patient_name,
+            prescription_id: rx.id,
+        }));
+
+        // Flatten all ingredients across all formula items in this prescription
+        const newCartItems = [];
+        rx.items?.forEach((item) => {
+            item.ingredients?.forEach((ing) => {
+                const med = ing.medicine || medicines.find((m) => m.id === ing.medicine_id);
+                if (med) {
+                    const existing = newCartItems.find((c) => c.id === med.id);
+                    if (existing) {
+                        existing.quantity += ing.quantity;
+                    } else {
+                        newCartItems.push({
+                            id: med.id,
+                            code: med.code,
+                            name: med.name,
+                            unit: med.unit,
+                            price: parseFloat(ing.price || med.sell_price),
+                            stock: med.stock,
+                            quantity: ing.quantity,
+                        });
+                    }
+                }
+            });
+        });
+
+        if (newCartItems.length > 0) {
+            setCart(newCartItems);
+            playBeep();
+        }
+
+        setPrescriptionModalOpen(false);
+    };
+
+    const clearPrescription = () => {
+        setSelectedPrescription(null);
+        setData((prev) => ({
+            ...prev,
+            customer_name: 'Pelanggan Umum',
+            prescription_id: null,
+        }));
+    };
 
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('id-ID', {
@@ -353,6 +412,28 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     isModal ? 'p-4 sm:p-5 space-y-4' : 'my-3 space-y-3'
                 }`}
             >
+                {/* Prescription Active Banner */}
+                {selectedPrescription && (
+                    <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-between text-xs">
+                        <div className="min-w-0 flex-1">
+                            <span className="font-bold text-teal-900 block truncate">
+                                Menebus Resep #{selectedPrescription.prescription_number}
+                            </span>
+                            <span className="text-[11px] text-teal-700 block truncate">
+                                Pasien: {selectedPrescription.patient_name} • Dokter: {selectedPrescription.doctor_name}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={clearPrescription}
+                            className="rounded-lg p-1 text-teal-500 hover:text-rose-600 hover:bg-teal-100/50"
+                            title="Batalkan Penebusan Resep Ini"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+                )}
+
                 {/* Customer Name */}
                 <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -589,13 +670,29 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             Scan barcode atau cari nama obat untuk langsung menambahkan ke keranjang
                         </p>
                     </div>
-                    <Link
-                        href={route('pos.history')}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
-                    >
-                        <Receipt className="h-4 w-4" />
-                        <span>Riwayat Struk</span>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setPrescriptionModalOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-teal-700 shadow-xs transition active:scale-[0.98]"
+                        >
+                            <Stethoscope className="h-4 w-4" />
+                            <span>Tebus Resep</span>
+                            {readyPrescriptions.length > 0 && (
+                                <span className="rounded-full bg-white text-teal-800 text-[10px] font-black px-1.5 py-0.2">
+                                    {readyPrescriptions.length}
+                                </span>
+                            )}
+                        </button>
+
+                        <Link
+                            href={route('pos.history')}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
+                        >
+                            <Receipt className="h-4 w-4" />
+                            <span>Riwayat Struk</span>
+                        </Link>
+                    </div>
                 </div>
             }
         >
@@ -1077,6 +1174,77 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                         </div>
                     </div>
                 )}
+            </Modal>
+
+            {/* Modal Pilih Resep Dokter */}
+            <Modal show={prescriptionModalOpen} onClose={() => setPrescriptionModalOpen(false)} maxWidth="2xl">
+                <div className="p-6">
+                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                        <div className="flex items-center gap-2 text-teal-700">
+                            <Stethoscope className="h-5 w-5" />
+                            <h2 className="text-base font-extrabold text-slate-900">
+                                Pilih Resep Dokter untuk Ditebus
+                            </h2>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setPrescriptionModalOpen(false)}
+                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                        {readyPrescriptions && readyPrescriptions.length > 0 ? (
+                            readyPrescriptions.map((rx) => (
+                                <div
+                                    key={rx.id}
+                                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-mono text-xs font-black text-teal-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                                {rx.prescription_number}
+                                            </span>
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                                rx.status === 'processed' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
+                                            }`}>
+                                                {rx.status === 'processed' ? 'Siap Ditebus' : 'Menunggu Diracik'}
+                                            </span>
+                                        </div>
+                                        <div className="font-black text-sm text-slate-900 mt-1">
+                                            {rx.patient_name} {rx.patient_age && `(${rx.patient_age})`}
+                                        </div>
+                                        <div className="text-xs text-slate-500">
+                                            Dokter: <span className="font-semibold text-slate-700">{rx.doctor_name}</span> • Tgl: {rx.prescription_date}
+                                        </div>
+                                        <div className="text-xs font-medium text-slate-600 mt-1">
+                                            Formula: {rx.items?.map((it) => it.racikan_name).join(', ')}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+                                        <span className="font-black text-sm text-teal-700">
+                                            {formatCurrency(rx.grand_total)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => loadPrescriptionToCart(rx)}
+                                            className="rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700 transition active:scale-[0.98]"
+                                        >
+                                            Muat ke Kasir
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-12 text-center text-xs text-slate-400">
+                                Tidak ada resep dokter yang menunggu penebusan saat ini.
+                            </div>
+                        )}
+                    </div>
+                </div>
             </Modal>
         </AuthenticatedLayout>
     );

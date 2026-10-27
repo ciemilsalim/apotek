@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpiryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
@@ -59,6 +60,17 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [ExpiryController::class, 'index'])->name('index');
             Route::post('/{batch}/quarantine', [ExpiryController::class, 'quarantine'])->name('quarantine');
             Route::get('/export', [ExpiryController::class, 'export'])->name('export');
+        });
+
+        // Prescriptions & Compounding (Resep Dokter & Obat Racikan)
+        Route::prefix('prescriptions')->name('prescriptions.')->group(function () {
+            Route::get('/', [PrescriptionController::class, 'index'])->name('index');
+            Route::get('/create', [PrescriptionController::class, 'create'])->name('create');
+            Route::post('/', [PrescriptionController::class, 'store'])->name('store');
+            Route::get('/{prescription}', [PrescriptionController::class, 'show'])->name('show');
+            Route::patch('/{prescription}/status', [PrescriptionController::class, 'updateStatus'])->name('update-status');
+            Route::get('/{prescription}/etiket', [PrescriptionController::class, 'etiket'])->name('etiket');
+            Route::delete('/{prescription}', [PrescriptionController::class, 'destroy'])->name('destroy');
         });
 
         // Reports (Daily, Monthly, PDF, Excel)

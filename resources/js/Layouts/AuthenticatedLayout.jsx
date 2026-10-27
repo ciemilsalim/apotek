@@ -6,6 +6,7 @@ import {
     CheckCircle2,
     ClipboardList,
     FileBarChart2,
+    FileText,
     History,
     Home,
     Layers,
@@ -148,6 +149,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     href: route('expiries.index'),
                     active: route().current('expiries.*'),
                     icon: AlertTriangle,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Resep & Racikan Dokter',
+                    subtitle: 'Kelola formula & etiket',
+                    href: route('prescriptions.index'),
+                    active: route().current('prescriptions.*'),
+                    icon: FileText,
                     roles: ['admin', 'operator'],
                 },
                 {

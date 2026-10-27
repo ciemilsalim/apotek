@@ -22,6 +22,7 @@ class Sale extends Model
         'cash_paid',
         'change_amount',
         'notes',
+        'prescription_id',
     ];
 
     protected function casts(): array
@@ -38,6 +39,11 @@ class Sale extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function prescription(): BelongsTo
+    {
+        return $this->belongsTo(Prescription::class);
     }
 
     public function items(): HasMany

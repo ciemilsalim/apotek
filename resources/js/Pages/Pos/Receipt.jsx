@@ -159,6 +159,18 @@ export default function PosReceipt({ sale }) {
                             <span>Pelanggan:</span>
                             <span className="font-bold">{sale.customer_name}</span>
                         </div>
+                        {sale.prescription && (
+                            <>
+                                <div className="flex justify-between">
+                                    <span>No. Resep:</span>
+                                    <span className="font-bold">{sale.prescription.prescription_number}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Dokter:</span>
+                                    <span className="font-bold">{sale.prescription.doctor_name}</span>
+                                </div>
+                            </>
+                        )}
                         <div className="flex justify-between">
                             <span>Pembayaran:</span>
                             <span className="font-bold uppercase">{sale.payment_method}</span>

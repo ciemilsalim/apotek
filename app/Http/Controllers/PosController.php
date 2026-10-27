@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Medicine;
 use App\Models\MedicineBatch;
+use App\Models\Prescription;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\StockAdjustment;
@@ -48,10 +49,17 @@ class PosController extends Controller
             ->take(5)
             ->get();
 
+        // Ready prescriptions waiting to be redeemed at POS
+        $readyPrescriptions = Prescription::with(['items.ingredients.medicine'])
+            ->whereIn('status', ['pending', 'processed'])
+            ->orderBy('id', 'desc')
+            ->get();
+
         return Inertia::render('Pos/Index', [
             'medicines' => $medicines,
             'categories' => $categories,
             'recentSales' => $recentSales,
+            'readyPrescriptions' => $readyPrescriptions,
             'filters' => [
                 'search' => $search,
                 'category_id' => $categoryId,
@@ -67,6 +75,7 @@ class PosController extends Controller
             'cash_paid' => ['required', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'prescription_id' => ['nullable', 'exists:prescriptions,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.medicine_id' => ['required', 'exists:medicines,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -147,6 +156,14 @@ class PosController extends Controller
 
                 $invoiceNumber = "INV-{$datePrefix}-{$seq}";
 
+                $prescription = null;
+                if (!empty($validated['prescription_id'])) {
+                    $prescription = Prescription::findOrFail($validated['prescription_id']);
+                    if ($prescription->status === 'completed') {
+                        throw new Exception("Resep dokter {$prescription->prescription_number} sudah pernah ditebus.");
+                    }
+                }
+
                 // 3. Create Sale record
                 $sale = Sale::create([
                     'invoice_number' => $invoiceNumber,
@@ -159,6 +176,7 @@ class PosController extends Controller
                     'cash_paid' => $validated['payment_method'] === 'cash' ? $cashPaid : $totalAmount,
                     'change_amount' => $changeAmount,
                     'notes' => $validated['notes'] ?? null,
+                    'prescription_id' => $prescription?->id,
                 ]);
 
                 // 4. Create SaleItems and update stock via FEFO (First Expired, First Out)
@@ -270,7 +288,15 @@ class PosController extends Controller
                     }
                 }
 
-                return $sale->load(['items', 'user:id,name']);
+                if ($prescription) {
+                    $prescription->update([
+                        'status' => 'completed',
+                        'sale_id' => $sale->id,
+                        'processed_by' => $user->id,
+                    ]);
+                }
+
+                return $sale->load(['items', 'user:id,name', 'prescription']);
             });
 
             return redirect()->route('pos.index')
@@ -286,7 +312,7 @@ class PosController extends Controller
         $search = $request->input('search');
         $date = $request->input('date');
 
-        $query = Sale::with(['user:id,name', 'items'])
+        $query = Sale::with(['user:id,name', 'items', 'prescription:id,prescription_number,doctor_name,patient_name'])
             ->when($search, function ($q, $search) {
                 $q->where(function ($sub) use ($search) {
                     $sub->where('invoice_number', 'like', "%{$search}%")
@@ -315,7 +341,11 @@ class PosController extends Controller
 
     public function show(Sale $sale): Response
     {
-        $sale->load(['items', 'user:id,name']);
+        $sale->load([
+            'items',
+            'user:id,name',
+            'prescription:id,prescription_number,doctor_name,doctor_sip,patient_name,patient_age,type,service_fee',
+        ]);
 
         return Inertia::render('Pos/Receipt', [
             'sale' => $sale,

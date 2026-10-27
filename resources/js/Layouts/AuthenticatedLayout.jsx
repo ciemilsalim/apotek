@@ -4,6 +4,7 @@ import {
     AlertCircle,
     AlertTriangle,
     CheckCircle2,
+    ChevronRight,
     ClipboardList,
     FileBarChart2,
     FileText,
@@ -11,6 +12,7 @@ import {
     Home,
     Layers,
     LayoutDashboard,
+    LayoutGrid,
     LogOut,
     Menu,
     Pill,
@@ -23,13 +25,30 @@ import {
     Wallet,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const { auth, flash, pharmacy } = usePage().props;
     const user = auth.user;
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
     const [dismissFlash, setDismissFlash] = useState(false);
+
+    // Prevent background scrolling and enable Escape to close when bottom sheet is active
+    useEffect(() => {
+        if (bottomSheetOpen) {
+            document.body.style.overflow = 'hidden';
+            const handleKeyDown = (e) => {
+                if (e.key === 'Escape') setBottomSheetOpen(false);
+            };
+            window.addEventListener('keydown', handleKeyDown);
+            return () => {
+                document.body.style.overflow = 'unset';
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [bottomSheetOpen]);
 
     // Human-friendly role naming for non-technical users
     const roleLabels = {
@@ -221,20 +240,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800 flex flex-col pb-20 lg:pb-0">
-            {/* Mobile Drawer Overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* Sidebar (Desktop & Tablet Slide-over) */}
-            <aside
-                className={`fixed inset-y-0 left-0 z-50 flex w-72 lg:w-64 xl:w-72 flex-col border-r border-slate-200/90 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
-            >
+            {/* Desktop Fixed Sidebar (>= 1024px) */}
+            <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 xl:w-72 flex-col border-r border-slate-200/90 bg-white">
                 {/* Brand Header */}
                 <div className="flex h-16 sm:h-20 items-center justify-between px-5 sm:px-6 border-b border-slate-100">
                     <Link href={route('dashboard')} className="flex items-center gap-3 min-w-0">
@@ -258,13 +265,6 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </div>
                     </Link>
-                    <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden"
-                        aria-label="Tutup Menu"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
                 </div>
 
                 {/* User Info Card (Clean Flat Design) */}
@@ -356,14 +356,8 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* Top Clean App Bar */}
                 <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="rounded-2xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100 lg:hidden"
-                            aria-label="Buka Menu Samping"
-                        >
-                            <Menu className="h-5 w-5" />
-                        </button>
-                        <div className="flex items-center gap-2 lg:hidden">
+                        {/* Mobile & Tablet Clean Brand Header (No hamburger icon) */}
+                        <div className="flex items-center gap-2.5 lg:hidden">
                             {pharmacy?.logo_url ? (
                                 <img
                                     src={pharmacy.logo_url}
@@ -375,7 +369,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Pill className="h-5 w-5" />
                                 </div>
                             )}
-                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[200px]">
+                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[220px]">
                                 {pharmacy?.name || 'Apotek Sehat'}
                             </span>
                         </div>
@@ -400,6 +394,18 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <span>Buka Kasir</span>
                             </Link>
                         )}
+
+                        {/* Quick Bottom Sheet Trigger for Mobile & Tablet */}
+                        <button
+                            type="button"
+                            onClick={() => setBottomSheetOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition lg:hidden shadow-xs active:scale-95"
+                            aria-label="Buka Semua Menu"
+                            title="Semua Menu"
+                        >
+                            <LayoutGrid className="h-4 w-4 text-emerald-600" />
+                            <span className="hidden sm:inline">Menu</span>
+                        </button>
 
                         {/* Quick Logout Button */}
                         <Link
@@ -489,18 +495,184 @@ export default function AuthenticatedLayout({ header, children }) {
                             </Link>
                         );
                     })}
-                    {/* More button on mobile to open drawer */}
+                    {/* Bottom Sheet Menu Launcher */}
                     <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-slate-500 hover:text-slate-800 font-medium"
+                        type="button"
+                        onClick={() => setBottomSheetOpen(true)}
+                        className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all ${
+                            bottomSheetOpen
+                                ? 'text-emerald-700 font-extrabold'
+                                : 'text-slate-500 hover:text-slate-800 font-medium'
+                        }`}
+                        aria-label="Buka Semua Menu"
                     >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl">
-                            <Menu className="h-5 w-5" />
+                        <div
+                            className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
+                                bottomSheetOpen ? 'bg-emerald-100 text-emerald-700' : ''
+                            }`}
+                        >
+                            <LayoutGrid className="h-5 w-5" />
                         </div>
-                        <span className="text-[11px] mt-0.5 tracking-tight">Lainnya</span>
+                        <span className="text-[11px] mt-0.5 tracking-tight font-semibold">
+                            Menu
+                        </span>
                     </button>
                 </div>
             </nav>
+
+            {/* Mobile & Tablet Bottom Sheet Menu */}
+            {bottomSheetOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-backdrop-fade-in"
+                        onClick={() => setBottomSheetOpen(false)}
+                    />
+
+                    {/* Sheet Container */}
+                    <div className="fixed inset-x-0 bottom-0 z-50 w-full max-w-xl mx-auto bg-white rounded-t-3xl shadow-2xl border-t border-slate-200/90 flex flex-col max-h-[85vh] animate-sheet-slide-up">
+                        {/* Drag / Pull Handle */}
+                        <div
+                            className="py-2.5 flex items-center justify-center shrink-0 cursor-pointer"
+                            onClick={() => setBottomSheetOpen(false)}
+                        >
+                            <div className="w-12 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400 transition" />
+                        </div>
+
+                        {/* Sheet Header */}
+                        <div className="px-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-3 min-w-0">
+                                {pharmacy?.logo_url ? (
+                                    <img
+                                        src={pharmacy.logo_url}
+                                        alt={pharmacy.name || 'Logo Apotek'}
+                                        className="h-10 w-10 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs shrink-0"
+                                    />
+                                ) : (
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold shrink-0">
+                                        <Pill className="h-5 w-5" />
+                                    </div>
+                                )}
+                                <div className="min-w-0">
+                                    <h3 className="text-sm font-extrabold text-slate-900 leading-tight truncate">
+                                        Semua Menu & Layanan
+                                    </h3>
+                                    <p className="text-[11px] text-slate-500 font-medium truncate">
+                                        {pharmacy?.name || 'Apotek Sehat'} • Akses Lengkap
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setBottomSheetOpen(false)}
+                                className="rounded-full p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition shrink-0"
+                                aria-label="Tutup Menu"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* User Profile Info Strip */}
+                        <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white font-black text-xs">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="truncate text-xs font-bold text-slate-900 leading-tight">
+                                        {user.name}
+                                    </p>
+                                    <span className="text-[10px] text-slate-500 truncate block">
+                                        {user.email}
+                                    </span>
+                                </div>
+                            </div>
+                            <span className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border shrink-0 ${currentRole.badge}`}>
+                                {currentRole.name}
+                            </span>
+                        </div>
+
+                        {/* Scrollable Navigation Menu List */}
+                        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+                            {sidebarNavItems.map((group, gIdx) => {
+                                const filtered = group.items.filter((item) =>
+                                    item.roles.includes(user.role),
+                                );
+                                if (filtered.length === 0) return null;
+
+                                return (
+                                    <div key={gIdx} className="space-y-1.5">
+                                        <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-1">
+                                            {group.section}
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                            {filtered.map((item) => {
+                                                const Icon = item.icon;
+                                                return (
+                                                    <Link
+                                                        key={item.title}
+                                                        href={item.href}
+                                                        onClick={() => setBottomSheetOpen(false)}
+                                                        className={`flex items-center justify-between p-3 rounded-2xl transition active:scale-[0.98] ${
+                                                            item.active
+                                                                ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                                                                : 'bg-white border border-slate-200/80 text-slate-800 hover:bg-slate-50 font-semibold'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3 min-w-0">
+                                                            <div
+                                                                className={`flex h-9 w-9 items-center justify-center rounded-xl shrink-0 ${
+                                                                    item.active
+                                                                        ? 'bg-white/20 text-white'
+                                                                        : 'bg-slate-100 text-slate-600'
+                                                                }`}
+                                                            >
+                                                                <Icon className="h-4.5 w-4.5" />
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <div className="text-xs truncate font-bold">
+                                                                    {item.title}
+                                                                </div>
+                                                                <div
+                                                                    className={`text-[10px] truncate ${
+                                                                        item.active
+                                                                            ? 'text-emerald-100'
+                                                                            : 'text-slate-400'
+                                                                    }`}
+                                                                >
+                                                                    {item.subtitle}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <ChevronRight
+                                                            className={`h-4 w-4 shrink-0 ${
+                                                                item.active ? 'text-white' : 'text-slate-300'
+                                                            }`}
+                                                        />
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Sheet Footer with Logout */}
+                        <div className="p-4 border-t border-slate-100 bg-white shrink-0">
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition active:scale-[0.99]"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                <span>Keluar Akun ({user.name})</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

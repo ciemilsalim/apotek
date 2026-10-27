@@ -12,6 +12,8 @@ class StockAdjustment extends Model
 
     protected $fillable = [
         'medicine_id',
+        'batch_id',
+        'batch_number',
         'user_id',
         'type',
         'quantity',
@@ -32,6 +34,11 @@ class StockAdjustment extends Model
     public function medicine(): BelongsTo
     {
         return $this->belongsTo(Medicine::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(MedicineBatch::class, 'batch_id');
     }
 
     public function user(): BelongsTo

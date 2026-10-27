@@ -52,6 +52,29 @@ class Medicine extends Model
         return $this->hasMany(SaleItem::class);
     }
 
+    public function batches(): HasMany
+    {
+        return $this->hasMany(MedicineBatch::class)->orderBy('expiry_date', 'asc');
+    }
+
+    public function activeBatches(): HasMany
+    {
+        return $this->hasMany(MedicineBatch::class)->where('current_stock', '>', 0)->orderBy('expiry_date', 'asc');
+    }
+
+    public function syncStockFromBatches(): void
+    {
+        $total = (int) $this->batches()->sum('current_stock');
+        $earliestActiveExpiry = $this->activeBatches()->min('expiry_date');
+
+        $updateData = ['stock' => $total];
+        if ($earliestActiveExpiry) {
+            $updateData['expiry_date'] = $earliestActiveExpiry;
+        }
+
+        $this->update($updateData);
+    }
+
     public function isLowStock(): bool
     {
         return $this->stock <= $this->min_stock;

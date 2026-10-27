@@ -13,6 +13,8 @@ class SaleItem extends Model
     protected $fillable = [
         'sale_id',
         'medicine_id',
+        'batch_id',
+        'batch_number',
         'medicine_name',
         'medicine_code',
         'unit',
@@ -38,5 +40,10 @@ class SaleItem extends Model
     public function medicine(): BelongsTo
     {
         return $this->belongsTo(Medicine::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(MedicineBatch::class, 'batch_id');
     }
 }

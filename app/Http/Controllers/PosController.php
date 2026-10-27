@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Medicine;
+use App\Models\MedicineBatch;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\StockAdjustment;
@@ -141,36 +142,113 @@ class PosController extends Controller
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
-                // 4. Create SaleItems and update stock
+                // 4. Create SaleItems and update stock via FEFO (First Expired, First Out)
                 foreach ($processedItems as $pItem) {
                     /** @var Medicine $med */
                     $med = $pItem['medicine'];
-                    $qty = $pItem['quantity'];
-
-                    SaleItem::create([
-                        'sale_id' => $sale->id,
-                        'medicine_id' => $med->id,
-                        'medicine_name' => $med->name,
-                        'medicine_code' => $med->code,
-                        'unit' => $med->unit,
-                        'price' => $pItem['price'],
-                        'quantity' => $qty,
-                        'subtotal' => $pItem['subtotal'],
-                    ]);
-
+                    $neededQty = $pItem['quantity'];
                     $oldStock = $med->stock;
-                    $newStock = $oldStock - $qty;
-                    $med->update(['stock' => $newStock]);
 
-                    StockAdjustment::create([
-                        'medicine_id' => $med->id,
-                        'user_id' => $user->id,
-                        'type' => 'out',
-                        'quantity' => $qty,
-                        'stock_before' => $oldStock,
-                        'stock_after' => $newStock,
-                        'notes' => "Penjualan #{$invoiceNumber}",
-                    ]);
+                    // Ensure legacy unbatched stock has a batch row before FEFO deduction
+                    if ($med->batches()->count() === 0 && $med->stock > 0) {
+                        MedicineBatch::create([
+                            'medicine_id' => $med->id,
+                            'batch_number' => 'LOT-INIT-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $med->code), 0, 4)),
+                            'expiry_date' => $med->expiry_date ?: Carbon::now()->addYear()->format('Y-m-d'),
+                            'initial_stock' => $med->stock,
+                            'current_stock' => $med->stock,
+                            'buy_price' => $med->buy_price,
+                            'notes' => 'Batch inisialisasi otomatis kasir',
+                        ]);
+                    }
+
+                    // Fetch active batches sorted by earliest expiry date (FEFO)
+                    $batches = $med->activeBatches()->lockForUpdate()->get();
+
+                    if ($batches->isNotEmpty()) {
+                        foreach ($batches as $batch) {
+                            if ($neededQty <= 0) break;
+                            $deduct = min($batch->current_stock, $neededQty);
+                            $batch->decrement('current_stock', $deduct);
+                            $neededQty -= $deduct;
+
+                            SaleItem::create([
+                                'sale_id' => $sale->id,
+                                'medicine_id' => $med->id,
+                                'batch_id' => $batch->id,
+                                'batch_number' => $batch->batch_number,
+                                'medicine_name' => $med->name,
+                                'medicine_code' => $med->code,
+                                'unit' => $med->unit,
+                                'price' => $pItem['price'],
+                                'quantity' => $deduct,
+                                'subtotal' => $pItem['price'] * $deduct,
+                            ]);
+
+                            StockAdjustment::create([
+                                'medicine_id' => $med->id,
+                                'batch_id' => $batch->id,
+                                'batch_number' => $batch->batch_number,
+                                'user_id' => $user->id,
+                                'type' => 'out',
+                                'quantity' => $deduct,
+                                'stock_before' => $batch->current_stock + $deduct,
+                                'stock_after' => $batch->current_stock,
+                                'notes' => "Penjualan #{$invoiceNumber} (Batch: {$batch->batch_number})",
+                            ]);
+                        }
+
+                        // If any remaining quantity wasn't covered by active batches
+                        if ($neededQty > 0) {
+                            SaleItem::create([
+                                'sale_id' => $sale->id,
+                                'medicine_id' => $med->id,
+                                'medicine_name' => $med->name,
+                                'medicine_code' => $med->code,
+                                'unit' => $med->unit,
+                                'price' => $pItem['price'],
+                                'quantity' => $neededQty,
+                                'subtotal' => $pItem['price'] * $neededQty,
+                            ]);
+
+                            StockAdjustment::create([
+                                'medicine_id' => $med->id,
+                                'user_id' => $user->id,
+                                'type' => 'out',
+                                'quantity' => $neededQty,
+                                'stock_before' => $oldStock,
+                                'stock_after' => max(0, $oldStock - $neededQty),
+                                'notes' => "Penjualan #{$invoiceNumber}",
+                            ]);
+                        }
+
+                        $med->syncStockFromBatches();
+                    } else {
+                        // Fallback if medicine has no batch records
+                        SaleItem::create([
+                            'sale_id' => $sale->id,
+                            'medicine_id' => $med->id,
+                            'medicine_name' => $med->name,
+                            'medicine_code' => $med->code,
+                            'unit' => $med->unit,
+                            'price' => $pItem['price'],
+                            'quantity' => $neededQty,
+                            'subtotal' => $pItem['subtotal'],
+                        ]);
+
+                        $newStock = max(0, $oldStock - $neededQty);
+                        $med->update(['stock' => $newStock]);
+
+                        StockAdjustment::create([
+                            'medicine_id' => $med->id,
+                            'user_id' => $user->id,
+                            'type' => 'out',
+                            'quantity' => $neededQty,
+                            'stock_before' => $oldStock,
+                            'stock_after' => $newStock,
+                            'notes' => "Penjualan #{$invoiceNumber}",
+                        ]);
+                    }
                 }
 
                 return $sale->load(['items', 'user:id,name']);

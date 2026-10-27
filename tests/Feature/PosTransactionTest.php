@@ -107,4 +107,81 @@ class PosTransactionTest extends TestCase
         // Stock remains unchanged
         $this->assertEquals(2, $medicine->fresh()->stock);
     }
+
+    public function test_pos_checkout_deducts_using_fefo_algorithm(): void
+    {
+        $kasir = User::factory()->create(['role' => 'kasir']);
+        $category = Category::create(['name' => 'Antibiotik', 'slug' => 'antibiotik']);
+        $medicine = Medicine::create([
+            'category_id' => $category->id,
+            'code' => 'OBT-FEFO',
+            'name' => 'Amoxicillin 500mg',
+            'unit' => 'Strip',
+            'buy_price' => 5000,
+            'sell_price' => 9000,
+            'stock' => 0,
+            'min_stock' => 5,
+        ]);
+
+        // Batch A expires earlier
+        $batchA = \App\Models\MedicineBatch::create([
+            'medicine_id' => $medicine->id,
+            'batch_number' => 'BATCH-EXP-EARLY',
+            'expiry_date' => '2026-11-15',
+            'initial_stock' => 10,
+            'current_stock' => 10,
+            'buy_price' => 5000,
+        ]);
+
+        // Batch B expires later
+        $batchB = \App\Models\MedicineBatch::create([
+            'medicine_id' => $medicine->id,
+            'batch_number' => 'BATCH-EXP-LATER',
+            'expiry_date' => '2027-06-20',
+            'initial_stock' => 20,
+            'current_stock' => 20,
+            'buy_price' => 5000,
+        ]);
+
+        $medicine->syncStockFromBatches();
+        $this->assertEquals(30, $medicine->fresh()->stock);
+
+        // Checkout 14 units -> Should consume all 10 of Batch A, and 4 of Batch B
+        $response = $this->actingAs($kasir)->post('/pos', [
+            'customer_name' => 'Pasien FEFO',
+            'payment_method' => 'cash',
+            'cash_paid' => 150000,
+            'items' => [
+                [
+                    'medicine_id' => $medicine->id,
+                    'quantity' => 14,
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect('/pos');
+        $response->assertSessionHas('success');
+
+        // Assert Batch A is exhausted
+        $this->assertEquals(0, $batchA->fresh()->current_stock);
+
+        // Assert Batch B has 16 remaining (20 - 4)
+        $this->assertEquals(16, $batchB->fresh()->current_stock);
+
+        // Assert total medicine stock is now 16
+        $this->assertEquals(16, $medicine->fresh()->stock);
+
+        // Assert sale items split accurately by batch
+        $this->assertDatabaseHas('sale_items', [
+            'medicine_id' => $medicine->id,
+            'batch_number' => 'BATCH-EXP-EARLY',
+            'quantity' => 10,
+        ]);
+
+        $this->assertDatabaseHas('sale_items', [
+            'medicine_id' => $medicine->id,
+            'batch_number' => 'BATCH-EXP-LATER',
+            'quantity' => 4,
+        ]);
+    }
 }

@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowRight,
+    Boxes,
     Calendar,
     ChevronRight,
     CircleDollarSign,
@@ -25,6 +26,7 @@ export default function Dashboard({
     topSelling,
     lowStockItems,
     recentAdjustments,
+    expiringBatches = [],
 }) {
     const user = usePage().props.auth.user;
 
@@ -367,8 +369,70 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Right 1 Col: Low Stock List & Top Selling */}
+                {/* Right 1 Col: Low Stock List, Expiring Batches & Top Selling */}
                 <div className="space-y-6">
+                    {/* Expiring Batches Card */}
+                    {expiringBatches && expiringBatches.length > 0 && (
+                        <div className="rounded-2xl bg-rose-50/70 border border-rose-200 p-5 shadow-xs">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-extrabold text-rose-950 flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-rose-600" />
+                                    <span>Batch Dekat Kadaluarsa</span>
+                                </h3>
+                                <span className="rounded-full bg-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-800">
+                                    {expiringBatches.length} Batch
+                                </span>
+                            </div>
+                            <div className="space-y-2.5">
+                                {expiringBatches.map((batch) => {
+                                    const expDate = new Date(batch.expiry_date);
+                                    const today = new Date();
+                                    const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                                    const isExpired = diffDays <= 0;
+
+                                    return (
+                                        <div
+                                            key={batch.id}
+                                            className="p-3 rounded-xl bg-white border border-rose-200/90 shadow-2xs"
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-xs font-bold text-slate-900 truncate">
+                                                        {batch.medicine?.name || 'Obat'}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
+                                                            Lot: {batch.batch_number}
+                                                        </span>
+                                                        <span className="text-[11px] text-slate-500">
+                                                            Sisa: <strong className="text-slate-800">{batch.current_stock}</strong> {batch.medicine?.unit}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span
+                                                    className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${
+                                                        isExpired
+                                                            ? 'bg-rose-600 text-white'
+                                                            : diffDays <= 30
+                                                            ? 'bg-rose-100 text-rose-800'
+                                                            : 'bg-amber-100 text-amber-800'
+                                                    }`}
+                                                >
+                                                    {isExpired
+                                                        ? 'Kadaluarsa'
+                                                        : `${diffDays} hr lagi`}
+                                                </span>
+                                            </div>
+                                            <div className="mt-1 text-[10px] text-slate-400">
+                                                Exp: {batch.expiry_date}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Low Stock List */}
                     <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
                         <div className="flex items-center justify-between mb-3">

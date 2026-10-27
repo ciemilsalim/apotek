@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{medicine}', [MedicineController::class, 'update'])->name('update');
             Route::delete('/{medicine}', [MedicineController::class, 'destroy'])->name('destroy');
             Route::post('/{medicine}/adjust-stock', [MedicineController::class, 'adjustStock'])->name('adjust-stock');
+            Route::post('/{medicine}/batches', [MedicineController::class, 'storeBatch'])->name('batches.store');
             Route::get('/adjustments/history', [MedicineController::class, 'adjustmentsHistory'])->name('adjustments');
         });
 

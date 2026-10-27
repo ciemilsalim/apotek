@@ -81,6 +81,7 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                             <tr>
                                 <th className="px-5 py-3.5">Waktu</th>
                                 <th className="px-5 py-3.5">Obat</th>
+                                <th className="px-5 py-3.5">No. Batch</th>
                                 <th className="px-5 py-3.5">Jenis Mutasi</th>
                                 <th className="px-5 py-3.5 text-center">Jumlah</th>
                                 <th className="px-5 py-3.5 text-center">Sebelum &gt; Sesudah</th>
@@ -93,6 +94,8 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                 adjustments.data.map((adj) => {
                                     const isAdd = adj.type === 'in';
                                     const isSub = adj.type === 'out';
+                                    const batchNo = adj.batch?.batch_number || adj.batch_number;
+
                                     return (
                                         <tr
                                             key={adj.id}
@@ -114,6 +117,15 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                                 <div className="font-mono text-[10px] text-emerald-600">
                                                     {adj.medicine?.code}
                                                 </div>
+                                            </td>
+                                            <td className="px-5 py-3.5">
+                                                {batchNo ? (
+                                                    <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                                                        {batchNo}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-slate-400 font-mono text-[11px]">-</span>
+                                                )}
                                             </td>
                                             <td className="px-5 py-3.5">
                                                 <span
@@ -169,7 +181,7 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan="7"
+                                        colSpan="8"
                                         className="py-10 text-center text-xs text-slate-400"
                                     >
                                         Belum ada riwayat penyesuaian stok.

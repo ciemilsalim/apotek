@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Medicine;
+use App\Models\MedicineBatch;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\StockAdjustment;
@@ -34,6 +35,14 @@ class DashboardController extends Controller
         $expiringMedicines = Medicine::whereNotNull('expiry_date')
             ->where('expiry_date', '<=', Carbon::now()->addMonths(3))
             ->count();
+
+        // Expiring batches with stock > 0
+        $expiringBatches = MedicineBatch::with('medicine:id,code,name,unit')
+            ->where('current_stock', '>', 0)
+            ->where('expiry_date', '<=', Carbon::now()->addMonths(3))
+            ->orderBy('expiry_date', 'asc')
+            ->take(6)
+            ->get();
 
         // 2. Recent sales
         $recentSalesQuery = Sale::with(['user:id,name', 'items'])
@@ -70,7 +79,7 @@ class DashboardController extends Controller
             ->get();
 
         // 5. Recent stock adjustments (for Operator & Admin)
-        $recentAdjustments = StockAdjustment::with(['medicine:id,code,name,unit', 'user:id,name'])
+        $recentAdjustments = StockAdjustment::with(['medicine:id,code,name,unit', 'batch:id,batch_number,expiry_date', 'user:id,name'])
             ->latest()
             ->take(5)
             ->get();
@@ -100,6 +109,7 @@ class DashboardController extends Controller
             'topSelling' => $topSelling,
             'lowStockItems' => $lowStockItems,
             'recentAdjustments' => $recentAdjustments,
+            'expiringBatches' => $expiringBatches,
         ]);
     }
 }

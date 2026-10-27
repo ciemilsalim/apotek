@@ -5,16 +5,22 @@ import {
     AlertTriangle,
     ArrowDownRight,
     ArrowUpRight,
+    Boxes,
     Calendar,
+    CheckCircle2,
     ClipboardList,
+    Clock,
     Edit,
     Filter,
+    Layers,
     MapPin,
     PackagePlus,
     Pill,
     Plus,
     Search,
+    ShieldAlert,
     SlidersHorizontal,
+    Tag,
     Trash2,
     X,
 } from 'lucide-react';
@@ -33,10 +39,16 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     const [restockModalOpen, setRestockModalOpen] = useState(false);
     const [targetMedicine, setTargetMedicine] = useState(null);
 
+    // Batch Management Modal State
+    const [batchesModalOpen, setBatchesModalOpen] = useState(false);
+    const [selectedMedicineForBatches, setSelectedMedicineForBatches] = useState(null);
+    const [showAddBatchForm, setShowAddBatchForm] = useState(false);
+
     // Delete Modal State
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [medicineToDelete, setMedicineToDelete] = useState(null);
 
+    // Form for Create / Edit Medicine
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             code: '',
@@ -48,15 +60,31 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             sell_price: '',
             stock: 10,
             min_stock: 10,
+            batch_number: '',
             expiry_date: '',
             location: 'Rak A-1',
             description: '',
         });
 
+    // Form for Restock / Adjust Stock
     const restockForm = useForm({
         type: 'in',
         quantity: 10,
         notes: 'Penerimaan stok dari distributor',
+        batch_mode: 'new', // 'new' or 'existing'
+        batch_id: '',
+        batch_number: '',
+        expiry_date: '',
+        buy_price: '',
+    });
+
+    // Form for Adding Batch directly
+    const batchForm = useForm({
+        batch_number: '',
+        expiry_date: '',
+        stock: 10,
+        buy_price: '',
+        notes: 'Penambahan batch baru',
     });
 
     const formatCurrency = (val) => {
@@ -85,12 +113,24 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         );
     };
 
+    const generateBatchSuggestion = (medCode) => {
+        const cleanCode = (medCode || 'MED').replace(/[^A-Za-z0-9]/g, '').substring(0, 4).toUpperCase();
+        const now = new Date();
+        const year = String(now.getFullYear()).substring(2);
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        return `B-${cleanCode}-${year}${month}`;
+    };
+
     const openCreateModal = () => {
         setEditingMedicine(null);
         reset();
         clearErrors();
+        const newCode = 'OBT-' + Math.floor(100 + Math.random() * 900);
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+
         setData({
-            code: 'OBT-' + Math.floor(100 + Math.random() * 900),
+            code: newCode,
             name: '',
             generic_name: '',
             category_id: categories[0]?.id || '',
@@ -99,7 +139,8 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             sell_price: '',
             stock: 10,
             min_stock: 10,
-            expiry_date: '',
+            batch_number: generateBatchSuggestion(newCode),
+            expiry_date: nextYear.toISOString().substring(0, 10),
             location: 'Rak A-1',
             description: '',
         });
@@ -119,6 +160,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             sell_price: med.sell_price,
             stock: med.stock,
             min_stock: med.min_stock,
+            batch_number: '',
             expiry_date: med.expiry_date ? med.expiry_date.substring(0, 10) : '',
             location: med.location || '',
             description: med.description || '',
@@ -143,10 +185,20 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         setTargetMedicine(med);
         restockForm.reset();
         restockForm.clearErrors();
+
+        const hasBatches = med.batches && med.batches.length > 0;
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+
         restockForm.setData({
             type: 'in',
             quantity: 10,
             notes: 'Penerimaan stok dari distributor',
+            batch_mode: hasBatches ? 'existing' : 'new',
+            batch_id: hasBatches ? String(med.batches[0].id) : '',
+            batch_number: generateBatchSuggestion(med.code),
+            expiry_date: nextYear.toISOString().substring(0, 10),
+            buy_price: med.buy_price || '',
         });
         setRestockModalOpen(true);
     };
@@ -156,6 +208,36 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         if (!targetMedicine) return;
         restockForm.post(route('medicines.adjust-stock', targetMedicine.id), {
             onSuccess: () => setRestockModalOpen(false),
+        });
+    };
+
+    const openBatchesModal = (med) => {
+        setSelectedMedicineForBatches(med);
+        setShowAddBatchForm(false);
+        batchForm.reset();
+        batchForm.clearErrors();
+
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+
+        batchForm.setData({
+            batch_number: generateBatchSuggestion(med.code),
+            expiry_date: nextYear.toISOString().substring(0, 10),
+            stock: 10,
+            buy_price: med.buy_price || '',
+            notes: 'Penambahan batch baru dari distributor',
+        });
+        setBatchesModalOpen(true);
+    };
+
+    const handleAddBatchSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedMedicineForBatches) return;
+        batchForm.post(route('medicines.batches.store', selectedMedicineForBatches.id), {
+            onSuccess: () => {
+                setShowAddBatchForm(false);
+                setBatchesModalOpen(false);
+            },
         });
     };
 
@@ -171,16 +253,31 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         });
     };
 
+    // Helper to evaluate batch expiry badge
+    const getBatchStatus = (batch) => {
+        if (!batch.expiry_date) return { label: 'Tanpa Exp', color: 'bg-slate-100 text-slate-700' };
+        const exp = new Date(batch.expiry_date);
+        const now = new Date();
+        const diffMonths = (exp - now) / (1000 * 60 * 60 * 24 * 30.44);
+
+        if (exp < now) {
+            return { label: 'Kadaluarsa', color: 'bg-rose-100 text-rose-800 border-rose-200' };
+        } else if (diffMonths <= 3) {
+            return { label: 'Segera Exp', color: 'bg-amber-100 text-amber-800 border-amber-200' };
+        }
+        return { label: 'Aman', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+    };
+
     return (
         <AuthenticatedLayout
             header={
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                            Data Obat & Persediaan
+                            Data Obat, Stok & Batch
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                            Kelola daftar obat, periksa stok fisik, dan tambah persediaan
+                            Kelola persediaan obat, kontrol nomor batch, pantau kadaluarsa, dan alur FEFO
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -202,7 +299,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 </div>
             }
         >
-            <Head title="Katalog Obat - Apotek Sehat" />
+            <Head title="Katalog Obat & Batch - Apotek Sehat" />
 
             {/* Quick Status Filter Tabs (Big touch targets for mobile) */}
             <div className="mb-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -237,50 +334,44 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Cari nama obat, kode, atau kandungan..."
+                            placeholder="Cari nama obat, kode, nomor batch, atau lokasi rak..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-4 py-2.5 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
+                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-4 py-2.5 text-xs sm:text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50/70"
                         />
                     </div>
 
                     <div className="flex w-full sm:w-auto items-center gap-2">
                         <select
                             value={categoryId}
-                            onChange={(e) => {
-                                setCategoryId(e.target.value);
-                                router.get(
-                                    route('medicines.index'),
-                                    { search, category_id: e.target.value, status },
-                                    { preserveState: true },
-                                );
-                            }}
-                            className="rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none"
+                            onChange={(e) => setCategoryId(e.target.value)}
+                            className="w-full sm:w-48 rounded-2xl border border-slate-300 px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none bg-white"
                         >
                             <option value="">Semua Kategori</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name}
                                 </option>
                             ))}
                         </select>
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-900 transition"
+                            className="rounded-2xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-slate-800 transition shadow-xs"
                         >
-                            Cari
+                            Filter
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Mobile View: Clean Medicine Cards (Screen < 768px) */}
-            <div className="block md:hidden space-y-3 mb-6">
+            {/* Mobile View: High Contrast Flat Cards (Screen < 768px) */}
+            <div className="grid grid-cols-1 gap-3 md:hidden mb-6">
                 {medicines.data && medicines.data.length > 0 ? (
                     medicines.data.map((med) => {
                         const isLow = med.stock <= med.min_stock;
                         const isOut = med.stock <= 0;
+                        const batchesCount = med.batches?.length || 0;
 
                         return (
                             <div
@@ -309,11 +400,19 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div className="flex items-center gap-1 text-slate-500">
-                                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                                        <span>{med.location || 'Rak belum diatur'}</span>
-                                    </div>
+                                {/* Batch & Expiry Info on Mobile */}
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-xs py-2 px-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <button
+                                        type="button"
+                                        onClick={() => openBatchesModal(med)}
+                                        className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-emerald-700"
+                                    >
+                                        <Boxes className="h-4 w-4 text-emerald-600" />
+                                        <span>{batchesCount} Batch</span>
+                                        <span className="text-[10px] text-emerald-600 font-semibold underline">
+                                            (Kelola)
+                                        </span>
+                                    </button>
                                     <div className="font-black text-sm text-emerald-700">
                                         {formatCurrency(med.sell_price)}
                                     </div>
@@ -327,7 +426,15 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
                                     >
                                         <Plus className="h-4 w-4" />
-                                        <span>Tambah Stok</span>
+                                        <span>Mutasi Stok</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => openBatchesModal(med)}
+                                        className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100"
+                                        title="Detail Batch"
+                                    >
+                                        <Boxes className="h-4 w-4" />
                                     </button>
                                     <button
                                         type="button"
@@ -363,10 +470,11 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
                             <tr>
                                 <th className="px-5 py-4">Kode & Nama Obat</th>
-                                <th className="px-5 py-4">Kategori & Posisi Rak</th>
+                                <th className="px-5 py-4">Kategori & Rak</th>
+                                <th className="px-5 py-4 text-center">Batch Obat</th>
                                 <th className="px-5 py-4 text-right">Harga Jual</th>
-                                <th className="px-5 py-4 text-center">Jumlah Stok</th>
-                                <th className="px-5 py-4">Kedaluwarsa</th>
+                                <th className="px-5 py-4 text-center">Total Stok</th>
+                                <th className="px-5 py-4">Exp Terdekat (FEFO)</th>
                                 <th className="px-5 py-4 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -375,6 +483,8 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 medicines.data.map((med) => {
                                     const isLow = med.stock <= med.min_stock;
                                     const isOut = med.stock <= 0;
+                                    const batches = med.batches || [];
+                                    const activeBatchesCount = batches.filter((b) => b.current_stock > 0).length;
 
                                     return (
                                         <tr key={med.id} className="hover:bg-slate-50 transition">
@@ -394,6 +504,20 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     <MapPin className="h-3 w-3" />
                                                     <span>{med.location || 'Belum diatur'}</span>
                                                 </div>
+                                            </td>
+                                            <td className="px-5 py-4 text-center">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openBatchesModal(med)}
+                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition"
+                                                    title="Kelola Batch Obat"
+                                                >
+                                                    <Boxes className="h-3.5 w-3.5 text-emerald-600" />
+                                                    <span>{batches.length} Batch</span>
+                                                    {activeBatchesCount > 0 && (
+                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                                    )}
+                                                </button>
                                             </td>
                                             <td className="px-5 py-4 text-right font-black text-sm text-slate-900">
                                                 {formatCurrency(med.sell_price)}
@@ -415,7 +539,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                 {med.expiry_date ? (
                                                     <div className="flex items-center gap-1">
                                                         <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                                                        <span>
+                                                        <span className="font-semibold">
                                                             {new Date(med.expiry_date).toLocaleDateString('id-ID')}
                                                         </span>
                                                     </div>
@@ -428,10 +552,19 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     <button
                                                         type="button"
                                                         onClick={() => openRestockModal(med)}
-                                                        className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition"
+                                                        className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-2xs"
+                                                        title="Mutasi Stok & Batch"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />
-                                                        <span>Tambah Stok</span>
+                                                        <span>Mutasi</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openBatchesModal(med)}
+                                                        className="rounded-xl border border-slate-200 p-1.5 text-slate-700 hover:bg-slate-100"
+                                                        title="Kelola Batch"
+                                                    >
+                                                        <Boxes className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"
@@ -456,7 +589,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="py-12 text-center text-xs text-slate-400">
+                                    <td colSpan="7" className="py-12 text-center text-xs text-slate-400">
                                         Tidak ada data obat yang ditemukan.
                                     </td>
                                 </tr>
@@ -492,35 +625,172 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 </div>
             )}
 
-            {/* Quick Restock Modal (Extremely simple for orang awam) */}
+            {/* Restock & Mutasi Stok Modal (Supports Batches & FEFO) */}
             <Modal
                 show={restockModalOpen}
                 onClose={() => setRestockModalOpen(false)}
-                maxWidth="sm"
+                maxWidth="md"
             >
-                <form onSubmit={handleRestockSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <form onSubmit={handleRestockSubmit} className="flex flex-col max-h-[88vh]">
+                    <div className="shrink-0 p-5 border-b border-slate-200 bg-white flex items-center justify-between">
                         <div>
                             <h2 className="text-base font-extrabold text-slate-900">
-                                Tambah Stok Obat
+                                Mutasi Persediaan & Batch Obat
                             </h2>
                             <p className="text-xs text-slate-500">
-                                {targetMedicine?.name} (Stok Saat Ini: {targetMedicine?.stock} {targetMedicine?.unit})
+                                {targetMedicine?.name} (Total Stok: {targetMedicine?.stock} {targetMedicine?.unit})
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={() => setRestockModalOpen(false)}
-                            className="rounded-xl p-1 text-slate-400 hover:bg-slate-100"
+                            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100"
                         >
                             <X className="h-5 w-5" />
                         </button>
                     </div>
 
-                    <div className="mt-4 space-y-4 text-xs">
+                    <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
+                        {/* Type of Adjustment */}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1.5">
+                                Jenis Mutasi Stok
+                            </label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {[
+                                    { id: 'in', label: 'Stok Masuk (+)', icon: ArrowDownRight },
+                                    { id: 'out', label: 'Stok Keluar (-)', icon: ArrowUpRight },
+                                    { id: 'adjustment', label: 'Opname Fisik', icon: SlidersHorizontal },
+                                ].map((t) => {
+                                    const Icon = t.icon;
+                                    return (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => restockForm.setData('type', t.id)}
+                                            className={`flex items-center justify-center gap-1 py-2.5 px-2 rounded-xl font-bold border-2 transition ${
+                                                restockForm.data.type === t.id
+                                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            <Icon className="h-3.5 w-3.5" />
+                                            <span>{t.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Batch Options for Stok Masuk */}
+                        {restockForm.data.type === 'in' && (
+                            <div className="rounded-2xl bg-slate-50 p-3.5 border border-slate-200 space-y-3">
+                                <label className="block font-bold text-slate-700">
+                                    Alokasi Nomor Batch
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => restockForm.setData('batch_mode', 'new')}
+                                        className={`py-2 px-3 rounded-xl font-extrabold text-xs border transition ${
+                                            restockForm.data.batch_mode === 'new'
+                                                ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        + Buat Batch Baru
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => restockForm.setData('batch_mode', 'existing')}
+                                        disabled={!targetMedicine?.batches || targetMedicine.batches.length === 0}
+                                        className={`py-2 px-3 rounded-xl font-extrabold text-xs border transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                            restockForm.data.batch_mode === 'existing'
+                                                ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        Pilih Batch Yang Ada ({targetMedicine?.batches?.length || 0})
+                                    </button>
+                                </div>
+
+                                {restockForm.data.batch_mode === 'new' ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                        <div>
+                                            <label className="block font-semibold text-slate-600 mb-1">
+                                                Nomor Batch Baru
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={restockForm.data.batch_number}
+                                                onChange={(e) => restockForm.setData('batch_number', e.target.value)}
+                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none bg-white"
+                                                placeholder="Contoh: B-PCT-2601"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-semibold text-slate-600 mb-1">
+                                                Tanggal Kadaluarsa Batch
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={restockForm.data.expiry_date}
+                                                onChange={(e) => restockForm.setData('expiry_date', e.target.value)}
+                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none bg-white"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block font-semibold text-slate-600 mb-1">
+                                            Pilih Batch Penerima
+                                        </label>
+                                        <select
+                                            value={restockForm.data.batch_id}
+                                            onChange={(e) => restockForm.setData('batch_id', e.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none bg-white"
+                                            required
+                                        >
+                                            {targetMedicine?.batches?.map((b) => (
+                                                <option key={b.id} value={b.id}>
+                                                    {b.batch_number} (Sisa: {b.current_stock} {targetMedicine.unit} • Exp: {b.expiry_date ? new Date(b.expiry_date).toLocaleDateString('id-ID') : '-'})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Batch Options for Stok Keluar */}
+                        {restockForm.data.type === 'out' && targetMedicine?.batches?.length > 0 && (
+                            <div>
+                                <label className="block font-bold text-slate-700 mb-1">
+                                    Pilih Batch yang Dikurangi (Opsional - Default FEFO)
+                                </label>
+                                <select
+                                    value={restockForm.data.batch_id}
+                                    onChange={(e) => restockForm.setData('batch_id', e.target.value)}
+                                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none bg-white"
+                                >
+                                    <option value="">Otomatis FEFO (Kadaluarsa Terdekat)</option>
+                                    {targetMedicine?.batches?.map((b) => (
+                                        <option key={b.id} value={b.id}>
+                                            Batch {b.batch_number} (Stok: {b.current_stock} • Exp: {b.expiry_date ? new Date(b.expiry_date).toLocaleDateString('id-ID') : '-'})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Quantity */}
                         <div>
                             <label className="block font-bold text-slate-700 mb-1">
-                                Jumlah Stok yang Ditambahkan
+                                {restockForm.data.type === 'adjustment'
+                                    ? 'Target Stok Fisik Hasil Opname'
+                                    : 'Jumlah Kuantitas (' + (targetMedicine?.unit || 'Item') + ')'}
                             </label>
                             <input
                                 type="number"
@@ -532,44 +802,235 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             />
                         </div>
 
+                        {/* Notes */}
                         <div>
                             <label className="block font-bold text-slate-700 mb-1">
-                                Catatan / Keterangan
+                                Catatan / Keterangan Mutasi
                             </label>
                             <input
                                 type="text"
                                 value={restockForm.data.notes}
                                 onChange={(e) => restockForm.setData('notes', e.target.value)}
-                                className="w-full rounded-2xl border border-slate-300 p-3 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
-                                placeholder="Penerimaan dari distributor"
+                                className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                placeholder="Contoh: Penerimaan dari PBF Kimia Farma"
                                 required
                             />
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+                    <div className="shrink-0 p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
                         <button
                             type="button"
                             onClick={() => setRestockModalOpen(false)}
-                            className="rounded-2xl px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100"
+                            className="rounded-xl px-4 py-2 font-bold text-slate-600 hover:bg-slate-200"
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
                             disabled={restockForm.processing}
-                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 font-extrabold text-white shadow-xs hover:bg-emerald-700"
+                            className="rounded-xl bg-emerald-600 px-5 py-2.5 font-extrabold text-white shadow-xs hover:bg-emerald-700 transition disabled:opacity-50"
                         >
-                            {restockForm.processing ? 'Menyimpan...' : 'Simpan Stok Masuk'}
+                            {restockForm.processing ? 'Menyimpan...' : 'Simpan Mutasi'}
                         </button>
                     </div>
                 </form>
             </Modal>
 
+            {/* Batch Details & Management Modal */}
+            <Modal
+                show={batchesModalOpen}
+                onClose={() => setBatchesModalOpen(false)}
+                maxWidth="lg"
+            >
+                <div className="flex flex-col max-h-[88vh]">
+                    <div className="shrink-0 p-5 border-b border-slate-200 bg-white flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                <Boxes className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-extrabold text-slate-900">
+                                    Daftar Batch: {selectedMedicineForBatches?.name}
+                                </h2>
+                                <p className="text-xs text-slate-500 font-mono">
+                                    {selectedMedicineForBatches?.code} • Total Stok: {selectedMedicineForBatches?.stock} {selectedMedicineForBatches?.unit}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setBatchesModalOpen(false)}
+                            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
+                        <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-700 uppercase tracking-wider text-[11px]">
+                                Batch Aktif & Riwayat Lot
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => setShowAddBatchForm(!showAddBatchForm)}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                                <span>{showAddBatchForm ? 'Tutup Form' : 'Tambah Batch Baru'}</span>
+                            </button>
+                        </div>
+
+                        {/* Inline Add Batch Form */}
+                        {showAddBatchForm && (
+                            <form
+                                onSubmit={handleAddBatchSubmit}
+                                className="p-4 rounded-2xl bg-emerald-50/60 border-2 border-emerald-200 space-y-3 animate-fade-in"
+                            >
+                                <div className="font-extrabold text-emerald-900">
+                                    Form Input Batch Baru
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">
+                                            Nomor Batch / Lot
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={batchForm.data.batch_number}
+                                            onChange={(e) => batchForm.setData('batch_number', e.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold bg-white focus:border-emerald-600 focus:outline-none"
+                                            placeholder="Contoh: B-PCT-2601"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">
+                                            Tanggal Kadaluarsa
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={batchForm.data.expiry_date}
+                                            onChange={(e) => batchForm.setData('expiry_date', e.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-emerald-600 focus:outline-none"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">
+                                            Jumlah Stok Batch
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={batchForm.data.stock}
+                                            onChange={(e) => batchForm.setData('stock', e.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-black bg-white focus:border-emerald-600 focus:outline-none"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">
+                                            Harga Beli Satuan (Rp)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={batchForm.data.buy_price}
+                                            onChange={(e) => batchForm.setData('buy_price', e.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-emerald-600 focus:outline-none"
+                                            placeholder="Gunakan harga beli standar obat"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-2 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAddBatchForm(false)}
+                                        className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={batchForm.processing}
+                                        className="rounded-xl bg-emerald-600 px-4 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700"
+                                    >
+                                        {batchForm.processing ? 'Menyimpan...' : 'Simpan Batch'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
+                        {/* Batches Table */}
+                        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xs">
+                            <table className="w-full text-left text-xs">
+                                <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-500 text-[10px]">
+                                    <tr>
+                                        <th className="px-4 py-3">No. Batch</th>
+                                        <th className="px-4 py-3">Tanggal Exp</th>
+                                        <th className="px-4 py-3 text-center">Status</th>
+                                        <th className="px-4 py-3 text-right">Sisa Stok</th>
+                                        <th className="px-4 py-3 text-right">Harga Beli</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {selectedMedicineForBatches?.batches && selectedMedicineForBatches.batches.length > 0 ? (
+                                        selectedMedicineForBatches.batches.map((b) => {
+                                            const statusInfo = getBatchStatus(b);
+                                            return (
+                                                <tr key={b.id} className="hover:bg-slate-50 transition">
+                                                    <td className="px-4 py-3 font-mono font-bold text-slate-900">
+                                                        {b.batch_number}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-slate-600">
+                                                        {b.expiry_date ? new Date(b.expiry_date).toLocaleDateString('id-ID') : '-'}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span
+                                                            className={`inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold border ${statusInfo.color}`}
+                                                        >
+                                                            {statusInfo.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right font-black text-slate-900">
+                                                        {b.current_stock} / {b.initial_stock} {selectedMedicineForBatches.unit}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right font-mono text-slate-600">
+                                                        {formatCurrency(b.buy_price)}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="py-8 text-center text-slate-400">
+                                                Belum ada batch terdaftar untuk obat ini.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="shrink-0 p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
+                        <button
+                            type="button"
+                            onClick={() => setBatchesModalOpen(false)}
+                            className="rounded-xl bg-slate-900 px-5 py-2 font-bold text-white text-xs hover:bg-slate-800"
+                        >
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
             {/* Create / Edit Medicine Modal */}
             <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="lg">
-                <form onSubmit={handleSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <form onSubmit={handleSubmit} className="flex flex-col max-h-[88vh]">
+                    <div className="shrink-0 p-5 border-b border-slate-200 bg-white flex items-center justify-between">
                         <h2 className="text-base font-extrabold text-slate-900">
                             {editingMedicine ? 'Ubah Data Obat' : 'Tambah Obat Baru ke Apotek'}
                         </h2>
@@ -582,10 +1043,10 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </button>
                     </div>
 
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="flex-1 overflow-y-auto p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div>
                             <label className="block font-bold text-slate-700 mb-1">
-                                Kode Obat (Unik)
+                                Kode Obat (Barcode / SKU)
                             </label>
                             <input
                                 type="text"
@@ -603,7 +1064,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <select
                                 value={data.category_id}
                                 onChange={(e) => setData('category_id', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none bg-white"
                                 required
                             >
                                 {categories.map((cat) => (
@@ -635,7 +1096,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <select
                                 value={data.unit}
                                 onChange={(e) => setData('unit', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none bg-white"
                                 required
                             >
                                 {units.map((u) => (
@@ -688,19 +1149,34 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </div>
 
                         {!editingMedicine && (
-                            <div>
-                                <label className="block font-bold text-slate-700 mb-1">
-                                    Stok Awal
-                                </label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={data.stock}
-                                    onChange={(e) => setData('stock', e.target.value)}
-                                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
-                                    required
-                                />
-                            </div>
+                            <>
+                                <div>
+                                    <label className="block font-bold text-slate-700 mb-1">
+                                        Stok Awal
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={data.stock}
+                                        onChange={(e) => setData('stock', e.target.value)}
+                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold text-slate-700 mb-1">
+                                        Nomor Batch Awal
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.batch_number}
+                                        onChange={(e) => setData('batch_number', e.target.value)}
+                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
+                                        placeholder="Contoh: B-MED-2601"
+                                    />
+                                </div>
+                            </>
                         )}
 
                         <div>
@@ -730,18 +1206,18 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+                    <div className="shrink-0 p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2">
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-2xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
+                            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200"
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700"
+                            className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Data Obat'}
                         </button>

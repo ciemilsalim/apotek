@@ -235,6 +235,26 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
     const changeAmount = data.payment_method === 'cash' ? Math.max(0, cashPaid - totalAmount) : 0;
     const isUnderpaid = data.payment_method === 'cash' && cashPaid < totalAmount;
 
+    // Format number or string with Indonesian thousand separator dots (e.g. 50000 -> "50.000")
+    const formatNumberDots = (val) => {
+        if (val === '' || val === null || val === undefined) return '';
+        const clean = String(val).replace(/\D/g, '');
+        if (!clean) return '';
+        const num = parseInt(clean, 10);
+        if (isNaN(num)) return '';
+        return new Intl.NumberFormat('id-ID').format(num);
+    };
+
+    // Handler for typing cash received with thousand separator dots
+    const handleCashPaidChange = (e) => {
+        const raw = e.target.value.replace(/\D/g, '');
+        if (raw === '') {
+            setData('cash_paid', '');
+        } else {
+            setData('cash_paid', parseInt(raw, 10));
+        }
+    };
+
     // Quick cash buttons
     const setQuickCash = (nominal) => {
         setData('cash_paid', nominal);
@@ -277,103 +297,148 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
         window.print();
     };
 
-    // Shared Cart Content Component
-    const CartContent = () => (
-        <div className="flex flex-col h-full">
-            {/* Cart Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+    // Shared Cart & Payment Component (Handles both Desktop Sidebar and Mobile Checkout Modal)
+    const CartContent = ({ isModal = false, onClose = () => {} }) => (
+        <div className={`flex flex-col ${isModal ? 'h-full max-h-[85vh]' : 'h-full'}`}>
+            {/* Header (Sticky / Fixed at top) */}
+            <div
+                className={`shrink-0 flex items-center justify-between ${
+                    isModal
+                        ? 'p-4 sm:p-5 border-b border-slate-200 bg-white'
+                        : 'pb-3 border-b border-slate-200'
+                }`}
+            >
                 <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
                         <ShoppingCart className="h-4 w-4" />
                     </div>
-                    <span className="font-extrabold text-sm sm:text-base text-slate-900">
-                        Keranjang Belanja ({totalItemsCount} item)
-                    </span>
-                </div>
-                {cart.length > 0 && (
-                    <button
-                        type="button"
-                        onClick={clearCart}
-                        className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1"
-                    >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span>Hapus Semua</span>
-                    </button>
-                )}
-            </div>
-
-            {/* Customer Name */}
-            <div className="mt-3">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Nama Pembeli / Pasien
-                </label>
-                <input
-                    type="text"
-                    value={data.customer_name}
-                    onChange={(e) => setData('customer_name', e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50"
-                    placeholder="Pelanggan Umum"
-                />
-            </div>
-
-            {/* Cart Items List with prominent + and - buttons */}
-            <div className="my-3 flex-1 overflow-y-auto max-h-60 sm:max-h-72 divide-y divide-slate-100">
-                {cart.length > 0 ? (
-                    cart.map((item) => (
-                        <div
-                            key={item.id}
-                            className="py-3 flex items-center justify-between gap-3"
-                        >
-                            <div className="min-w-0 flex-1">
-                                <div className="text-sm font-bold text-slate-900 truncate">
-                                    {item.name}
-                                </div>
-                                <div className="text-xs font-semibold text-emerald-700">
-                                    {formatCurrency(item.price)} / {item.unit}
-                                </div>
-                            </div>
-
-                            {/* Prominent Minus (-) & Plus (+) Buttons in Cart */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => updateQuantity(item.id, -1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-100 active:scale-95 transition"
-                                    title="Kurangi 1"
-                                >
-                                    <Minus className="h-4 w-4" />
-                                </button>
-                                <span className="w-8 text-center font-black text-sm text-slate-900">
-                                    {item.quantity}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => updateQuantity(item.id, 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition"
-                                    title="Tambah 1"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => removeFromCart(item.id)}
-                                    className="p-1.5 text-slate-300 hover:text-rose-600 ml-1"
-                                    title="Hapus dari keranjang"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="py-12 text-center text-xs sm:text-sm text-slate-400">
-                        Keranjang masih kosong. Scan barcode atau klik obat di katalog.
+                    <div>
+                        <span className="font-extrabold text-sm sm:text-base text-slate-900 block leading-tight">
+                            {isModal ? 'Pembayaran & Keranjang' : 'Keranjang Belanja'}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-500">
+                            {totalItemsCount} item obat dipilih
+                        </span>
                     </div>
-                )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                    {cart.length > 0 && (
+                        <button
+                            type="button"
+                            onClick={clearCart}
+                            className="text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition"
+                            title="Kosongkan Keranjang"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Hapus Semua</span>
+                        </button>
+                    )}
+                    {isModal && (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="rounded-xl p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                            title="Tutup Modal"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    )}
+                </div>
             </div>
 
-            {/* Calculations & Payment Form */}
-            <div className="pt-3 border-t border-slate-200 space-y-3">
+            {/* Scrollable Body (Internal scroll so top header & bottom checkout are never blocked) */}
+            <div
+                className={`flex-1 overflow-y-auto ${
+                    isModal ? 'p-4 sm:p-5 space-y-4' : 'my-3 space-y-3'
+                }`}
+            >
+                {/* Customer Name */}
+                <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Nama Pembeli / Pasien
+                    </label>
+                    <input
+                        type="text"
+                        value={data.customer_name}
+                        onChange={(e) => setData('customer_name', e.target.value)}
+                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50"
+                        placeholder="Pelanggan Umum"
+                    />
+                </div>
+
+                {/* Cart Items List */}
+                <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Daftar Obat Yang Dibeli
+                        </span>
+                        <span className="text-xs text-slate-500 font-bold">
+                            {cart.length} jenis obat
+                        </span>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+                        {cart.length > 0 ? (
+                            <div className="overflow-y-auto max-h-48 sm:max-h-56 divide-y divide-slate-100">
+                                {cart.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="p-3 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <div className="text-sm font-bold text-slate-900 truncate">
+                                                {item.name}
+                                            </div>
+                                            <div className="text-xs font-semibold text-emerald-700">
+                                                {formatCurrency(item.price)} / {item.unit}
+                                                <span className="text-slate-400 font-normal ml-1.5">
+                                                    (Subtotal: {formatCurrency(item.price * item.quantity)})
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Prominent Minus (-) & Plus (+) Buttons in Cart */}
+                                        <div className="flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateQuantity(item.id, -1)}
+                                                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+                                                title="Kurangi 1"
+                                            >
+                                                <Minus className="h-3.5 w-3.5" />
+                                            </button>
+                                            <span className="w-7 text-center font-black text-sm text-slate-900">
+                                                {item.quantity}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => updateQuantity(item.id, 1)}
+                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition"
+                                                title="Tambah 1"
+                                            >
+                                                <Plus className="h-3.5 w-3.5" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="p-1.5 text-slate-300 hover:text-rose-600 ml-0.5 transition"
+                                                title="Hapus dari keranjang"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-8 text-center text-xs text-slate-400">
+                                Keranjang masih kosong. Scan barcode atau klik obat di katalog.
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Total Bayar Banner */}
                 <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex items-center justify-between">
                     <div>
@@ -381,7 +446,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             Total Tagihan
                         </div>
                         <div className="text-xs text-slate-500 font-medium">
-                            {totalItemsCount} item obat
+                            {totalItemsCount} item obat ({cart.length} jenis)
                         </div>
                     </div>
                     <div className="text-xl sm:text-2xl font-black text-emerald-700">
@@ -413,7 +478,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                     }}
                                     className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold border-2 transition ${
                                         data.payment_method === m.id
-                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                                             : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                                     }`}
                                 >
@@ -425,21 +490,26 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     </div>
                 </div>
 
-                {/* Cash Payment Section */}
+                {/* Cash Payment Section with Dot Separator */}
                 {data.payment_method === 'cash' && (
-                    <div className="space-y-2 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-                        <div className="flex items-center justify-between gap-2">
+                    <div className="space-y-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                             <label className="text-xs font-bold text-slate-700">
-                                Uang Diterima (Rp):
+                                Uang Diterima:
                             </label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={data.cash_paid}
-                                onChange={(e) => setData('cash_paid', e.target.value)}
-                                className="w-36 rounded-xl border border-slate-300 px-3 py-2 text-right font-black text-base text-slate-900 focus:border-emerald-600 focus:outline-none bg-white"
-                                placeholder="0"
-                            />
+                            <div className="relative flex-1 sm:max-w-[200px]">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-extrabold text-xs text-slate-400">
+                                    Rp
+                                </span>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={formatNumberDots(data.cash_paid)}
+                                    onChange={handleCashPaidChange}
+                                    className="w-full rounded-xl border border-slate-300 pl-8 pr-3 py-2 text-right font-black text-base text-slate-900 focus:border-emerald-600 focus:outline-none bg-white shadow-xs"
+                                    placeholder="0"
+                                />
+                            </div>
                         </div>
 
                         {/* Quick Nominal Buttons */}
@@ -447,18 +517,18 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             <button
                                 type="button"
                                 onClick={() => setQuickCash(totalAmount)}
-                                className="rounded-lg bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-bold hover:bg-emerald-200"
+                                className="rounded-lg bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-bold hover:bg-emerald-200 transition"
                             >
                                 Uang Pas
                             </button>
-                            {[20000, 50000, 100000, 200000].map((nom) => (
+                            {[10000, 20000, 50000, 100000, 200000, 500000].map((nom) => (
                                 <button
                                     key={nom}
                                     type="button"
                                     onClick={() => setQuickCash(nom)}
-                                    className="rounded-lg bg-white border border-slate-200 text-slate-700 px-2 py-1 text-xs font-bold hover:bg-slate-100"
+                                    className="rounded-lg bg-white border border-slate-200 text-slate-700 px-2 py-1 text-xs font-bold hover:bg-slate-100 transition"
                                 >
-                                    {nom / 1000}rb
+                                    {nom >= 1000 ? `${nom / 1000}rb` : nom}
                                 </button>
                             ))}
                         </div>
@@ -480,8 +550,16 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                         </div>
                     </div>
                 )}
+            </div>
 
-                {/* Final Checkout Button */}
+            {/* Footer (Sticky / Fixed at bottom, always fully accessible) */}
+            <div
+                className={`shrink-0 ${
+                    isModal
+                        ? 'p-4 sm:p-5 border-t border-slate-200 bg-slate-50'
+                        : 'pt-3 border-t border-slate-200'
+                }`}
+            >
                 <button
                     type="button"
                     onClick={handleCheckout}
@@ -490,7 +568,9 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 >
                     <Check className="h-5 w-5" />
                     <span>
-                        {processing ? 'Menyimpan Transaksi...' : 'Bayar & Selesaikan'}
+                        {processing
+                            ? 'Menyimpan Transaksi...'
+                            : `Bayar ${formatCurrency(totalAmount)} & Selesaikan`}
                     </span>
                 </button>
             </div>
@@ -763,7 +843,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 {/* Right Panel for Tablet & Desktop: Live Cart (5 Cols on Desktop) */}
                 <div className="hidden lg:block lg:col-span-5">
                     <div className="sticky top-24 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
-                        <CartContent />
+                        <CartContent isModal={false} />
                     </div>
                 </div>
             </div>
@@ -777,7 +857,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             className="flex flex-col cursor-pointer"
                         >
                             <span className="text-xs font-bold text-slate-500">
-                                {totalItemsCount} Obat Dipilih
+                                {totalItemsCount} Obat Dipilih ({cart.length} jenis)
                             </span>
                             <span className="text-lg font-black text-emerald-700">
                                 {formatCurrency(totalAmount)}
@@ -795,18 +875,22 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 </div>
             )}
 
-            {/* Mobile Cart Drawer Modal */}
+            {/* Mobile Cart & Checkout Modal (Structured with fixed header, internal scroll, and fixed footer) */}
             <Modal
                 show={cartDrawerOpen}
                 onClose={() => {
                     setCartDrawerOpen(false);
                     searchInputRef.current?.focus();
                 }}
-                maxWidth="md"
+                maxWidth="lg"
             >
-                <div className="p-6">
-                    <CartContent />
-                </div>
+                <CartContent
+                    isModal={true}
+                    onClose={() => {
+                        setCartDrawerOpen(false);
+                        searchInputRef.current?.focus();
+                    }}
+                />
             </Modal>
 
             {/* Instant Receipt Popup Modal with Thermal Printer Support */}
@@ -819,141 +903,166 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 maxWidth="sm"
             >
                 {lastCompletedSale && (
-                    <div className="p-6 text-slate-900">
-                        {/* Thermal Printer Paper Size Selector */}
-                        <div className="no-print mb-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-700">
-                                Format Kertas Termal:
-                            </span>
-                            <div className="flex gap-1">
+                    <div className="flex flex-col max-h-[88vh] text-slate-900">
+                        {/* Header & Thermal Printer Paper Size Selector */}
+                        <div className="shrink-0 p-4 border-b border-slate-200 bg-white">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                        <CheckCircle2 className="h-4 w-4" />
+                                    </div>
+                                    <span className="font-extrabold text-sm text-slate-900">
+                                        Transaksi Berhasil
+                                    </span>
+                                </div>
                                 <button
                                     type="button"
-                                    onClick={() => setPaperSize('58mm')}
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
-                                        paperSize === '58mm'
-                                            ? 'bg-emerald-600 text-white border-emerald-600'
-                                            : 'bg-white text-slate-700 border-slate-200'
-                                    }`}
+                                    onClick={() => {
+                                        setReceiptModalOpen(false);
+                                        searchInputRef.current?.focus();
+                                    }}
+                                    className="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                                 >
-                                    58 mm (Mini)
+                                    <X className="h-4 w-4" />
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setPaperSize('80mm')}
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
-                                        paperSize === '80mm'
-                                            ? 'bg-emerald-600 text-white border-emerald-600'
-                                            : 'bg-white text-slate-700 border-slate-200'
-                                    }`}
-                                >
-                                    80 mm (Standar)
-                                </button>
+                            </div>
+
+                            <div className="no-print p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                                <span className="text-xs font-bold text-slate-700">
+                                    Format Kertas Termal:
+                                </span>
+                                <div className="flex gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaperSize('58mm')}
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                                            paperSize === '58mm'
+                                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                                : 'bg-white text-slate-700 border-slate-200'
+                                        }`}
+                                    >
+                                        58 mm (Mini)
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaperSize('80mm')}
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                                            paperSize === '80mm'
+                                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                                : 'bg-white text-slate-700 border-slate-200'
+                                        }`}
+                                    >
+                                        80 mm (Standar)
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         {/* Thermal Receipt Body (Has id="thermal-receipt" for @media print) */}
-                        <div
-                            id="thermal-receipt"
-                            className="bg-white p-4 rounded-xl border border-slate-200 font-mono text-xs text-black"
-                            style={{ maxWidth: paperSize === '80mm' ? '80mm' : '58mm', margin: '0 auto' }}
-                        >
-                            {/* Header */}
-                            <div className="text-center pb-2 border-b border-dashed border-black">
-                                <h2 className="text-sm font-black tracking-tight">
-                                    APOTEK SEHAT
-                                </h2>
-                                <p className="text-[10px]">
-                                    Jl. Farmasi Sehat No. 88
-                                </p>
-                                <p className="text-[10px]">
-                                    Telp: (021) 555-0123
-                                </p>
-                                <div className="mt-1 font-bold text-[11px]">
-                                    {lastCompletedSale.invoice_number}
-                                </div>
-                                <p className="text-[9px]">
-                                    {new Date(lastCompletedSale.created_at).toLocaleString('id-ID')}
-                                </p>
-                            </div>
-
-                            {/* Customer & Cashier */}
-                            <div className="py-2 text-[10px] space-y-0.5 border-b border-dashed border-black">
-                                <div className="flex justify-between">
-                                    <span>Kasir:</span>
-                                    <span>{lastCompletedSale.user?.name}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Pelanggan:</span>
-                                    <span>{lastCompletedSale.customer_name}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Metode:</span>
-                                    <span className="uppercase">{lastCompletedSale.payment_method}</span>
-                                </div>
-                            </div>
-
-                            {/* Itemized List */}
-                            <div className="py-2 space-y-1.5 border-b border-dashed border-black text-[10px]">
-                                {lastCompletedSale.items?.map((item, idx) => (
-                                    <div key={idx}>
-                                        <div className="font-bold">
-                                            {item.medicine_name}
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>
-                                                {item.quantity} x {item.price.toLocaleString('id-ID')}
-                                            </span>
-                                            <span>
-                                                {item.subtotal.toLocaleString('id-ID')}
-                                            </span>
-                                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
+                            <div
+                                id="thermal-receipt"
+                                className="bg-white p-4 rounded-xl border border-slate-200 font-mono text-xs text-black shadow-xs"
+                                style={{ maxWidth: paperSize === '80mm' ? '80mm' : '58mm', margin: '0 auto' }}
+                            >
+                                {/* Header */}
+                                <div className="text-center pb-2 border-b border-dashed border-black">
+                                    <h2 className="text-sm font-black tracking-tight">
+                                        APOTEK SEHAT
+                                    </h2>
+                                    <p className="text-[10px]">
+                                        Jl. Farmasi Sehat No. 88
+                                    </p>
+                                    <p className="text-[10px]">
+                                        Telp: (021) 555-0123
+                                    </p>
+                                    <div className="mt-1 font-bold text-[11px]">
+                                        {lastCompletedSale.invoice_number}
                                     </div>
-                                ))}
-                            </div>
-
-                            {/* Totals */}
-                            <div className="py-2 space-y-1 text-[11px] border-b border-dashed border-black">
-                                <div className="flex justify-between">
-                                    <span>Subtotal:</span>
-                                    <span>{lastCompletedSale.subtotal.toLocaleString('id-ID')}</span>
+                                    <p className="text-[9px]">
+                                        {new Date(lastCompletedSale.created_at).toLocaleString('id-ID')}
+                                    </p>
                                 </div>
-                                {lastCompletedSale.discount > 0 && (
+
+                                {/* Customer & Cashier */}
+                                <div className="py-2 text-[10px] space-y-0.5 border-b border-dashed border-black">
                                     <div className="flex justify-between">
-                                        <span>Diskon:</span>
-                                        <span>-{lastCompletedSale.discount.toLocaleString('id-ID')}</span>
+                                        <span>Kasir:</span>
+                                        <span>{lastCompletedSale.user?.name}</span>
                                     </div>
-                                )}
-                                <div className="flex justify-between font-black text-xs pt-1">
-                                    <span>TOTAL:</span>
-                                    <span>Rp {lastCompletedSale.total_amount.toLocaleString('id-ID')}</span>
+                                    <div className="flex justify-between">
+                                        <span>Pelanggan:</span>
+                                        <span>{lastCompletedSale.customer_name}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Metode:</span>
+                                        <span className="uppercase">{lastCompletedSale.payment_method}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Bayar:</span>
-                                    <span>Rp {lastCompletedSale.cash_paid.toLocaleString('id-ID')}</span>
-                                </div>
-                                <div className="flex justify-between font-bold">
-                                    <span>Kembali:</span>
-                                    <span>Rp {lastCompletedSale.change_amount.toLocaleString('id-ID')}</span>
-                                </div>
-                            </div>
 
-                            {/* Footer */}
-                            <div className="text-center pt-2 text-[9px] space-y-0.5">
-                                <p>Terima kasih atas kunjungan Anda</p>
-                                <p>Semoga lekas sembuh!</p>
-                                <p>Struk pembayaran yang sah</p>
+                                {/* Itemized List */}
+                                <div className="py-2 space-y-1.5 border-b border-dashed border-black text-[10px]">
+                                    {lastCompletedSale.items?.map((item, idx) => (
+                                        <div key={idx}>
+                                            <div className="font-bold">
+                                                {item.medicine_name}
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>
+                                                    {item.quantity} x {item.price.toLocaleString('id-ID')}
+                                                </span>
+                                                <span>
+                                                    {item.subtotal.toLocaleString('id-ID')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Totals */}
+                                <div className="py-2 space-y-1 text-[11px] border-b border-dashed border-black">
+                                    <div className="flex justify-between">
+                                        <span>Subtotal:</span>
+                                        <span>{lastCompletedSale.subtotal.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    {lastCompletedSale.discount > 0 && (
+                                        <div className="flex justify-between">
+                                            <span>Diskon:</span>
+                                            <span>-{lastCompletedSale.discount.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between font-black text-xs pt-1">
+                                        <span>TOTAL:</span>
+                                        <span>Rp {lastCompletedSale.total_amount.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Bayar:</span>
+                                        <span>Rp {lastCompletedSale.cash_paid.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold">
+                                        <span>Kembali:</span>
+                                        <span>Rp {lastCompletedSale.change_amount.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
+                                <div className="text-center pt-2 text-[9px] space-y-0.5">
+                                    <p>Terima kasih atas kunjungan Anda</p>
+                                    <p>Semoga lekas sembuh!</p>
+                                    <p>Struk pembayaran yang sah</p>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Modal Action Buttons */}
-                        <div className="no-print mt-5 flex gap-2">
+                        {/* Modal Action Buttons (Always sticky at bottom) */}
+                        <div className="no-print shrink-0 p-4 border-t border-slate-200 bg-white flex gap-2">
                             <button
                                 type="button"
                                 onClick={handlePrintThermal}
-                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-slate-800 transition"
+                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-slate-800 active:scale-95 transition"
                             >
                                 <Printer className="h-4 w-4" />
-                                <span>Cetak Struk Termal ({paperSize})</span>
+                                <span>Cetak ({paperSize})</span>
                             </button>
                             <button
                                 type="button"
@@ -961,7 +1070,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                     setReceiptModalOpen(false);
                                     searchInputRef.current?.focus();
                                 }}
-                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-black text-white hover:bg-emerald-700 transition"
+                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-black text-white hover:bg-emerald-700 active:scale-95 transition"
                             >
                                 Transaksi Baru
                             </button>

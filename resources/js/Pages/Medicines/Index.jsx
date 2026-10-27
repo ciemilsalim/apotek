@@ -1,11 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Modal from '@/Components/Modal';
 import BarcodeScannerModal from '@/Components/BarcodeScannerModal';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import BarcodePrintModal from '@/Components/BarcodePrintModal';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowDownRight,
     ArrowUpRight,
+    Barcode,
     Boxes,
     Calendar,
     Camera,
@@ -24,6 +26,7 @@ import {
     Search,
     ShieldAlert,
     SlidersHorizontal,
+    Sparkles,
     Tag,
     Trash2,
     UploadCloud,
@@ -32,13 +35,19 @@ import {
 import { useState } from 'react';
 
 export default function MedicinesIndex({ medicines, categories, filters, units }) {
+    const { pharmacy } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [categoryId, setCategoryId] = useState(filters.category_id || '');
     const [status, setStatus] = useState(filters.status || 'all');
 
     // Camera Scanner & Excel Import States
     const [cameraScannerOpen, setCameraScannerOpen] = useState(false);
+    const [formCameraScannerOpen, setFormCameraScannerOpen] = useState(false);
     const [importModalOpen, setImportModalOpen] = useState(false);
+
+    // Barcode Sticker Print Modal State
+    const [barcodePrintModalOpen, setBarcodePrintModalOpen] = useState(false);
+    const [selectedMedicineForBarcode, setSelectedMedicineForBarcode] = useState(null);
 
     // Form for Excel Import
     const importForm = useForm({
@@ -155,11 +164,25 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         return `B-${cleanCode}-${year}${month}`;
     };
 
+    const generateCustomBarcode = () => {
+        // Standar barcode internal 12-digit (prefix retail '200' + 9 angka acak)
+        const randomDigits = Math.floor(100000000 + Math.random() * 900000000);
+        const generated = `200${randomDigits}`;
+        setData('code', generated);
+    };
+
+    const openBarcodePrintModal = (med) => {
+        setSelectedMedicineForBarcode(med);
+        setBarcodePrintModalOpen(true);
+    };
+
     const openCreateModal = () => {
         setEditingMedicine(null);
         reset();
         clearErrors();
-        const newCode = 'OBT-' + Math.floor(100 + Math.random() * 900);
+        // Generate barcode custom 12-digit otomatis
+        const randomDigits = Math.floor(100000000 + Math.random() * 900000000);
+        const newCode = `200${randomDigits}`;
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
 
@@ -484,41 +507,49 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     </div>
                                 </div>
 
-                                {/* Action Buttons for Mobile */}
-                                <div className="flex items-center justify-between pt-1 gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => openRestockModal(med)}
-                                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
-                                    >
-                                        <Plus className="h-4 w-4" />
-                                        <span>Mutasi Stok</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => openBatchesModal(med)}
-                                        className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100"
-                                        title="Detail Batch"
-                                    >
-                                        <Boxes className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => openEditModal(med)}
-                                        className="rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100"
-                                        title="Ubah Data"
-                                    >
-                                        <Edit className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => confirmDelete(med)}
-                                        className="rounded-xl border border-rose-200 p-2.5 text-rose-600 hover:bg-rose-50"
-                                        title="Hapus"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
+                                    {/* Action Buttons for Mobile */}
+                                    <div className="flex items-center justify-between pt-1 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => openRestockModal(med)}
+                                            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                            <span>Mutasi</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => openBarcodePrintModal(med)}
+                                            className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition"
+                                            title="Cetak Stiker Barcode"
+                                        >
+                                            <Barcode className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => openBatchesModal(med)}
+                                            className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100"
+                                            title="Detail Batch"
+                                        >
+                                            <Boxes className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => openEditModal(med)}
+                                            className="rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100"
+                                            title="Ubah Data"
+                                        >
+                                            <Edit className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => confirmDelete(med)}
+                                            className="rounded-xl border border-rose-200 p-2.5 text-rose-600 hover:bg-rose-50"
+                                            title="Hapus"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
                             </div>
                         );
                     })
@@ -623,6 +654,14 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />
                                                         <span>Mutasi</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openBarcodePrintModal(med)}
+                                                        className="rounded-xl border border-slate-200 p-1.5 text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition"
+                                                        title="Cetak Stiker Barcode Obat"
+                                                    >
+                                                        <Barcode className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         type="button"
@@ -1110,17 +1149,51 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Kode Obat (Barcode / SKU)
-                            </label>
-                            <input
-                                type="text"
-                                value={data.code}
-                                onChange={(e) => setData('code', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
-                                required
-                            />
+                        <div className="sm:col-span-2">
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="block font-bold text-slate-700">
+                                    Kode Obat / Barcode (SKU)
+                                </label>
+                                <span className="text-[11px] text-slate-500 hidden sm:inline">
+                                    Bisa scan barcode fisik atau generate otomatis
+                                </span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <div className="relative flex-1">
+                                    <input
+                                        type="text"
+                                        value={data.code}
+                                        onChange={(e) => setData('code', e.target.value)}
+                                        className="w-full rounded-xl border border-slate-300 pl-3 pr-8 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
+                                        placeholder="Scan barcode kemasan atau ketik kode..."
+                                        required
+                                    />
+                                    <Barcode className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormCameraScannerOpen(true)}
+                                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-2xs"
+                                        title="Scan Barcode Kemasan via Kamera Perangkat"
+                                    >
+                                        <Camera className="h-4 w-4" />
+                                        <span>Scan Kamera</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={generateCustomBarcode}
+                                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
+                                        title="Buat Barcode 12-Digit Internal Otomatis"
+                                    >
+                                        <Sparkles className="h-4 w-4 text-amber-500" />
+                                        <span>Buat Barcode</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="mt-1 text-[11px] text-slate-500">
+                                Pindai barcode pada kotak/botol obat, atau gunakan tombol &ldquo;Buat Barcode&rdquo; untuk membuat barcode internal yang dapat dicetak stiker dan ditempelkan pada obat.
+                            </p>
                         </div>
 
                         <div>
@@ -1440,12 +1513,30 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 </form>
             </Modal>
 
-            {/* Camera Barcode Scanner Modal */}
+            {/* Camera Barcode Scanner for Search */}
             <BarcodeScannerModal
                 isOpen={cameraScannerOpen}
                 onClose={() => setCameraScannerOpen(false)}
                 onScan={handleCameraScan}
-                title="Scan Barcode Obat"
+                title="Scan Barcode Obat (Pencarian)"
+            />
+
+            {/* Camera Barcode Scanner for Medicine Form (Add / Edit) */}
+            <BarcodeScannerModal
+                isOpen={formCameraScannerOpen}
+                onClose={() => setFormCameraScannerOpen(false)}
+                onScan={(scannedCode) => {
+                    setData('code', scannedCode);
+                }}
+                title="Pindai Barcode Kemasan Obat"
+            />
+
+            {/* Barcode Sticker Label Print Modal */}
+            <BarcodePrintModal
+                isOpen={barcodePrintModalOpen}
+                onClose={() => setBarcodePrintModalOpen(false)}
+                medicine={selectedMedicineForBarcode}
+                pharmacy={pharmacy}
             />
         </AuthenticatedLayout>
     );

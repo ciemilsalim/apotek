@@ -8,6 +8,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -79,6 +80,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');
             Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+
+            // Laporan Laba Rugi (Profit & Loss / Income Statement)
+            Route::get('/profit-loss', [ProfitLossController::class, 'index'])->name('profit-loss');
+            Route::get('/profit-loss/export/pdf', [ProfitLossController::class, 'exportPdf'])->name('profit-loss.export.pdf');
+            Route::get('/profit-loss/export/excel', [ProfitLossController::class, 'exportExcel'])->name('profit-loss.export.excel');
         });
 
         // Finance & Cash Flow (Manajemen Keuangan & Arus Kas)

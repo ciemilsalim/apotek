@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     Calendar,
     CircleDollarSign,
@@ -102,6 +102,28 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
             }
         >
             <Head title="Laporan Penjualan - Apotek Sehat" />
+
+            {/* Top Module Navigation Bar */}
+            <div className="mb-4 flex border-b border-slate-200 bg-white px-4 pt-2 rounded-t-xl shadow-xs">
+                <Link
+                    href={route('reports.index')}
+                    className="border-b-2 border-emerald-600 px-4 py-2.5 text-xs font-bold text-emerald-700 transition"
+                >
+                    Laporan Transaksi Penjualan
+                </Link>
+                <Link
+                    href={route('reports.profit-loss')}
+                    className="border-b-2 border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                >
+                    Laporan Laba Rugi & HPP
+                </Link>
+                <Link
+                    href={route('finance.index')}
+                    className="border-b-2 border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                >
+                    Buku Kas & Arus Kas
+                </Link>
+            </div>
 
             {/* Quick Period Selector Tabs */}
             <div className="mb-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">

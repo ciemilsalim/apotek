@@ -149,14 +149,20 @@
         <table class="header-table">
             <tr>
                 <td style="width: 60%;">
-                    <div class="brand-title">APOTEK SEHAT</div>
-                    <div class="brand-subtitle">Sistem Informasi Farmasi & Laporan Keuangan Terpadu</div>
+                    <div class="brand-title">{{ $pharmacy->name ?? 'APOTEK SEHAT' }}</div>
+                    <div class="brand-subtitle">{{ $pharmacy->tagline ?? 'Sistem Informasi Farmasi & Laporan Keuangan Terpadu' }}</div>
+                    @if(!empty($pharmacy->address))
+                        <div style="font-size: 8px; color: #64748b; margin-top: 2px;">{{ $pharmacy->address }} @if(!empty($pharmacy->phone)) | Telp: {{ $pharmacy->phone }} @endif</div>
+                    @endif
                     <div class="report-title">{{ $title }}</div>
                 </td>
                 <td style="width: 40%;" class="meta-text">
                     <div>Periode: <strong>{{ $startDate }} - {{ $endDate }}</strong></div>
                     <div>Dicetak: <strong>{{ $generatedAt }}</strong></div>
                     <div>Oleh: <strong>{{ $generatedBy }}</strong></div>
+                    @if(!empty($pharmacy->sia_number))
+                        <div>No. SIA: <strong>{{ $pharmacy->sia_number }}</strong></div>
+                    @endif
                     <div>Sifat: <strong>Laporan Keuangan Resmi</strong></div>
                 </td>
             </tr>
@@ -309,21 +315,21 @@
                 <div>Mengetahui,</div>
                 <div><strong>Apoteker Pengelola Apotek (APA)</strong></div>
                 <div class="sign-space"></div>
-                <div>( .................................................. )</div>
-                <div style="color: #64748b; font-size: 8px;">SIPA: .......................................</div>
+                <div>( <strong>{{ $pharmacy->apa_name ?? '..................................................' }}</strong> )</div>
+                <div style="color: #64748b; font-size: 8px;">SIPA: {{ $pharmacy->sipa_number ?? '.......................................' }}</div>
             </td>
             <td>
                 <div>Dibuat Oleh,</div>
                 <div><strong>Bagian Keuangan & Administrasi</strong></div>
                 <div class="sign-space"></div>
                 <div>( <strong>{{ $generatedBy }}</strong> )</div>
-                <div style="color: #64748b; font-size: 8px;">Apotek Sehat</div>
+                <div style="color: #64748b; font-size: 8px;">{{ $pharmacy->name ?? 'Apotek Sehat' }}</div>
             </td>
         </tr>
     </table>
 
     <div class="footer">
-        Dokumen Laporan Laba Rugi dihasilkan otomatis oleh Sistem Informasi Farmasi Apotek Sehat pada {{ $generatedAt }}.
+        Dokumen Laporan Laba Rugi dihasilkan otomatis oleh Sistem Informasi Farmasi {{ $pharmacy->name ?? 'Apotek Sehat' }} pada {{ $generatedAt }}.
     </div>
 </body>
 </html>

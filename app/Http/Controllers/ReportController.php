@@ -110,6 +110,7 @@ class ReportController extends Controller
         $totalItemsSold = (int) SaleItem::whereIn('sale_id', $saleIds)->sum('quantity');
 
         $pdf = Pdf::loadView('reports.pdf', [
+            'pharmacy' => \App\Models\PharmacyProfile::getSettings(),
             'title' => $title,
             'sales' => $sales,
             'totalRevenue' => $totalRevenue,

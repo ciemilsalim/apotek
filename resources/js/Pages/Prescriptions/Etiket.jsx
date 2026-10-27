@@ -1,7 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Printer } from 'lucide-react';
 
 export default function PrescriptionEtiket({ prescription }) {
+    const { pharmacy } = usePage().props;
     const handlePrint = () => {
         window.print();
     };
@@ -57,13 +58,13 @@ export default function PrescriptionEtiket({ prescription }) {
                             {/* Pharmacy Header */}
                             <div className="text-center pb-2 border-b-2 border-dashed border-slate-300">
                                 <div className="font-black text-sm uppercase tracking-wide">
-                                    APOTEK SEHAT FARMA
+                                    {pharmacy?.name || 'APOTEK SEHAT'}
                                 </div>
                                 <div className="text-[10px] text-slate-500">
-                                    SIPA: 503/442/SIPA/2026 • Telp: (021) 555-0199
+                                    {pharmacy?.sipa_number ? `SIPA: ${pharmacy.sipa_number}` : ''} {pharmacy?.phone ? `• Telp: ${pharmacy.phone}` : ''}
                                 </div>
                                 <div className="text-[10px] text-slate-500">
-                                    Jl. Raya Farmasi No. 12, Jakarta
+                                    {pharmacy?.address || 'Jl. Raya Farmasi No. 12'}
                                 </div>
                             </div>
 

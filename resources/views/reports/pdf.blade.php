@@ -102,6 +102,18 @@
             color: #334155;
             text-transform: uppercase;
         }
+        .sign-table {
+            width: 100%;
+            margin-top: 24px;
+        }
+        .sign-table td {
+            width: 50%;
+            text-align: center;
+            font-size: 9px;
+        }
+        .sign-space {
+            height: 45px;
+        }
         .footer {
             margin-top: 24px;
             padding-top: 10px;
@@ -116,13 +128,19 @@
         <table class="header-table">
             <tr>
                 <td style="width: 60%;">
-                    <div class="brand-title">APOTEK SEHAT</div>
-                    <div class="brand-subtitle">Sistem Informasi Farmasi & Manajemen Obat Terpadu</div>
+                    <div class="brand-title">{{ $pharmacy->name ?? 'APOTEK SEHAT' }}</div>
+                    <div class="brand-subtitle">{{ $pharmacy->tagline ?? 'Sistem Informasi Farmasi & Manajemen Obat Terpadu' }}</div>
+                    @if(!empty($pharmacy->address))
+                        <div style="font-size: 8px; color: #64748b; margin-top: 2px;">{{ $pharmacy->address }} @if(!empty($pharmacy->phone)) | Telp: {{ $pharmacy->phone }} @endif</div>
+                    @endif
                     <div class="report-title">{{ $title }}</div>
                 </td>
                 <td style="width: 40%;" class="meta-text">
                     <div>Dicetak pada: <strong>{{ $generatedAt }}</strong></div>
                     <div>Oleh: <strong>{{ $generatedBy }}</strong></div>
+                    @if(!empty($pharmacy->sia_number))
+                        <div>No. SIA: <strong>{{ $pharmacy->sia_number }}</strong></div>
+                    @endif
                     <div>Status Dokumen: <strong>Resmi & Sah</strong></div>
                 </td>
             </tr>
@@ -193,10 +211,30 @@
         @endif
     </table>
 
+    <!-- Tanda Tangan Resmi -->
+    <table class="sign-table">
+        <tr>
+            <td>
+                <div>Mengetahui,</div>
+                <div><strong>Apoteker Pengelola Apotek (APA)</strong></div>
+                <div class="sign-space"></div>
+                <div>( <strong>{{ $pharmacy->apa_name ?? '..................................................' }}</strong> )</div>
+                <div style="color: #64748b; font-size: 8px;">SIPA: {{ $pharmacy->sipa_number ?? '.......................................' }}</div>
+            </td>
+            <td>
+                <div>Dibuat Oleh,</div>
+                <div><strong>Petugas / Penanggung Jawab Laporan</strong></div>
+                <div class="sign-space"></div>
+                <div>( <strong>{{ $generatedBy }}</strong> )</div>
+                <div style="color: #64748b; font-size: 8px;">{{ $pharmacy->name ?? 'Apotek Sehat' }}</div>
+            </td>
+        </tr>
+    </table>
+
     <div class="footer">
         <table style="width: 100%;">
             <tr>
-                <td>Laporan ini di-generate otomatis oleh Sistem Apotek Sehat.</td>
+                <td>Laporan ini di-generate otomatis oleh Sistem {{ $pharmacy->name ?? 'Apotek Sehat' }}.</td>
                 <td class="text-right">Halaman 1 / 1</td>
             </tr>
         </table>

@@ -187,7 +187,10 @@ class FinanceController extends Controller
         $totalIncome = $totalSales + $totalOtherIncome;
         $netCashFlow = $totalIncome - $totalExpense;
 
+        $pharmacy = \App\Models\PharmacyProfile::getSettings();
+
         $pdf = Pdf::loadView('reports.finance_pdf', [
+            'pharmacy' => $pharmacy,
             'title' => $title,
             'startDate' => $start->translatedFormat('d F Y'),
             'endDate' => $end->translatedFormat('d F Y'),
@@ -212,6 +215,7 @@ class FinanceController extends Controller
     public function exportExcel(Request $request): StreamedResponse
     {
         [$start, $end, $title, $filters] = $this->getPeriodRange($request);
+        $pharmacy = \App\Models\PharmacyProfile::getSettings();
 
         $salesQuery = Sale::whereBetween('created_at', [$start, $end]);
         $totalSales = (float) (clone $salesQuery)->sum('total_amount');
@@ -241,11 +245,11 @@ class FinanceController extends Controller
 
         $categories = FinancialTransaction::getCategories();
 
-        $callback = function () use ($transactions, $title, $totalSales, $salesCash, $salesNonCash, $totalOtherIncome, $totalIncome, $totalExpense, $netCashFlow, $categories) {
+        $callback = function () use ($pharmacy, $transactions, $title, $totalSales, $salesCash, $salesNonCash, $totalOtherIncome, $totalIncome, $totalExpense, $netCashFlow, $categories) {
             $handle = fopen('php://output', 'w');
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
 
-            fputcsv($handle, ['APOTEK SEHAT']);
+            fputcsv($handle, [$pharmacy->name ?? 'APOTEK SEHAT']);
             fputcsv($handle, [$title]);
             fputcsv($handle, ['Waktu Ekspor: ' . Carbon::now()->format('d/m/Y H:i:s')]);
             fputcsv($handle, []);

@@ -195,8 +195,10 @@ class ProfitLossController extends Controller
     {
         [$start, $end, $title, $filters] = $this->getPeriodRange($request);
         $data = $this->calculateProfitLossData($start, $end);
+        $pharmacy = \App\Models\PharmacyProfile::getSettings();
 
         $pdf = Pdf::loadView('reports.profit_loss_pdf', array_merge($data, [
+            'pharmacy' => $pharmacy,
             'title' => $title,
             'startDate' => $start->translatedFormat('d F Y'),
             'endDate' => $end->translatedFormat('d F Y'),
@@ -213,6 +215,7 @@ class ProfitLossController extends Controller
     {
         [$start, $end, $title, $filters] = $this->getPeriodRange($request);
         $data = $this->calculateProfitLossData($start, $end);
+        $pharmacy = \App\Models\PharmacyProfile::getSettings();
 
         $filename = 'laporan-laba-rugi-' . Carbon::now()->format('Ymd_His') . '.csv';
 
@@ -224,11 +227,11 @@ class ProfitLossController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function () use ($data, $title, $start, $end) {
+        $callback = function () use ($pharmacy, $data, $title, $start, $end) {
             $handle = fopen('php://output', 'w');
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
 
-            fputcsv($handle, ['APOTEK SEHAT']);
+            fputcsv($handle, [$pharmacy->name ?? 'APOTEK SEHAT']);
             fputcsv($handle, ['LAPORAN LABA RUGI KOMPREHENSIF']);
             fputcsv($handle, [$title]);
             fputcsv($handle, ['Periode: ' . $start->format('d/m/Y') . ' - ' . $end->format('d/m/Y')]);

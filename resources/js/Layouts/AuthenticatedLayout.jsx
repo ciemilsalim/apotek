@@ -16,6 +16,7 @@ import {
     Pill,
     Settings,
     ShoppingCart,
+    Store,
     TrendingUp,
     User,
     Users,
@@ -25,7 +26,7 @@ import {
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const { auth, flash } = usePage().props;
+    const { auth, flash, pharmacy } = usePage().props;
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dismissFlash, setDismissFlash] = useState(false);
@@ -206,6 +207,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     icon: Users,
                     roles: ['admin'],
                 },
+                {
+                    title: 'Profil & Identitas Apotek',
+                    subtitle: 'Nama, logo, legalitas & struk',
+                    href: route('settings.pharmacy.edit'),
+                    active: route().current('settings.pharmacy.*'),
+                    icon: Store,
+                    roles: ['admin'],
+                },
             ],
         },
     ];
@@ -229,15 +238,23 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* Brand Header */}
                 <div className="flex h-20 items-center justify-between px-6 border-b border-slate-100">
                     <Link href={route('dashboard')} className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm">
-                            <Pill className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <div className="text-base font-extrabold text-slate-900 leading-tight">
-                                Apotek Sehat
+                        {pharmacy?.logo_url ? (
+                            <img
+                                src={pharmacy.logo_url}
+                                alt={pharmacy.name || 'Logo Apotek'}
+                                className="h-11 w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs"
+                            />
+                        ) : (
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm">
+                                <Pill className="h-6 w-6" />
                             </div>
-                            <div className="text-xs text-slate-500 font-medium">
-                                Sistem Manajemen Mudah
+                        )}
+                        <div className="min-w-0">
+                            <div className="text-base font-extrabold text-slate-900 leading-tight truncate">
+                                {pharmacy?.name || 'Apotek Sehat'}
+                            </div>
+                            <div className="text-xs text-slate-500 font-medium truncate">
+                                {pharmacy?.tagline || 'Sistem Manajemen Mudah'}
                             </div>
                         </div>
                     </Link>
@@ -347,11 +364,19 @@ export default function AuthenticatedLayout({ header, children }) {
                             <Menu className="h-5 w-5" />
                         </button>
                         <div className="flex items-center gap-2 lg:hidden">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
-                                <Pill className="h-5 w-5" />
-                            </div>
-                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight">
-                                Apotek Sehat
+                            {pharmacy?.logo_url ? (
+                                <img
+                                    src={pharmacy.logo_url}
+                                    alt={pharmacy.name || 'Logo Apotek'}
+                                    className="h-9 w-9 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs"
+                                />
+                            ) : (
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
+                                    <Pill className="h-5 w-5" />
+                                </div>
+                            )}
+                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[200px]">
+                                {pharmacy?.name || 'Apotek Sehat'}
                             </span>
                         </div>
                         <div className="hidden lg:block">{header}</div>

@@ -32,7 +32,7 @@ export default function PosIndex({
     filters,
     readyPrescriptions = [],
 }) {
-    const { flash } = usePage().props;
+    const { flash, pharmacy } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [selectedCategory, setSelectedCategory] = useState(filters.category_id || '');
     const [cart, setCart] = useState([]);
@@ -1166,15 +1166,29 @@ export default function PosIndex({
                             >
                                 {/* Header */}
                                 <div className="text-center pb-2 border-b border-dashed border-black">
-                                    <h2 className="text-sm font-black tracking-tight">
-                                        APOTEK SEHAT
+                                    {pharmacy?.logo_url && (
+                                        <img
+                                            src={pharmacy.logo_url}
+                                            alt="Logo"
+                                            className="h-8 w-8 mx-auto object-contain mb-1"
+                                        />
+                                    )}
+                                    <h2 className="text-sm font-black tracking-tight uppercase">
+                                        {pharmacy?.name || 'APOTEK SEHAT'}
                                     </h2>
+                                    {pharmacy?.tagline && (
+                                        <p className="text-[9px] italic text-slate-600 mb-0.5">
+                                            {pharmacy.tagline}
+                                        </p>
+                                    )}
                                     <p className="text-[10px]">
-                                        Jl. Farmasi Sehat No. 88
+                                        {pharmacy?.address || 'Jl. Farmasi Sehat No. 88'}
                                     </p>
-                                    <p className="text-[10px]">
-                                        Telp: (021) 555-0123
-                                    </p>
+                                    {pharmacy?.phone && (
+                                        <p className="text-[10px]">
+                                            Telp: {pharmacy.phone}
+                                        </p>
+                                    )}
                                     <div className="mt-1 font-bold text-[11px]">
                                         {lastCompletedSale.invoice_number}
                                     </div>
@@ -1245,10 +1259,18 @@ export default function PosIndex({
                                 </div>
 
                                 {/* Footer */}
-                                <div className="text-center pt-2 text-[9px] space-y-0.5">
-                                    <p>Terima kasih atas kunjungan Anda</p>
-                                    <p>Semoga lekas sembuh!</p>
-                                    <p>Struk pembayaran yang sah</p>
+                                <div className="text-center pt-2 text-[9px] leading-relaxed">
+                                    {pharmacy?.receipt_footer ? (
+                                        <div className="whitespace-pre-line font-bold">
+                                            {pharmacy.receipt_footer}
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-0.5">
+                                            <p className="font-bold">Terima kasih atas kunjungan Anda</p>
+                                            <p>Semoga lekas sembuh!</p>
+                                            <p>Struk pembayaran yang sah</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

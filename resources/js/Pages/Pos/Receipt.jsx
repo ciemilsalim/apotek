@@ -1,9 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle2, Printer, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PosReceipt({ sale }) {
+    const { pharmacy } = usePage().props;
     const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
 
     const formatCurrency = (val) => {
@@ -132,15 +133,29 @@ export default function PosReceipt({ sale }) {
                 >
                     {/* Header */}
                     <div className="text-center pb-3 border-b border-dashed border-black">
-                        <h2 className="text-base font-black tracking-tight">
-                            APOTEK SEHAT
+                        {pharmacy?.logo_url && (
+                            <img
+                                src={pharmacy.logo_url}
+                                alt="Logo"
+                                className="h-9 w-9 mx-auto object-contain mb-1"
+                            />
+                        )}
+                        <h2 className="text-base font-black tracking-tight uppercase">
+                            {pharmacy?.name || 'APOTEK SEHAT'}
                         </h2>
+                        {pharmacy?.tagline && (
+                            <p className="text-[9px] italic text-slate-600 mb-0.5">
+                                {pharmacy.tagline}
+                            </p>
+                        )}
                         <p className="text-[10px]">
-                            Jl. Farmasi Sehat No. 88
+                            {pharmacy?.address || 'Jl. Farmasi Sehat No. 88'}
                         </p>
-                        <p className="text-[10px]">
-                            Telp: (021) 555-0123
-                        </p>
+                        {pharmacy?.phone && (
+                            <p className="text-[10px]">
+                                Telp: {pharmacy.phone}
+                            </p>
+                        )}
                         <div className="mt-1 font-bold text-xs">
                             {sale.invoice_number}
                         </div>
@@ -223,10 +238,18 @@ export default function PosReceipt({ sale }) {
                     </div>
 
                     {/* Footer */}
-                    <div className="text-center pt-3 text-[9px] space-y-0.5">
-                        <p className="font-bold">Terima kasih atas kunjungan Anda</p>
-                        <p>Semoga lekas sembuh!</p>
-                        <p>Struk ini bukti pembayaran sah</p>
+                    <div className="text-center pt-3 text-[9px] leading-relaxed">
+                        {pharmacy?.receipt_footer ? (
+                            <div className="whitespace-pre-line font-bold">
+                                {pharmacy.receipt_footer}
+                            </div>
+                        ) : (
+                            <div className="space-y-0.5">
+                                <p className="font-bold">Terima kasih atas kunjungan Anda</p>
+                                <p>Semoga lekas sembuh!</p>
+                                <p>Struk ini bukti pembayaran sah</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 

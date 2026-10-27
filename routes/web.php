@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpiryController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\PharmacyProfileController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ProfileController;
@@ -28,12 +29,19 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 3. Admin Only: User Management
-    Route::middleware(['role:admin'])->prefix('users')->name('users.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::put('/{user}', [UserController::class, 'update'])->name('update');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    // 3. Admin Only: User Management & Pharmacy Profile Settings
+    Route::middleware(['role:admin'])->group(function () {
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::put('/{user}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/pharmacy', [PharmacyProfileController::class, 'edit'])->name('pharmacy.edit');
+            Route::post('/pharmacy', [PharmacyProfileController::class, 'update'])->name('pharmacy.update');
+        });
     });
 
     // 4. Admin & Operator: Medicine Stock Management (CRUD) & Categories

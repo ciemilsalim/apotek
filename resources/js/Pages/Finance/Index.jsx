@@ -185,6 +185,28 @@ export default function FinanceIndex({
             <Head title="Manajemen Keuangan & Arus Kas" />
 
             <div className="space-y-6">
+                {/* Module Navigation Tabs */}
+                <div className="flex border-b border-slate-200 bg-white px-4 pt-2 rounded-t-xl shadow-sm">
+                    <Link
+                        href={route('reports.index')}
+                        className="border-b-2 border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                    >
+                        Laporan Transaksi Penjualan
+                    </Link>
+                    <Link
+                        href={route('reports.profit-loss')}
+                        className="border-b-2 border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                    >
+                        Laporan Laba Rugi & HPP
+                    </Link>
+                    <Link
+                        href={route('finance.index')}
+                        className="border-b-2 border-emerald-600 px-4 py-2.5 text-xs font-bold text-emerald-700 transition"
+                    >
+                        Buku Kas & Arus Kas
+                    </Link>
+                </div>
+
                 {/* 1. Filter Bar */}
                 <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                     <form onSubmit={handleApplyFilter} className="space-y-3">

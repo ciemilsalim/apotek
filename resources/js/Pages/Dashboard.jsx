@@ -9,7 +9,7 @@ import {
     CircleDollarSign,
     Clock,
     FileSpreadsheet,
-    FileText,
+    History,
     Package,
     Pill,
     Plus,
@@ -18,6 +18,7 @@ import {
     ShoppingCart,
     TrendingUp,
     Users,
+    Wallet,
 } from 'lucide-react';
 
 export default function Dashboard({
@@ -77,6 +78,27 @@ export default function Dashboard({
                         </Link>
                     )}
 
+                    {/* Riwayat Penjualan for Kasir */}
+                    {user.role === 'kasir' && (
+                        <Link
+                            href={route('pos.history')}
+                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-slate-800 text-white shadow-sm hover:bg-slate-900 transition active:scale-[0.98]"
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
+                                    <History className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <div className="text-base font-extrabold">Riwayat Struk</div>
+                                    <div className="text-xs text-slate-300 font-medium">
+                                        Cetak ulang struk transaksi
+                                    </div>
+                                </div>
+                            </div>
+                            <ArrowRight className="h-5 w-5" />
+                        </Link>
+                    )}
+
                     {/* Stock Management Quick Button for Operator & Admin */}
                     {['admin', 'operator'].includes(user.role) && (
                         <Link
@@ -90,7 +112,70 @@ export default function Dashboard({
                                 <div>
                                     <div className="text-base font-extrabold">Kelola Stok Obat</div>
                                     <div className="text-xs text-teal-100 font-medium">
-                                        Tambah & periksa persediaan
+                                        Katalog, stok & batch FEFO
+                                    </div>
+                                </div>
+                            </div>
+                            <ArrowRight className="h-5 w-5" />
+                        </Link>
+                    )}
+
+                    {/* Resep Dokter Quick Button for Operator & Admin */}
+                    {['admin', 'operator'].includes(user.role) && (
+                        <Link
+                            href={route('prescriptions.index')}
+                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-indigo-700 text-white shadow-sm hover:bg-indigo-800 transition active:scale-[0.98]"
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
+                                    <Boxes className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <div className="text-base font-extrabold">Resep & Racikan</div>
+                                    <div className="text-xs text-indigo-100 font-medium">
+                                        Formula puyer, kapsul & etiket
+                                    </div>
+                                </div>
+                            </div>
+                            <ArrowRight className="h-5 w-5" />
+                        </Link>
+                    )}
+
+                    {/* Expiry Monitoring Quick Button for Operator & Admin */}
+                    {['admin', 'operator'].includes(user.role) && (
+                        <Link
+                            href={route('expiries.index')}
+                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-amber-600 text-white shadow-sm hover:bg-amber-700 transition active:scale-[0.98]"
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
+                                    <AlertTriangle className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <div className="text-base font-extrabold">Pantau Kadaluarsa</div>
+                                    <div className="text-xs text-amber-100 font-medium">
+                                        Peringatan & karantina batch
+                                    </div>
+                                </div>
+                            </div>
+                            <ArrowRight className="h-5 w-5" />
+                        </Link>
+                    )}
+
+                    {/* Finance & Cash Flow Quick Button for Operator & Admin */}
+                    {['admin', 'operator'].includes(user.role) && (
+                        <Link
+                            href={route('finance.index')}
+                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-sky-700 text-white shadow-sm hover:bg-sky-800 transition active:scale-[0.98]"
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
+                                    <Wallet className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <div className="text-base font-extrabold">Keuangan & Kas</div>
+                                    <div className="text-xs text-sky-100 font-medium">
+                                        Buku kas & catat pengeluaran
                                     </div>
                                 </div>
                             </div>
@@ -101,17 +186,17 @@ export default function Dashboard({
                     {/* Reports Quick Button for Operator & Admin */}
                     {['admin', 'operator'].includes(user.role) && (
                         <Link
-                            href={route('reports.index')}
+                            href={route('reports.profit-loss')}
                             className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-slate-800 text-white shadow-sm hover:bg-slate-900 transition active:scale-[0.98]"
                         >
                             <div className="flex items-center gap-3.5">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <FileText className="h-6 w-6" />
+                                    <TrendingUp className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <div className="text-base font-extrabold">Laporan Penjualan</div>
+                                    <div className="text-base font-extrabold">Laporan Laba Rugi</div>
                                     <div className="text-xs text-slate-300 font-medium">
-                                        Cetak PDF dan unduh Excel
+                                        Analisis HPP, omset & profit
                                     </div>
                                 </div>
                             </div>
@@ -123,7 +208,7 @@ export default function Dashboard({
                     {user.role === 'admin' && (
                         <Link
                             href={route('users.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition active:scale-[0.98] sm:col-span-2 lg:col-span-1"
+                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition active:scale-[0.98]"
                         >
                             <div className="flex items-center gap-3.5">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">

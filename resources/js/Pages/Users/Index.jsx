@@ -3,14 +3,11 @@ import Modal from '@/Components/Modal';
 import { Head, router, useForm } from '@inertiajs/react';
 import {
     Edit,
-    KeyRound,
-    Mail,
-    Phone,
     Plus,
     Search,
     Shield,
     Trash2,
-    UserCheck,
+    User,
     UserPlus,
     Users,
     X,
@@ -65,7 +62,7 @@ export default function UsersIndex({ users, filters, roles }) {
         setData({
             name: user.name,
             email: user.email,
-            password: '', // optional on update
+            password: '',
             role: user.role,
             phone: user.phone || '',
             is_active: Boolean(user.is_active),
@@ -101,20 +98,20 @@ export default function UsersIndex({ users, filters, roles }) {
     const roleBadge = (role) => {
         if (role === 'admin') {
             return (
-                <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                <span className="rounded-lg bg-purple-100 px-2.5 py-1 text-xs font-black text-purple-700 border border-purple-200">
                     Admin
                 </span>
             );
         }
         if (role === 'operator') {
             return (
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                <span className="rounded-lg bg-blue-100 px-2.5 py-1 text-xs font-black text-blue-700 border border-blue-200">
                     Operator
                 </span>
             );
         }
         return (
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+            <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-black text-emerald-700 border border-emerald-200">
                 Kasir
             </span>
         );
@@ -123,41 +120,41 @@ export default function UsersIndex({ users, filters, roles }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                            Manajemen Pengguna
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                            Manajemen Staf & Pengguna
                         </h1>
-                        <p className="text-xs text-slate-500">
-                            Kelola hak akses dan akun staf (Admin, Operator, Kasir)
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                            Kelola data akun staf apotek (Admin, Operator, dan Kasir)
                         </p>
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
                     >
                         <UserPlus className="h-4 w-4" />
-                        <span>Tambah Pengguna</span>
+                        <span>Tambah Pengguna Baru</span>
                     </button>
                 </div>
             }
         >
-            <Head title="Manajemen Pengguna" />
+            <Head title="Kelola Staf - Apotek Sehat" />
 
             {/* Filter and Search Bar */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <div className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
                     className="flex flex-col sm:flex-row gap-3 items-center justify-between"
                 >
-                    <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <div className="relative w-full sm:flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Cari nama, email, nomor HP..."
+                            placeholder="Cari nama atau email staf..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2 text-xs focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-4 py-2.5 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
                         />
                     </div>
 
@@ -172,7 +169,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none"
                         >
                             <option value="">Semua Peran</option>
                             <option value="admin">Admin</option>
@@ -182,7 +179,7 @@ export default function UsersIndex({ users, filters, roles }) {
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                            className="rounded-2xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-900 transition"
                         >
                             Cari
                         </button>
@@ -190,76 +187,111 @@ export default function UsersIndex({ users, filters, roles }) {
                 </form>
             </div>
 
-            {/* Users Table */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Mobile Card List (< 768px) */}
+            <div className="block md:hidden space-y-3 mb-6">
+                {users.data && users.data.length > 0 ? (
+                    users.data.map((u) => (
+                        <div
+                            key={u.id}
+                            className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-3"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 font-black text-slate-700 text-sm">
+                                        {u.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <div className="font-extrabold text-sm text-slate-900">
+                                            {u.name}
+                                        </div>
+                                        <div className="text-xs text-slate-500">{u.email}</div>
+                                    </div>
+                                </div>
+                                {roleBadge(u.role)}
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                                <span className="text-slate-500">
+                                    No. HP: <strong className="text-slate-800">{u.phone || '-'}</strong>
+                                </span>
+                                <div className="flex gap-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => openEditModal(u)}
+                                        className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => confirmDelete(u)}
+                                        className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="py-12 text-center text-xs text-slate-400 bg-white rounded-2xl border border-slate-200">
+                        Tidak ada pengguna yang ditemukan.
+                    </div>
+                )}
+            </div>
+
+            {/* Tablet & Desktop Table (>= 768px) */}
+            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-xs mb-6">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50/75 font-semibold uppercase text-slate-400 dark:border-slate-800 dark:bg-slate-900/50">
+                        <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
                             <tr>
-                                <th className="px-5 py-3.5">Nama & Email</th>
-                                <th className="px-5 py-3.5">Peran</th>
-                                <th className="px-5 py-3.5">No. Telepon</th>
-                                <th className="px-5 py-3.5">Status</th>
-                                <th className="px-5 py-3.5">Terdaftar</th>
-                                <th className="px-5 py-3.5 text-right">Aksi</th>
+                                <th className="px-5 py-4">Nama Lengkap & Email</th>
+                                <th className="px-5 py-4">Hak Akses (Role)</th>
+                                <th className="px-5 py-4">Nomor HP</th>
+                                <th className="px-5 py-4">Status</th>
+                                <th className="px-5 py-4 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        <tbody className="divide-y divide-slate-100">
                             {users.data && users.data.length > 0 ? (
-                                users.data.map((user) => (
-                                    <tr
-                                        key={user.id}
-                                        className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40"
-                                    >
-                                        <td className="px-5 py-3.5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700 font-bold dark:bg-slate-800 dark:text-slate-300">
-                                                    {user.name.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-slate-900 dark:text-white">
-                                                        {user.name}
-                                                    </div>
-                                                    <div className="text-[11px] text-slate-400">
-                                                        {user.email}
-                                                    </div>
-                                                </div>
+                                users.data.map((u) => (
+                                    <tr key={u.id} className="hover:bg-slate-50 transition">
+                                        <td className="px-5 py-4">
+                                            <div className="font-extrabold text-sm text-slate-900">
+                                                {u.name}
                                             </div>
+                                            <div className="text-xs text-slate-500">{u.email}</div>
                                         </td>
-                                        <td className="px-5 py-3.5">
-                                            {roleBadge(user.role)}
+                                        <td className="px-5 py-4">{roleBadge(u.role)}</td>
+                                        <td className="px-5 py-4 text-slate-700 font-medium">
+                                            {u.phone || '-'}
                                         </td>
-                                        <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">
-                                            {user.phone || '-'}
-                                        </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-5 py-4">
                                             <span
                                                 className={`inline-block h-2 w-2 rounded-full mr-1.5 ${
-                                                    user.is_active
-                                                        ? 'bg-emerald-500'
-                                                        : 'bg-slate-400'
+                                                    u.is_active ? 'bg-emerald-500' : 'bg-slate-400'
                                                 }`}
                                             />
-                                            <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
-                                                {user.is_active ? 'Aktif' : 'Nonaktif'}
+                                            <span className="font-bold text-slate-700">
+                                                {u.is_active ? 'Aktif' : 'Nonaktif'}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-3.5 text-slate-500">
-                                            {new Date(user.created_at).toLocaleDateString('id-ID')}
-                                        </td>
-                                        <td className="px-5 py-3.5 text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-5 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-1.5">
                                                 <button
-                                                    onClick={() => openEditModal(user)}
-                                                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
-                                                    title="Ubah data"
+                                                    type="button"
+                                                    onClick={() => openEditModal(u)}
+                                                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100"
+                                                    title="Ubah"
                                                 >
                                                     <Edit className="h-4 w-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => confirmDelete(user)}
-                                                    className="rounded-lg p-1.5 text-rose-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
-                                                    title="Hapus pengguna"
+                                                    type="button"
+                                                    onClick={() => confirmDelete(u)}
+                                                    className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50"
+                                                    title="Hapus"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
@@ -269,166 +301,117 @@ export default function UsersIndex({ users, filters, roles }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td
-                                        colSpan="6"
-                                        className="py-10 text-center text-xs text-slate-400"
-                                    >
-                                        Tidak ada data pengguna yang ditemukan.
+                                    <td colSpan="5" className="py-12 text-center text-xs text-slate-400">
+                                        Tidak ada pengguna yang ditemukan.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination */}
-                {users.links && users.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs dark:border-slate-800">
-                        <div className="text-slate-500">
-                            Menampilkan {users.from || 0} - {users.to || 0} dari{' '}
-                            {users.total} pengguna
-                        </div>
-                        <div className="flex gap-1">
-                            {users.links.map((link, idx) => (
-                                <button
-                                    key={idx}
-                                    disabled={!link.url}
-                                    onClick={() => link.url && router.visit(link.url)}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`rounded-lg px-2.5 py-1 ${
-                                        link.active
-                                            ? 'bg-emerald-600 text-white font-bold'
-                                            : link.url
-                                            ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                                            : 'text-slate-300 cursor-not-allowed dark:text-slate-700'
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
-            {/* Create / Edit Modal */}
-            <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md">
+            {/* Create / Edit User Modal */}
+            <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="sm">
                 <form onSubmit={handleSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                        <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                            {editingUser ? 'Ubah Data Pengguna' : 'Tambah Pengguna Baru'}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <h2 className="text-base font-extrabold text-slate-900">
+                            {editingUser ? 'Ubah Data Staf' : 'Tambah Staf Baru'}
                         </h2>
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="rounded-xl p-1 text-slate-400 hover:bg-slate-100"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="h-5 w-5" />
                         </button>
                     </div>
 
-                    <div className="mt-4 space-y-4 text-xs">
-                        {/* Name */}
+                    <div className="mt-4 space-y-3.5 text-xs">
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Nama Lengkap
                             </label>
                             <input
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Contoh: Budi Santoso"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                placeholder="Contoh: Rian Pratama"
                                 required
                             />
-                            {errors.name && (
-                                <div className="mt-1 text-rose-500">{errors.name}</div>
-                            )}
                         </div>
 
-                        {/* Email */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Alamat Email
                             </label>
                             <input
                                 type="email"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
                                 placeholder="email@apotek.test"
                                 required
                             />
-                            {errors.email && (
-                                <div className="mt-1 text-rose-500">{errors.email}</div>
-                            )}
                         </div>
 
-                        {/* Role selection */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Peran / Hak Akses (Role)
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Peran Akun (Wewenang)
                             </label>
                             <select
                                 value={data.role}
                                 onChange={(e) => setData('role', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold focus:border-emerald-600 focus:outline-none"
                                 required
                             >
-                                <option value="admin">Admin (Manajemen User, Stok, POS, Laporan)</option>
-                                <option value="operator">Operator (Kelola Stok Obat & Laporan Penjualan)</option>
-                                <option value="kasir">Kasir (Transaksi Penjualan POS)</option>
+                                <option value="kasir">Kasir (Transaksi Penjualan)</option>
+                                <option value="operator">Operator (Kelola Stok & Laporan)</option>
+                                <option value="admin">Admin (Akses Penuh Seluruh Sistem)</option>
                             </select>
-                            {errors.role && (
-                                <div className="mt-1 text-rose-500">{errors.role}</div>
-                            )}
                         </div>
 
-                        {/* Password */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                {editingUser
-                                    ? 'Kata Sandi Baru (Kosongkan jika tidak diubah)'
-                                    : 'Kata Sandi'}
+                            <label className="block font-bold text-slate-700 mb-1">
+                                {editingUser ? 'Kata Sandi Baru (Opsional)' : 'Kata Sandi Akun'}
                             </label>
                             <input
                                 type="password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
                                 placeholder="Minimal 8 karakter"
                                 required={!editingUser}
                             />
-                            {errors.password && (
-                                <div className="mt-1 text-rose-500">{errors.password}</div>
-                            )}
                         </div>
 
-                        {/* Phone */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Nomor Telepon / WA (Opsional)
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Nomor HP / WA (Opsional)
                             </label>
                             <input
                                 type="text"
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
                                 placeholder="08123456789"
                             />
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+                    <div className="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-2xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition disabled:opacity-50"
+                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Data'}
                         </button>
@@ -436,39 +419,31 @@ export default function UsersIndex({ users, filters, roles }) {
                 </form>
             </Modal>
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Modal */}
             <Modal
                 show={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
                 maxWidth="sm"
             >
                 <div className="p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 mb-4 dark:bg-rose-950/60 dark:text-rose-400">
-                        <Trash2 className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                        Hapus Pengguna Ini?
+                    <h3 className="text-base font-extrabold text-slate-900">
+                        Hapus Staf Ini?
                     </h3>
-                    <p className="mt-1 text-xs text-slate-500">
-                        Apakah Anda yakin ingin menghapus akun pengguna{' '}
-                        <strong className="text-slate-900 dark:text-white">
-                            {userToDelete?.name}
-                        </strong>
-                        ? Tindakan ini tidak dapat dibatalkan.
+                    <p className="mt-1 text-xs text-slate-600">
+                        Apakah Anda yakin ingin menghapus akun <strong>{userToDelete?.name}</strong>?
                     </p>
-
                     <div className="mt-6 flex items-center justify-end gap-2">
                         <button
                             onClick={() => setDeleteModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition"
+                            className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700"
                         >
-                            Ya, Hapus Pengguna
+                            Ya, Hapus
                         </button>
                     </div>
                 </div>

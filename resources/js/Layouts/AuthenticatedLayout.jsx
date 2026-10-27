@@ -1,22 +1,20 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Activity,
     AlertCircle,
     CheckCircle2,
-    ChevronDown,
     ClipboardList,
     FileBarChart2,
     History,
+    Home,
     Layers,
     LayoutDashboard,
     LogOut,
     Menu,
     Pill,
-    PlusCircle,
+    Settings,
     ShoppingCart,
-    UserCheck,
+    User,
     Users,
     X,
 } from 'lucide-react';
@@ -28,290 +26,420 @@ export default function AuthenticatedLayout({ header, children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dismissFlash, setDismissFlash] = useState(false);
 
-    // Role badge color configuration
-    const roleBadges = {
+    // Human-friendly role naming for non-technical users
+    const roleLabels = {
         admin: {
-            label: 'ADMINISTRATOR',
-            classes: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800',
+            name: 'Admin Apotek',
+            badge: 'bg-purple-100 text-purple-800 border-purple-200',
         },
         operator: {
-            label: 'OPERATOR STOK',
-            classes: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800',
+            name: 'Petugas Stok',
+            badge: 'bg-blue-100 text-blue-800 border-blue-200',
         },
         kasir: {
-            label: 'KASIR',
-            classes: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+            name: 'Kasir Penjualan',
+            badge: 'bg-emerald-100 text-emerald-800 border-emerald-200',
         },
     };
 
-    const currentBadge = roleBadges[user.role] || {
-        label: user.role?.toUpperCase(),
-        classes: 'bg-slate-100 text-slate-700 border-slate-200',
+    const currentRole = roleLabels[user.role] || {
+        name: user.role,
+        badge: 'bg-slate-100 text-slate-800 border-slate-200',
     };
 
-    // Navigation items based on role
-    const navItems = [
+    // Primary mobile navigation items
+    const mobileNavItems = [
         {
-            title: 'Dashboard',
+            title: 'Beranda',
             href: route('dashboard'),
             active: route().current('dashboard'),
-            icon: LayoutDashboard,
+            icon: Home,
             roles: ['admin', 'operator', 'kasir'],
         },
         {
-            title: 'Kasir / POS',
+            title: 'Kasir',
             href: route('pos.index'),
-            active: route().current('pos.index'),
+            active: route().current('pos.*'),
             icon: ShoppingCart,
             roles: ['admin', 'kasir'],
         },
         {
-            title: 'Riwayat Penjualan',
-            href: route('pos.history'),
-            active: route().current('pos.history') || route().current('pos.receipt'),
-            icon: History,
-            roles: ['admin', 'kasir'],
-        },
-        {
-            title: 'Data Obat & Stok',
+            title: 'Data Obat',
             href: route('medicines.index'),
-            active: route().current('medicines.index'),
+            active: route().current('medicines.*') || route().current('categories.*'),
             icon: Pill,
             roles: ['admin', 'operator'],
         },
         {
-            title: 'Kategori Obat',
-            href: route('categories.index'),
-            active: route().current('categories.index'),
-            icon: Layers,
-            roles: ['admin', 'operator'],
-        },
-        {
-            title: 'Riwayat Stok',
-            href: route('medicines.adjustments'),
-            active: route().current('medicines.adjustments'),
-            icon: ClipboardList,
-            roles: ['admin', 'operator'],
-        },
-        {
-            title: 'Laporan Penjualan',
+            title: 'Laporan',
             href: route('reports.index'),
             active: route().current('reports.*'),
             icon: FileBarChart2,
             roles: ['admin', 'operator'],
         },
         {
-            title: 'Manajemen Pengguna',
+            title: 'Pengguna',
             href: route('users.index'),
             active: route().current('users.*'),
             icon: Users,
             roles: ['admin'],
         },
+    ].filter((item) => item.roles.includes(user.role));
+
+    // Full sidebar navigation items for Tablet & Desktop
+    const sidebarNavItems = [
+        {
+            section: 'UTAMA',
+            items: [
+                {
+                    title: 'Beranda',
+                    subtitle: 'Ringkasan & status apotek',
+                    href: route('dashboard'),
+                    active: route().current('dashboard'),
+                    icon: LayoutDashboard,
+                    roles: ['admin', 'operator', 'kasir'],
+                },
+            ],
+        },
+        {
+            section: 'PENJUALAN',
+            items: [
+                {
+                    title: 'Kasir / Transaksi',
+                    subtitle: 'Layanan penjualan obat',
+                    href: route('pos.index'),
+                    active: route().current('pos.index'),
+                    icon: ShoppingCart,
+                    roles: ['admin', 'kasir'],
+                },
+                {
+                    title: 'Riwayat Struk Penjualan',
+                    subtitle: 'Daftar transaksi selesai',
+                    href: route('pos.history'),
+                    active: route().current('pos.history') || route().current('pos.receipt'),
+                    icon: History,
+                    roles: ['admin', 'kasir'],
+                },
+            ],
+        },
+        {
+            section: 'STOK & OBAT',
+            items: [
+                {
+                    title: 'Katalog Obat & Stok',
+                    subtitle: 'Daftar obat & tambah stok',
+                    href: route('medicines.index'),
+                    active: route().current('medicines.index'),
+                    icon: Pill,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Kategori Obat',
+                    subtitle: 'Kelompok jenis obat',
+                    href: route('categories.index'),
+                    active: route().current('categories.index'),
+                    icon: Layers,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Catatan Keluar-Masuk Stok',
+                    subtitle: 'Audit mutasi & restock',
+                    href: route('medicines.adjustments'),
+                    active: route().current('medicines.adjustments'),
+                    icon: ClipboardList,
+                    roles: ['admin', 'operator'],
+                },
+            ],
+        },
+        {
+            section: 'LAPORAN & KONTROL',
+            items: [
+                {
+                    title: 'Laporan Penjualan',
+                    subtitle: 'Cetak PDF & Excel',
+                    href: route('reports.index'),
+                    active: route().current('reports.*'),
+                    icon: FileBarChart2,
+                    roles: ['admin', 'operator'],
+                },
+                {
+                    title: 'Kelola Akun Staf',
+                    subtitle: 'Admin, Operator, Kasir',
+                    href: route('users.index'),
+                    active: route().current('users.*'),
+                    icon: Users,
+                    roles: ['admin'],
+                },
+            ],
+        },
     ];
 
-    const allowedNavItems = navItems.filter((item) =>
-        item.roles.includes(user.role),
-    );
-
     return (
-        <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800 dark:bg-slate-900 dark:text-slate-100">
-            {/* Mobile backdrop */}
+        <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800 flex flex-col pb-20 lg:pb-0">
+            {/* Mobile Drawer Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar (Desktop & Tablet Slide-over) */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-950 ${
+                className={`fixed inset-y-0 left-0 z-50 flex w-72 md:w-80 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                } lg:translate-x-0`}
+                }`}
             >
-                {/* Brand header */}
-                <div className="flex h-18 items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-                    <Link href={route('dashboard')}>
-                        <ApplicationLogo />
+                {/* Brand Header */}
+                <div className="flex h-20 items-center justify-between px-6 border-b border-slate-100">
+                    <Link href={route('dashboard')} className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm">
+                            <Pill className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <div className="text-base font-extrabold text-slate-900 leading-tight">
+                                Apotek Sehat
+                            </div>
+                            <div className="text-xs text-slate-500 font-medium">
+                                Sistem Manajemen Mudah
+                            </div>
+                        </div>
                     </Link>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800"
+                        className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 lg:hidden"
+                        aria-label="Tutup Menu"
                     >
-                        <X className="h-5 w-5" />
+                        <X className="h-6 w-6" />
                     </button>
                 </div>
 
-                {/* User mini profile card in sidebar */}
-                <div className="p-4 mx-4 my-3 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/15">
+                {/* User Info Card (Clean Flat Design) */}
+                <div className="p-4 mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-sm">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white font-black text-lg">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                            <p className="truncate text-sm font-bold text-slate-900">
                                 {user.name}
                             </p>
                             <span
-                                className={`inline-block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider border ${currentBadge.classes}`}
+                                className={`inline-block mt-0.5 rounded-lg px-2.5 py-0.5 text-xs font-bold border ${currentRole.badge}`}
                             >
-                                {currentBadge.label}
+                                {currentRole.name}
                             </span>
                         </div>
                     </div>
                 </div>
 
-                {/* Navigation links */}
-                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
-                    <div className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        Menu Utama
+                {/* Sidebar Navigation Links */}
+                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+                    {sidebarNavItems.map((group, gIdx) => {
+                        const filtered = group.items.filter((item) =>
+                            item.roles.includes(user.role),
+                        );
+                        if (filtered.length === 0) return null;
+
+                        return (
+                            <div key={gIdx} className="space-y-1">
+                                <div className="px-3 text-[11px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                    {group.section}
+                                </div>
+                                {filtered.map((item) => {
+                                    const Icon = item.icon;
+                                    return (
+                                        <Link
+                                            key={item.title}
+                                            href={item.href}
+                                            onClick={() => setSidebarOpen(false)}
+                                            className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-all ${
+                                                item.active
+                                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                                    : 'text-slate-700 hover:bg-slate-100'
+                                            }`}
+                                        >
+                                            <Icon
+                                                className={`h-5 w-5 shrink-0 ${
+                                                    item.active ? 'text-white' : 'text-slate-400'
+                                                }`}
+                                            />
+                                            <div className="min-w-0 flex-1">
+                                                <div className="truncate">{item.title}</div>
+                                                <div
+                                                    className={`text-[11px] font-normal truncate ${
+                                                        item.active
+                                                            ? 'text-emerald-100'
+                                                            : 'text-slate-400'
+                                                    }`}
+                                                >
+                                                    {item.subtitle}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Sidebar Footer Logout */}
+                <div className="border-t border-slate-100 p-4">
+                    <Link
+                        href={route('logout')}
+                        method="post"
+                        as="button"
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 hover:bg-rose-100 transition"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        <span>Keluar Akun</span>
+                    </Link>
+                </div>
+            </aside>
+
+            {/* Main Content Area (Mobile First: Full Width on mobile, offset on desktop) */}
+            <div className="flex-1 lg:pl-72 md:lg:pl-80 flex flex-col">
+                {/* Top Clean App Bar */}
+                <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 backdrop-blur-md">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="rounded-2xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100 lg:hidden"
+                            aria-label="Buka Menu Samping"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </button>
+                        <div className="flex items-center gap-2 lg:hidden">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
+                                <Pill className="h-5 w-5" />
+                            </div>
+                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight">
+                                Apotek Sehat
+                            </span>
+                        </div>
+                        <div className="hidden lg:block">{header}</div>
                     </div>
-                    {allowedNavItems.map((item) => {
+
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Current Role Pill */}
+                        <div
+                            className={`rounded-xl px-2.5 py-1 text-xs font-bold border ${currentRole.badge}`}
+                        >
+                            {currentRole.name}
+                        </div>
+
+                        {/* Quick POS Button for Kasir / Admin */}
+                        {['admin', 'kasir'].includes(user.role) && !route().current('pos.*') && (
+                            <Link
+                                href={route('pos.index')}
+                                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                            >
+                                <ShoppingCart className="h-4 w-4" />
+                                <span>Buka Kasir</span>
+                            </Link>
+                        )}
+
+                        {/* Quick Logout Button */}
+                        <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
+                            className="rounded-xl border border-slate-200 p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                            title="Keluar Akun"
+                        >
+                            <LogOut className="h-4 w-4" />
+                        </Link>
+                    </div>
+                </header>
+
+                {/* Subheader Title for Mobile */}
+                {header && (
+                    <div className="block lg:hidden border-b border-slate-200 bg-white px-4 py-3 shadow-xs">
+                        {header}
+                    </div>
+                )}
+
+                {/* Flash Success & Error Notification Banner (Big & Clear) */}
+                {!dismissFlash && (flash?.success || flash?.error) && (
+                    <div className="mx-4 mt-4 sm:mx-6">
+                        {flash.success && (
+                            <div className="flex items-center justify-between rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 text-sm font-semibold text-emerald-900 shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+                                    <span>{flash.success}</span>
+                                </div>
+                                <button
+                                    onClick={() => setDismissFlash(true)}
+                                    className="rounded-lg p-1 text-emerald-700 hover:bg-emerald-100"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+                        )}
+                        {flash.error && (
+                            <div className="flex items-center justify-between rounded-2xl border-2 border-rose-300 bg-rose-50 p-4 text-sm font-semibold text-rose-900 shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <AlertCircle className="h-6 w-6 text-rose-600 shrink-0" />
+                                    <span>{flash.error}</span>
+                                </div>
+                                <button
+                                    onClick={() => setDismissFlash(true)}
+                                    className="rounded-lg p-1 text-rose-700 hover:bg-rose-100"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Page Content */}
+                <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+                    {children}
+                </main>
+            </div>
+
+            {/* Mobile Bottom Navigation Bar (Gold standard for Mobile First UI) */}
+            <nav className="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200/90 py-1.5 px-2 lg:hidden shadow-lg shadow-slate-900/10">
+                <div className="flex items-center justify-around max-w-md mx-auto">
+                    {mobileNavItems.map((item) => {
                         const Icon = item.icon;
                         return (
                             <Link
                                 key={item.title}
                                 href={item.href}
-                                onClick={() => setSidebarOpen(false)}
-                                className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
+                                className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all ${
                                     item.active
-                                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 dark:bg-emerald-500'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+                                        ? 'text-emerald-700 font-extrabold'
+                                        : 'text-slate-500 hover:text-slate-800 font-medium'
                                 }`}
                             >
-                                <Icon
-                                    className={`h-4 w-4 shrink-0 ${
-                                        item.active ? 'text-white' : 'text-slate-400'
+                                <div
+                                    className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
+                                        item.active ? 'bg-emerald-100 text-emerald-700' : ''
                                     }`}
-                                />
-                                <span>{item.title}</span>
+                                >
+                                    <Icon className="h-5 w-5" />
+                                </div>
+                                <span className="text-[11px] mt-0.5 tracking-tight">
+                                    {item.title}
+                                </span>
                             </Link>
                         );
                     })}
-                </div>
-
-                {/* Sidebar footer */}
-                <div className="border-t border-slate-100 p-4 dark:border-slate-800">
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors dark:text-rose-400 dark:hover:bg-rose-950/40"
+                    {/* More button on mobile to open drawer */}
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-slate-500 hover:text-slate-800 font-medium"
                     >
-                        <LogOut className="h-4 w-4" />
-                        <span>Keluar Sistem</span>
-                    </Link>
-                </div>
-            </aside>
-
-            {/* Main content wrapper */}
-            <div className="flex min-h-screen flex-col lg:pl-72">
-                {/* Top header bar */}
-                <header className="sticky top-0 z-30 flex h-18 items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-md sm:px-6 lg:px-8 dark:border-slate-800 dark:bg-slate-950/80">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800"
-                        >
-                            <Menu className="h-6 w-6" />
-                        </button>
-                        <div className="hidden sm:block">
-                            {header}
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl">
+                            <Menu className="h-5 w-5" />
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        {/* Quick POS action button if role is admin or kasir */}
-                        {['admin', 'kasir'].includes(user.role) && (
-                            <Link
-                                href={route('pos.index')}
-                                className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
-                            >
-                                <ShoppingCart className="h-3.5 w-3.5" />
-                                <span>Buka Kasir</span>
-                            </Link>
-                        )}
-
-                        {/* User dropdown menu */}
-                        <Dropdown>
-                            <Dropdown.Trigger>
-                                <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs dark:bg-emerald-900/60 dark:text-emerald-200">
-                                        {user.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="hidden md:inline font-semibold">
-                                        {user.name}
-                                    </span>
-                                    <ChevronDown className="h-4 w-4 text-slate-400" />
-                                </button>
-                            </Dropdown.Trigger>
-
-                            <Dropdown.Content align="right" width="48">
-                                <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 text-xs">
-                                    <div className="font-bold text-slate-900 dark:text-white">
-                                        {user.name}
-                                    </div>
-                                    <div className="text-slate-500 truncate">{user.email}</div>
-                                </div>
-                                <Dropdown.Link href={route('profile.edit')}>
-                                    Profil Saya
-                                </Dropdown.Link>
-                                <Dropdown.Link
-                                    href={route('logout')}
-                                    method="post"
-                                    as="button"
-                                >
-                                    Keluar
-                                </Dropdown.Link>
-                            </Dropdown.Content>
-                        </Dropdown>
-                    </div>
-                </header>
-
-                {/* Mobile title if header is present */}
-                {header && (
-                    <div className="block sm:hidden border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
-                        {header}
-                    </div>
-                )}
-
-                {/* Flash Messages */}
-                {!dismissFlash && (flash?.success || flash?.error) && (
-                    <div className="mx-4 mt-4 sm:mx-6 lg:mx-8">
-                        {flash.success && (
-                            <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200">
-                                <div className="flex items-center gap-2.5">
-                                    <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                    <span>{flash.success}</span>
-                                </div>
-                                <button
-                                    onClick={() => setDismissFlash(true)}
-                                    className="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            </div>
-                        )}
-                        {flash.error && (
-                            <div className="flex items-center justify-between rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 shadow-sm dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200">
-                                <div className="flex items-center gap-2.5">
-                                    <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0" />
-                                    <span>{flash.error}</span>
-                                </div>
-                                <button
-                                    onClick={() => setDismissFlash(true)}
-                                    className="text-rose-600 hover:text-rose-800 dark:text-rose-400"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Main page content */}
-                <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
-            </div>
+                        <span className="text-[11px] mt-0.5 tracking-tight">Lainnya</span>
+                    </button>
+                </div>
+            </nav>
         </div>
     );
 }

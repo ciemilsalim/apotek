@@ -7,7 +7,6 @@ import {
     ArrowUpRight,
     Calendar,
     ClipboardList,
-    DollarSign,
     Edit,
     Filter,
     MapPin,
@@ -38,34 +37,26 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [medicineToDelete, setMedicineToDelete] = useState(null);
 
-    const {
-        data,
-        setData,
-        post,
-        put,
-        processing,
-        errors,
-        reset,
-        clearErrors,
-    } = useForm({
-        code: '',
-        name: '',
-        generic_name: '',
-        category_id: categories[0]?.id || '',
-        unit: 'Strip',
-        buy_price: '',
-        sell_price: '',
-        stock: 0,
-        min_stock: 10,
-        expiry_date: '',
-        location: '',
-        description: '',
-    });
+    const { data, setData, post, put, processing, errors, reset, clearErrors } =
+        useForm({
+            code: '',
+            name: '',
+            generic_name: '',
+            category_id: categories[0]?.id || '',
+            unit: 'Strip',
+            buy_price: '',
+            sell_price: '',
+            stock: 10,
+            min_stock: 10,
+            expiry_date: '',
+            location: 'Rak A-1',
+            description: '',
+        });
 
     const restockForm = useForm({
-        type: 'in', // 'in', 'out', 'adjustment'
+        type: 'in',
         quantity: 10,
-        notes: '',
+        notes: 'Penerimaan stok dari distributor',
     });
 
     const formatCurrency = (val) => {
@@ -81,6 +72,15 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         router.get(
             route('medicines.index'),
             { search, category_id: categoryId, status },
+            { preserveState: true },
+        );
+    };
+
+    const handleQuickFilter = (newStatus) => {
+        setStatus(newStatus);
+        router.get(
+            route('medicines.index'),
+            { search, category_id: categoryId, status: newStatus },
             { preserveState: true },
         );
     };
@@ -146,7 +146,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         restockForm.setData({
             type: 'in',
             quantity: 10,
-            notes: 'Penerimaan stok obat dari distributor',
+            notes: 'Penerimaan stok dari distributor',
         });
         setRestockModalOpen(true);
     };
@@ -176,53 +176,75 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             header={
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                            Data Obat & Manajemen Stok
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                            Data Obat & Persediaan
                         </h1>
-                        <p className="text-xs text-slate-500">
-                            Kelola katalog farmasi, penyesuaian stok, dan pemantauan masa kedaluwarsa
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                            Kelola daftar obat, periksa stok fisik, dan tambah persediaan
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Link
                             href={route('medicines.adjustments')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
-                            <ClipboardList className="h-3.5 w-3.5" />
-                            <span>Riwayat Stok</span>
+                            <ClipboardList className="h-4 w-4" />
+                            <span>Riwayat Mutasi</span>
                         </Link>
                         <button
                             onClick={openCreateModal}
-                            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
                         >
-                            <PackagePlus className="h-4 w-4" />
-                            <span>Tambah Obat</span>
+                            <Plus className="h-4 w-4" />
+                            <span>Tambah Obat Baru</span>
                         </button>
                     </div>
                 </div>
             }
         >
-            <Head title="Data Obat & Stok" />
+            <Head title="Katalog Obat - Apotek Sehat" />
 
-            {/* Filter Bar */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Quick Status Filter Tabs (Big touch targets for mobile) */}
+            <div className="mb-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {[
+                    { id: 'all', label: 'Semua Obat' },
+                    { id: 'low_stock', label: '⚠️ Stok Menipis' },
+                    { id: 'out_of_stock', label: '❌ Stok Habis' },
+                    { id: 'expiring', label: '📅 Hampir Kedaluwarsa' },
+                ].map((tab) => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => handleQuickFilter(tab.id)}
+                        className={`shrink-0 rounded-2xl px-4 py-2.5 text-xs font-extrabold border-2 transition ${
+                            status === tab.id
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Search and Category Filter Bar */}
+            <div className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
-                    className="flex flex-col lg:flex-row gap-3 items-center justify-between"
+                    className="flex flex-col sm:flex-row gap-3 items-center justify-between"
                 >
-                    <div className="relative w-full lg:w-80">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <div className="relative w-full sm:flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Cari kode obat, nama, kandungan, rak..."
+                            placeholder="Cari nama obat, kode, atau kandungan..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2 text-xs focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-4 py-2.5 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
                         />
                     </div>
 
-                    <div className="flex flex-wrap w-full lg:w-auto items-center gap-2">
-                        {/* Category filter */}
+                    <div className="flex w-full sm:w-auto items-center gap-2">
                         <select
                             value={categoryId}
                             onChange={(e) => {
@@ -233,7 +255,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none"
                         >
                             <option value="">Semua Kategori</option>
                             {categories.map((cat) => (
@@ -243,117 +265,156 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             ))}
                         </select>
 
-                        {/* Status filter */}
-                        <select
-                            value={status}
-                            onChange={(e) => {
-                                setStatus(e.target.value);
-                                router.get(
-                                    route('medicines.index'),
-                                    { search, category_id: categoryId, status: e.target.value },
-                                    { preserveState: true },
-                                );
-                            }}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                        >
-                            <option value="all">Semua Status Stok</option>
-                            <option value="low_stock">Stok Menipis (Kritis)</option>
-                            <option value="out_of_stock">Stok Habis (0)</option>
-                            <option value="expiring">Mendekati Kedaluwarsa</option>
-                        </select>
-
                         <button
                             type="submit"
-                            className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                            className="rounded-2xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-900 transition"
                         >
-                            Terapkan
+                            Cari
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Medicines Table */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Mobile View: Clean Medicine Cards (Screen < 768px) */}
+            <div className="block md:hidden space-y-3 mb-6">
+                {medicines.data && medicines.data.length > 0 ? (
+                    medicines.data.map((med) => {
+                        const isLow = med.stock <= med.min_stock;
+                        const isOut = med.stock <= 0;
+
+                        return (
+                            <div
+                                key={med.id}
+                                className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-3"
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="text-base font-extrabold text-slate-900">
+                                            {med.name}
+                                        </div>
+                                        <div className="text-xs text-slate-500 font-mono mt-0.5">
+                                            {med.code} • {med.category?.name || '-'}
+                                        </div>
+                                    </div>
+                                    <span
+                                        className={`rounded-xl px-2.5 py-1 text-xs font-black ${
+                                            isOut
+                                                ? 'bg-rose-100 text-rose-700 border border-rose-200'
+                                                : isLow
+                                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                                : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                        }`}
+                                    >
+                                        Stok: {med.stock} {med.unit}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div className="flex items-center gap-1 text-slate-500">
+                                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                                        <span>{med.location || 'Rak belum diatur'}</span>
+                                    </div>
+                                    <div className="font-black text-sm text-emerald-700">
+                                        {formatCurrency(med.sell_price)}
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons for Mobile */}
+                                <div className="flex items-center justify-between pt-1 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => openRestockModal(med)}
+                                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        <span>Tambah Stok</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => openEditModal(med)}
+                                        className="rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100"
+                                        title="Ubah Data"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => confirmDelete(med)}
+                                        className="rounded-xl border border-rose-200 p-2.5 text-rose-600 hover:bg-rose-50"
+                                        title="Hapus"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="py-12 text-center text-xs text-slate-400 bg-white rounded-2xl border border-slate-200">
+                        Tidak ada data obat yang ditemukan.
+                    </div>
+                )}
+            </div>
+
+            {/* Tablet & Desktop View: Clean Flat Table (Screen >= 768px) */}
+            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-xs mb-6">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50/75 font-semibold uppercase text-slate-400 dark:border-slate-800 dark:bg-slate-900/50">
+                        <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
                             <tr>
-                                <th className="px-5 py-3.5">Kode & Nama Obat</th>
-                                <th className="px-5 py-3.5">Kategori & Lokasi</th>
-                                <th className="px-5 py-3.5 text-right">Harga Beli</th>
-                                <th className="px-5 py-3.5 text-right">Harga Jual</th>
-                                <th className="px-5 py-3.5 text-center">Stok</th>
-                                <th className="px-5 py-3.5">Kedaluwarsa</th>
-                                <th className="px-5 py-3.5 text-right">Aksi</th>
+                                <th className="px-5 py-4">Kode & Nama Obat</th>
+                                <th className="px-5 py-4">Kategori & Posisi Rak</th>
+                                <th className="px-5 py-4 text-right">Harga Jual</th>
+                                <th className="px-5 py-4 text-center">Jumlah Stok</th>
+                                <th className="px-5 py-4">Kedaluwarsa</th>
+                                <th className="px-5 py-4 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        <tbody className="divide-y divide-slate-100">
                             {medicines.data && medicines.data.length > 0 ? (
                                 medicines.data.map((med) => {
                                     const isLow = med.stock <= med.min_stock;
                                     const isOut = med.stock <= 0;
+
                                     return (
-                                        <tr
-                                            key={med.id}
-                                            className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40"
-                                        >
-                                            <td className="px-5 py-3.5">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 font-bold dark:bg-emerald-950/60 dark:text-emerald-300">
-                                                        <Pill className="h-4 w-4" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-slate-900 dark:text-white">
-                                                            {med.name}
-                                                        </div>
-                                                        <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                                                            <span className="font-mono font-semibold text-emerald-600">
-                                                                {med.code}
-                                                            </span>
-                                                            {med.generic_name && (
-                                                                <span>• {med.generic_name}</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                        <tr key={med.id} className="hover:bg-slate-50 transition">
+                                            <td className="px-5 py-4">
+                                                <div className="font-extrabold text-sm text-slate-900">
+                                                    {med.name}
+                                                </div>
+                                                <div className="text-[11px] text-slate-500 font-mono">
+                                                    {med.code} {med.generic_name && `• ${med.generic_name}`}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-3.5">
-                                                <div className="font-medium text-slate-700 dark:text-slate-300">
+                                            <td className="px-5 py-4">
+                                                <div className="font-bold text-slate-800">
                                                     {med.category?.name || '-'}
                                                 </div>
-                                                <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                                                    <MapPin className="h-3 w-3 text-slate-400" />
+                                                <div className="text-slate-400 flex items-center gap-1 mt-0.5">
+                                                    <MapPin className="h-3 w-3" />
                                                     <span>{med.location || 'Belum diatur'}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-3.5 text-right text-slate-500">
-                                                {formatCurrency(med.buy_price)}
-                                            </td>
-                                            <td className="px-5 py-3.5 text-right font-bold text-slate-900 dark:text-white">
+                                            <td className="px-5 py-4 text-right font-black text-sm text-slate-900">
                                                 {formatCurrency(med.sell_price)}
                                             </td>
-                                            <td className="px-5 py-3.5 text-center">
-                                                <div className="flex flex-col items-center">
-                                                    <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold ${
-                                                            isOut
-                                                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                                                                : isLow
-                                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                                                                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                                        }`}
-                                                    >
-                                                        {med.stock} {med.unit}
-                                                    </span>
-                                                    <span className="text-[10px] text-slate-400 mt-0.5">
-                                                        Min: {med.min_stock}
-                                                    </span>
-                                                </div>
+                                            <td className="px-5 py-4 text-center">
+                                                <span
+                                                    className={`inline-block rounded-xl px-2.5 py-1 text-xs font-black ${
+                                                        isOut
+                                                            ? 'bg-rose-100 text-rose-700'
+                                                            : isLow
+                                                            ? 'bg-amber-100 text-amber-800'
+                                                            : 'bg-emerald-100 text-emerald-800'
+                                                    }`}
+                                                >
+                                                    {med.stock} {med.unit}
+                                                </span>
                                             </td>
-                                            <td className="px-5 py-3.5">
+                                            <td className="px-5 py-4 text-slate-600">
                                                 {med.expiry_date ? (
-                                                    <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
-                                                        <Calendar className="h-3 w-3 text-slate-400" />
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
                                                         <span>
                                                             {new Date(med.expiry_date).toLocaleDateString('id-ID')}
                                                         </span>
@@ -362,30 +423,29 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     <span className="text-slate-400">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-5 py-3.5 text-right">
+                                            <td className="px-5 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-1.5">
-                                                    {/* Restock Button */}
                                                     <button
+                                                        type="button"
                                                         onClick={() => openRestockModal(med)}
-                                                        className="inline-flex items-center gap-1 rounded-lg bg-teal-50 px-2.5 py-1 text-[11px] font-bold text-teal-700 hover:bg-teal-100 transition dark:bg-teal-950/40 dark:text-teal-300"
-                                                        title="Atur / Tambah Stok"
+                                                        className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition"
                                                     >
-                                                        <SlidersHorizontal className="h-3.5 w-3.5" />
-                                                        <span>Stok</span>
+                                                        <Plus className="h-3.5 w-3.5" />
+                                                        <span>Tambah Stok</span>
                                                     </button>
-                                                    {/* Edit */}
                                                     <button
+                                                        type="button"
                                                         onClick={() => openEditModal(med)}
-                                                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
-                                                        title="Ubah Data Obat"
+                                                        className="rounded-xl border border-slate-200 p-1.5 text-slate-600 hover:bg-slate-100"
+                                                        title="Ubah"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                     </button>
-                                                    {/* Delete */}
                                                     <button
+                                                        type="button"
                                                         onClick={() => confirmDelete(med)}
-                                                        className="rounded-lg p-1.5 text-rose-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40"
-                                                        title="Hapus Obat"
+                                                        className="rounded-xl border border-rose-200 p-1.5 text-rose-600 hover:bg-rose-50"
+                                                        title="Hapus"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -396,91 +456,154 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 })
                             ) : (
                                 <tr>
-                                    <td
-                                        colSpan="7"
-                                        className="py-12 text-center text-xs text-slate-400"
-                                    >
-                                        Tidak ada data obat yang sesuai dengan filter pencarian.
+                                    <td colSpan="6" className="py-12 text-center text-xs text-slate-400">
+                                        Tidak ada data obat yang ditemukan.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination */}
-                {medicines.links && medicines.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs dark:border-slate-800">
-                        <div className="text-slate-500">
-                            Menampilkan {medicines.from || 0} - {medicines.to || 0} dari{' '}
-                            {medicines.total} obat
-                        </div>
-                        <div className="flex gap-1">
-                            {medicines.links.map((link, idx) => (
-                                <button
-                                    key={idx}
-                                    disabled={!link.url}
-                                    onClick={() => link.url && router.visit(link.url)}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`rounded-lg px-2.5 py-1 ${
-                                        link.active
-                                            ? 'bg-emerald-600 text-white font-bold'
-                                            : link.url
-                                            ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                                            : 'text-slate-300 cursor-not-allowed dark:text-slate-700'
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
+            {/* Pagination */}
+            {medicines.links && medicines.links.length > 3 && (
+                <div className="flex items-center justify-between rounded-2xl bg-white border border-slate-200 p-4 text-xs">
+                    <div className="text-slate-500 font-medium">
+                        Total {medicines.total} obat
+                    </div>
+                    <div className="flex gap-1">
+                        {medicines.links.map((link, idx) => (
+                            <button
+                                key={idx}
+                                disabled={!link.url}
+                                onClick={() => link.url && router.visit(link.url)}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                className={`rounded-xl px-3 py-1.5 font-bold ${
+                                    link.active
+                                        ? 'bg-emerald-600 text-white'
+                                        : link.url
+                                        ? 'text-slate-700 hover:bg-slate-100'
+                                        : 'text-slate-300 cursor-not-allowed'
+                                }`}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Quick Restock Modal (Extremely simple for orang awam) */}
+            <Modal
+                show={restockModalOpen}
+                onClose={() => setRestockModalOpen(false)}
+                maxWidth="sm"
+            >
+                <form onSubmit={handleRestockSubmit} className="p-6">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <div>
+                            <h2 className="text-base font-extrabold text-slate-900">
+                                Tambah Stok Obat
+                            </h2>
+                            <p className="text-xs text-slate-500">
+                                {targetMedicine?.name} (Stok Saat Ini: {targetMedicine?.stock} {targetMedicine?.unit})
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setRestockModalOpen(false)}
+                            className="rounded-xl p-1 text-slate-400 hover:bg-slate-100"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <div className="mt-4 space-y-4 text-xs">
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Jumlah Stok yang Ditambahkan
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={restockForm.data.quantity}
+                                onChange={(e) => restockForm.setData('quantity', e.target.value)}
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-lg font-black text-slate-900 focus:border-emerald-600 focus:outline-none"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Catatan / Keterangan
+                            </label>
+                            <input
+                                type="text"
+                                value={restockForm.data.notes}
+                                onChange={(e) => restockForm.setData('notes', e.target.value)}
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                placeholder="Penerimaan dari distributor"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+                        <button
+                            type="button"
+                            onClick={() => setRestockModalOpen(false)}
+                            className="rounded-2xl px-4 py-2.5 font-bold text-slate-600 hover:bg-slate-100"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={restockForm.processing}
+                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 font-extrabold text-white shadow-xs hover:bg-emerald-700"
+                        >
+                            {restockForm.processing ? 'Menyimpan...' : 'Simpan Stok Masuk'}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
             {/* Create / Edit Medicine Modal */}
-            <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="2xl">
+            <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="lg">
                 <form onSubmit={handleSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Pill className="h-5 w-5 text-emerald-600" />
-                            <span>{editingMedicine ? 'Ubah Data Obat' : 'Tambah Obat Baru'}</span>
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <h2 className="text-base font-extrabold text-slate-900">
+                            {editingMedicine ? 'Ubah Data Obat' : 'Tambah Obat Baru ke Apotek'}
                         </h2>
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="rounded-xl p-1 text-slate-400 hover:bg-slate-100"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="h-5 w-5" />
                         </button>
                     </div>
 
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        {/* Code */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Kode Obat (Unik)
                             </label>
                             <input
                                 type="text"
                                 value={data.code}
                                 onChange={(e) => setData('code', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 font-mono font-bold"
-                                placeholder="Contoh: OBT-009"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
                                 required
                             />
-                            {errors.code && (
-                                <div className="mt-1 text-rose-500">{errors.code}</div>
-                            )}
                         </div>
 
-                        {/* Category */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Kategori Obat
                             </label>
                             <select
                                 value={data.category_id}
                                 onChange={(e) => setData('category_id', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
                                 required
                             >
                                 {categories.map((cat) => (
@@ -491,47 +614,28 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             </select>
                         </div>
 
-                        {/* Name */}
-                        <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Nama Obat / Merk Dagang
+                        <div className="sm:col-span-2">
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Nama Obat / Merk
                             </label>
                             <input
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Contoh: Panadol Extra 500mg"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
+                                placeholder="Contoh: Paracetamol 500mg"
                                 required
                             />
-                            {errors.name && (
-                                <div className="mt-1 text-rose-500">{errors.name}</div>
-                            )}
                         </div>
 
-                        {/* Generic Name */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Nama Generik / Kandungan
-                            </label>
-                            <input
-                                type="text"
-                                value={data.generic_name}
-                                onChange={(e) => setData('generic_name', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Contoh: Paracetamol 500mg, Kafein 65mg"
-                            />
-                        </div>
-
-                        {/* Unit */}
-                        <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Satuan Kemasan
                             </label>
                             <select
                                 value={data.unit}
                                 onChange={(e) => setData('unit', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
                                 required
                             >
                                 {units.map((u) => (
@@ -542,23 +646,21 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             </select>
                         </div>
 
-                        {/* Location */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Posisi Rak / Tempat Penyimpanan
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Lokasi Rak Penyimpanan
                             </label>
                             <input
                                 type="text"
                                 value={data.location}
                                 onChange={(e) => setData('location', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Contoh: Rak B-3, Kulkas Suhu 2-8°C"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                placeholder="Contoh: Rak A-1"
                             />
                         </div>
 
-                        {/* Buy Price */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Harga Beli Pokok (Rp)
                             </label>
                             <input
@@ -566,18 +668,13 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="0"
                                 value={data.buy_price}
                                 onChange={(e) => setData('buy_price', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="0"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
                                 required
                             />
-                            {errors.buy_price && (
-                                <div className="mt-1 text-rose-500">{errors.buy_price}</div>
-                            )}
                         </div>
 
-                        {/* Sell Price */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-bold text-slate-700 mb-1">
                                 Harga Jual Konsumen (Rp)
                             </label>
                             <input
@@ -585,19 +682,14 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="0"
                                 value={data.sell_price}
                                 onChange={(e) => setData('sell_price', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="0"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-emerald-700 focus:border-emerald-600 focus:outline-none"
                                 required
                             />
-                            {errors.sell_price && (
-                                <div className="mt-1 text-rose-500">{errors.sell_price}</div>
-                            )}
                         </div>
 
-                        {/* Initial Stock (Only on create) */}
                         {!editingMedicine && (
                             <div>
-                                <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                                <label className="block font-bold text-slate-700 mb-1">
                                     Stok Awal
                                 </label>
                                 <input
@@ -605,167 +697,53 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     min="0"
                                     value={data.stock}
                                     onChange={(e) => setData('stock', e.target.value)}
-                                    className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
                                     required
                                 />
                             </div>
                         )}
 
-                        {/* Minimum Stock Alert */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Batas Minimum Stok (Peringatan Kritis)
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Batas Peringatan Stok Menipis
                             </label>
                             <input
                                 type="number"
                                 min="0"
                                 value={data.min_stock}
                                 onChange={(e) => setData('min_stock', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
                                 required
                             />
                         </div>
 
-                        {/* Expiry Date */}
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Tanggal Kedaluwarsa (Expired)
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Tanggal Kedaluwarsa
                             </label>
                             <input
                                 type="date"
                                 value={data.expiry_date}
                                 onChange={(e) => setData('expiry_date', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                            />
-                        </div>
-
-                        {/* Description */}
-                        <div className="sm:col-span-2">
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Catatan / Indikasi / Aturan Pakai (Opsional)
-                            </label>
-                            <textarea
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={2}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Indikasi pemakaian, efek samping, dosis umum..."
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
                             />
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+                    <div className="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-2xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition disabled:opacity-50"
+                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Data Obat'}
-                        </button>
-                    </div>
-                </form>
-            </Modal>
-
-            {/* Quick Restock / Adjust Stock Modal */}
-            <Modal
-                show={restockModalOpen}
-                onClose={() => setRestockModalOpen(false)}
-                maxWidth="md"
-            >
-                <form onSubmit={handleRestockSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                        <div>
-                            <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                                Atur / Tambah Stok Obat
-                            </h2>
-                            <p className="text-xs text-slate-500">
-                                {targetMedicine?.name} ({targetMedicine?.code}) • Saat ini: {targetMedicine?.stock} {targetMedicine?.unit}
-                            </p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => setRestockModalOpen(false)}
-                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
-                    </div>
-
-                    <div className="mt-4 space-y-4 text-xs">
-                        <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Jenis Penyesuaian
-                            </label>
-                            <select
-                                value={restockForm.data.type}
-                                onChange={(e) => restockForm.setData('type', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                required
-                            >
-                                <option value="in">Stok Masuk / Restock (+ Tambah)</option>
-                                <option value="out">Stok Keluar / Rusak / Hilang (- Kurang)</option>
-                                <option value="adjustment">Koreksi Fisik (Set Nilai Total)</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                {restockForm.data.type === 'adjustment'
-                                    ? 'Total Stok Hasil Opname Fisik'
-                                    : 'Jumlah Kuantitas (' + (targetMedicine?.unit || 'Item') + ')'}
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                value={restockForm.data.quantity}
-                                onChange={(e) => restockForm.setData('quantity', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                required
-                            />
-                            {restockForm.errors.quantity && (
-                                <div className="mt-1 text-rose-500">{restockForm.errors.quantity}</div>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
-                                Keterangan / Alasan Penyesuaian
-                            </label>
-                            <input
-                                type="text"
-                                value={restockForm.data.notes}
-                                onChange={(e) => restockForm.setData('notes', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
-                                placeholder="Contoh: Penerimaan faktur suplier no #1234"
-                                required
-                            />
-                            {restockForm.errors.notes && (
-                                <div className="mt-1 text-rose-500">{restockForm.errors.notes}</div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
-                        <button
-                            type="button"
-                            onClick={() => setRestockModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                        >
-                            Batal
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={restockForm.processing}
-                            className="rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-teal-700 transition disabled:opacity-50"
-                        >
-                            {restockForm.processing ? 'Menyimpan...' : 'Simpan Penyesuaian'}
                         </button>
                     </div>
                 </form>
@@ -778,32 +756,24 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 maxWidth="sm"
             >
                 <div className="p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 mb-4 dark:bg-rose-950/60 dark:text-rose-400">
-                        <Trash2 className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                        Hapus Data Obat?
+                    <h3 className="text-base font-extrabold text-slate-900">
+                        Hapus Obat Ini?
                     </h3>
-                    <p className="mt-1 text-xs text-slate-500">
-                        Apakah Anda yakin ingin menghapus data obat{' '}
-                        <strong className="text-slate-900 dark:text-white">
-                            {medicineToDelete?.name}
-                        </strong>
-                        ? Data obat yang pernah digunakan dalam transaksi penjualan tidak dapat dihapus.
+                    <p className="mt-1 text-xs text-slate-600">
+                        Apakah Anda yakin ingin menghapus data obat <strong>{medicineToDelete?.name}</strong>?
                     </p>
-
                     <div className="mt-6 flex items-center justify-end gap-2">
                         <button
                             onClick={() => setDeleteModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition"
+                            className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700"
                         >
-                            Ya, Hapus Obat
+                            Ya, Hapus
                         </button>
                     </div>
                 </div>

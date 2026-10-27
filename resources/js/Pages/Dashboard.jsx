@@ -2,20 +2,19 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
-    ArrowRight,
     Boxes,
+    Building2,
     Calendar,
-    ChevronRight,
-    CircleDollarSign,
-    Clock,
-    FileSpreadsheet,
+    ClipboardList,
+    FileBarChart2,
+    FileText,
     History,
-    Package,
+    Layers,
     Pill,
-    Plus,
     Receipt,
     ShieldAlert,
     ShoppingCart,
+    Store,
     TrendingUp,
     Users,
     Wallet,
@@ -23,590 +22,297 @@ import {
 
 export default function Dashboard({
     stats,
-    recentSales,
-    topSelling,
-    lowStockItems,
-    recentAdjustments,
     expiringBatches = [],
+    lowStockItems = [],
 }) {
-    const user = usePage().props.auth.user;
+    const { auth, pharmacy } = usePage().props;
+    const user = auth.user;
 
-    const formatCurrency = (val) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            maximumFractionDigits: 0,
-        }).format(val || 0);
-    };
+    // Define all mobile-style menu items with role access and visual styling
+    const allMenuItems = [
+        {
+            id: 'pos',
+            title: 'Kasir / Transaksi',
+            subtitle: 'Layanan penjualan obat',
+            href: route('pos.index'),
+            icon: ShoppingCart,
+            gradient: 'from-emerald-600 to-teal-500 shadow-emerald-500/20',
+            roles: ['admin', 'kasir'],
+            badge: null,
+        },
+        {
+            id: 'pos_history',
+            title: 'Riwayat Struk',
+            subtitle: 'Cetak ulang nota kasir',
+            href: route('pos.history'),
+            icon: History,
+            gradient: 'from-slate-800 to-slate-700 shadow-slate-700/20',
+            roles: ['admin', 'kasir'],
+            badge: null,
+        },
+        {
+            id: 'medicines',
+            title: 'Katalog Obat & Stok',
+            subtitle: 'Daftar obat, harga & stok',
+            href: route('medicines.index'),
+            icon: Pill,
+            gradient: 'from-teal-600 to-cyan-500 shadow-teal-500/20',
+            roles: ['admin', 'operator'],
+            badge: stats?.lowStockCount > 0 ? `${stats.lowStockCount} Menipis` : null,
+            badgeColor: 'bg-amber-500 text-white',
+        },
+        {
+            id: 'categories',
+            title: 'Kategori Obat',
+            subtitle: 'Kelompok golongan obat',
+            href: route('categories.index'),
+            icon: Layers,
+            gradient: 'from-cyan-600 to-blue-500 shadow-cyan-500/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'expiries',
+            title: 'Pantau Kadaluarsa',
+            subtitle: 'Monitoring batch FEFO',
+            href: route('expiries.index'),
+            icon: AlertTriangle,
+            gradient: 'from-amber-500 to-orange-500 shadow-amber-500/20',
+            roles: ['admin', 'operator'],
+            badge: expiringBatches && expiringBatches.length > 0 ? `${expiringBatches.length} Kritis` : null,
+            badgeColor: 'bg-rose-600 text-white',
+        },
+        {
+            id: 'prescriptions',
+            title: 'Resep & Racikan',
+            subtitle: 'Resep dokter & etiket',
+            href: route('prescriptions.index'),
+            icon: FileText,
+            gradient: 'from-indigo-600 to-purple-500 shadow-indigo-500/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'adjustments',
+            title: 'Catatan Mutasi Stok',
+            subtitle: 'Audit keluar-masuk stok',
+            href: route('medicines.adjustments'),
+            icon: ClipboardList,
+            gradient: 'from-blue-600 to-sky-500 shadow-blue-500/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'reports',
+            title: 'Laporan Penjualan',
+            subtitle: 'Rekap transaksi & PDF',
+            href: route('reports.index'),
+            icon: FileBarChart2,
+            gradient: 'from-rose-600 to-pink-500 shadow-rose-500/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'profit_loss',
+            title: 'Laporan Laba Rugi',
+            subtitle: 'HPP, omset & profit bersih',
+            href: route('reports.profit-loss'),
+            icon: TrendingUp,
+            gradient: 'from-violet-600 to-purple-600 shadow-violet-500/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'finance',
+            title: 'Keuangan & Buku Kas',
+            subtitle: 'Pemasukan & pengeluaran',
+            href: route('finance.index'),
+            icon: Wallet,
+            gradient: 'from-emerald-700 to-emerald-500 shadow-emerald-600/20',
+            roles: ['admin', 'operator'],
+            badge: null,
+        },
+        {
+            id: 'users',
+            title: 'Kelola Akun Staf',
+            subtitle: 'Admin, operator & kasir',
+            href: route('users.index'),
+            icon: Users,
+            gradient: 'from-purple-700 to-indigo-600 shadow-purple-600/20',
+            roles: ['admin'],
+            badge: null,
+        },
+        {
+            id: 'pharmacy_settings',
+            title: 'Profil & Identitas Apotek',
+            subtitle: 'Nama, logo, legalitas & struk',
+            href: route('settings.pharmacy.edit'),
+            icon: Store,
+            gradient: 'from-blue-700 to-teal-600 shadow-blue-600/20',
+            roles: ['admin'],
+            badge: null,
+        },
+    ];
+
+    // Filter items based on active user's role
+    const menuItems = allMenuItems.filter((item) => item.roles.includes(user.role));
+
+    // Current formatted date in Indonesian
+    const todayFormatted = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+
+    const roleName = {
+        admin: 'Admin Apotek',
+        operator: 'Petugas Stok',
+        kasir: 'Kasir Penjualan',
+    }[user.role] || user.role;
 
     return (
         <AuthenticatedLayout
             header={
                 <div>
                     <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                        Ringkasan Apotek
+                        Menu Utama
                     </h1>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                        Halo, <span className="font-bold text-slate-800">{user.name}</span>. Semua data penjualan dan stok diperbarui otomatis.
+                        Pilih menu untuk memulai aktivitas operasional apotek
                     </p>
                 </div>
             }
         >
-            <Head title="Beranda Apotek Sehat" />
+            <Head title={`Beranda - ${pharmacy?.name || 'Apotek Sehat'}`} />
 
-            {/* Quick Action Hub (Mobile First: Giant touch targets) */}
-            <div className="mb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {/* POS Quick Button for Kasir & Admin */}
-                    {['admin', 'kasir'].includes(user.role) && (
-                        <Link
-                            href={route('pos.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <ShoppingCart className="h-6 w-6" />
+            <div className="py-2 sm:py-4 max-w-6xl mx-auto">
+                {/* Welcome Card Banner (Mobile App Style) */}
+                <div className="mb-6 rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-5 sm:p-7 shadow-sm shadow-emerald-900/10 relative overflow-hidden">
+                    <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+                    <div className="absolute -left-8 -bottom-8 w-44 h-44 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                            {pharmacy?.logo_url ? (
+                                <img
+                                    src={pharmacy.logo_url}
+                                    alt="Logo"
+                                    className="h-14 w-14 sm:h-16 sm:w-16 object-contain rounded-2xl bg-white p-1.5 shadow-md shrink-0 border border-white/20"
+                                />
+                            ) : (
+                                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0">
+                                    <Store className="h-7 w-7" />
                                 </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Buka Kasir</div>
-                                    <div className="text-xs text-emerald-100 font-medium">
-                                        Mulai transaksi penjualan baru
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Riwayat Penjualan for Kasir */}
-                    {user.role === 'kasir' && (
-                        <Link
-                            href={route('pos.history')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-slate-800 text-white shadow-sm hover:bg-slate-900 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <History className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Riwayat Struk</div>
-                                    <div className="text-xs text-slate-300 font-medium">
-                                        Cetak ulang struk transaksi
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Stock Management Quick Button for Operator & Admin */}
-                    {['admin', 'operator'].includes(user.role) && (
-                        <Link
-                            href={route('medicines.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-teal-700 text-white shadow-sm hover:bg-teal-800 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <Pill className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Kelola Stok Obat</div>
-                                    <div className="text-xs text-teal-100 font-medium">
-                                        Katalog, stok & batch FEFO
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Resep Dokter Quick Button for Operator & Admin */}
-                    {['admin', 'operator'].includes(user.role) && (
-                        <Link
-                            href={route('prescriptions.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-indigo-700 text-white shadow-sm hover:bg-indigo-800 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <Boxes className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Resep & Racikan</div>
-                                    <div className="text-xs text-indigo-100 font-medium">
-                                        Formula puyer, kapsul & etiket
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Expiry Monitoring Quick Button for Operator & Admin */}
-                    {['admin', 'operator'].includes(user.role) && (
-                        <Link
-                            href={route('expiries.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-amber-600 text-white shadow-sm hover:bg-amber-700 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <AlertTriangle className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Pantau Kadaluarsa</div>
-                                    <div className="text-xs text-amber-100 font-medium">
-                                        Peringatan & karantina batch
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Finance & Cash Flow Quick Button for Operator & Admin */}
-                    {['admin', 'operator'].includes(user.role) && (
-                        <Link
-                            href={route('finance.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-sky-700 text-white shadow-sm hover:bg-sky-800 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <Wallet className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Keuangan & Kas</div>
-                                    <div className="text-xs text-sky-100 font-medium">
-                                        Buku kas & catat pengeluaran
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* Reports Quick Button for Operator & Admin */}
-                    {['admin', 'operator'].includes(user.role) && (
-                        <Link
-                            href={route('reports.profit-loss')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-slate-800 text-white shadow-sm hover:bg-slate-900 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <TrendingUp className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Laporan Laba Rugi</div>
-                                    <div className="text-xs text-slate-300 font-medium">
-                                        Analisis HPP, omset & profit
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-
-                    {/* User Management Quick Button for Admin */}
-                    {user.role === 'admin' && (
-                        <Link
-                            href={route('users.index')}
-                            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-3.5">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white">
-                                    <Users className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <div className="text-base font-extrabold">Kelola Staf</div>
-                                    <div className="text-xs text-purple-200 font-medium">
-                                        Akun Admin, Operator, Kasir
-                                    </div>
-                                </div>
-                            </div>
-                            <ArrowRight className="h-5 w-5" />
-                        </Link>
-                    )}
-                </div>
-            </div>
-
-            {/* KPI Metrics Cards (Large, Clean, Flat) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                {/* 1. Uang Masuk Hari Ini */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            {user.role === 'kasir' ? 'Penjualan Saya' : 'Penjualan Hari Ini'}
-                        </span>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                            <CircleDollarSign className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
-                        {formatCurrency(
-                            user.role === 'kasir'
-                                ? stats.myTodaySalesAmount
-                                : stats.todaySalesAmount,
-                        )}
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 font-medium flex items-center gap-1">
-                        <Receipt className="h-3.5 w-3.5 text-slate-400" />
-                        <span>
-                            {user.role === 'kasir'
-                                ? stats.myTodaySalesCount
-                                : stats.todaySalesCount}{' '}
-                            Transaksi
-                        </span>
-                    </p>
-                </div>
-
-                {/* 2. Penjualan Bulan Ini */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            Penjualan Bulan Ini
-                        </span>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-100 text-teal-700">
-                            <TrendingUp className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
-                        {formatCurrency(stats.monthSalesAmount)}
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 font-medium flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{stats.monthSalesCount} Transaksi</span>
-                    </p>
-                </div>
-
-                {/* 3. Total Jenis Obat */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            Semua Jenis Obat
-                        </span>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-                            <Pill className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
-                        {stats.totalMedicines} Item
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 font-medium flex items-center gap-1">
-                        <Package className="h-3.5 w-3.5 text-slate-400" />
-                        <span>Katalog aktif apotek</span>
-                    </p>
-                </div>
-
-                {/* 4. Stok Kritis / Menipis */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            Stok Menipis
-                        </span>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                            <AlertTriangle className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="text-lg sm:text-2xl font-black text-amber-600 leading-tight">
-                        {stats.lowStockCount} Obat
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 font-medium flex items-center gap-1">
-                        <ShieldAlert className="h-3.5 w-3.5 text-rose-500" />
-                        <span>Perlu restock segera</span>
-                    </p>
-                </div>
-            </div>
-
-            {/* Low Stock Warning Box (If any drugs are low in stock) */}
-            {stats.lowStockCount > 0 && ['admin', 'operator'].includes(user.role) && (
-                <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white font-bold">
-                            <AlertTriangle className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <div className="text-sm sm:text-base font-extrabold text-amber-950">
-                                Perhatian: Ada {stats.lowStockCount} obat dengan stok menipis!
-                            </div>
-                            <div className="text-xs text-amber-800">
-                                Segera lakukan penambahan stok agar pelayanan kasir tidak terganggu.
-                            </div>
-                        </div>
-                    </div>
-                    <Link
-                        href={route('medicines.index', { status: 'low_stock' })}
-                        className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-amber-700 transition"
-                    >
-                        <span>Lihat & Tambah Stok</span>
-                        <ArrowRight className="h-4 w-4" />
-                    </Link>
-                </div>
-            )}
-
-            {/* 2-Column Content Section: Recent Transactions & Quick Inventory */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left 2 Cols: Recent Transactions */}
-                <div className="lg:col-span-2 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                                {user.role === 'kasir'
-                                    ? 'Transaksi Penjualan Terakhir Saya'
-                                    : 'Transaksi Penjualan Terkini'}
-                            </h2>
-                            <p className="text-xs text-slate-500">
-                                Daftar struk pembelian yang baru saja selesai diproses
-                            </p>
-                        </div>
-                        {['admin', 'kasir'].includes(user.role) && (
-                            <Link
-                                href={route('pos.history')}
-                                className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800"
-                            >
-                                <span>Lihat Semua</span>
-                                <ChevronRight className="h-4 w-4" />
-                            </Link>
-                        )}
-                    </div>
-
-                    {/* Mobile Card List for small screens (< 640px) */}
-                    <div className="block sm:hidden space-y-2.5">
-                        {recentSales && recentSales.length > 0 ? (
-                            recentSales.map((sale) => (
-                                <Link
-                                    key={sale.id}
-                                    href={route('pos.receipt', sale.id)}
-                                    className="block p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100 transition"
-                                >
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="font-mono text-xs font-extrabold text-emerald-700">
-                                            {sale.invoice_number}
-                                        </span>
-                                        <span className="text-xs font-black text-slate-900">
-                                            {formatCurrency(sale.total_amount)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-xs text-slate-500">
-                                        <span>{sale.customer_name}</span>
-                                        <span className="rounded-md bg-white px-2 py-0.5 text-[10px] font-bold uppercase border border-slate-200">
-                                            {sale.payment_method}
-                                        </span>
-                                    </div>
-                                </Link>
-                            ))
-                        ) : (
-                            <div className="py-8 text-center text-xs text-slate-400">
-                                Belum ada transaksi penjualan hari ini.
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Desktop & Tablet Table (>= 640px) */}
-                    <div className="hidden sm:block overflow-x-auto">
-                        <table className="w-full text-left text-xs">
-                            <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
-                                <tr>
-                                    <th className="px-4 py-3">No. Faktur</th>
-                                    <th className="px-4 py-3">Waktu</th>
-                                    <th className="px-4 py-3">Pelanggan</th>
-                                    <th className="px-4 py-3">Metode</th>
-                                    <th className="px-4 py-3 text-right">Total Belanja</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {recentSales && recentSales.length > 0 ? (
-                                    recentSales.map((sale) => (
-                                        <tr key={sale.id} className="hover:bg-slate-50 transition">
-                                            <td className="px-4 py-3 font-mono font-bold text-emerald-700">
-                                                <Link
-                                                    href={route('pos.receipt', sale.id)}
-                                                    className="hover:underline"
-                                                >
-                                                    {sale.invoice_number}
-                                                </Link>
-                                            </td>
-                                            <td className="px-4 py-3 text-slate-500">
-                                                {new Date(sale.created_at).toLocaleTimeString('id-ID', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })}
-                                            </td>
-                                            <td className="px-4 py-3 font-medium text-slate-800">
-                                                {sale.customer_name}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-bold uppercase text-slate-600">
-                                                    {sale.payment_method}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-right font-black text-slate-900">
-                                                {formatCurrency(sale.total_amount)}
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="5" className="py-8 text-center text-xs text-slate-400">
-                                            Belum ada transaksi hari ini.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {/* Right 1 Col: Low Stock List, Expiring Batches & Top Selling */}
-                <div className="space-y-6">
-                    {/* Expiring Batches Card */}
-                    {expiringBatches && expiringBatches.length > 0 && (
-                        <div className="rounded-2xl bg-rose-50/70 border border-rose-200 p-5 shadow-xs">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-extrabold text-rose-950 flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-rose-600" />
-                                    <span>Batch Dekat Kadaluarsa</span>
-                                </h3>
+                            )}
+                            <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="rounded-full bg-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-800">
-                                        {expiringBatches.length} Batch
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border border-white/20">
+                                        {roleName}
                                     </span>
-                                    {['admin', 'operator'].includes(user.role) && (
+                                    <span className="flex items-center gap-1 text-[11px] text-emerald-100 font-medium">
+                                        <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
+                                        Online
+                                    </span>
+                                </div>
+                                <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-1">
+                                    Selamat Datang, {user.name}
+                                </h2>
+                                <p className="text-xs text-emerald-100/90 font-medium mt-0.5">
+                                    {pharmacy?.name || 'Apotek Sehat'} • {todayFormatted}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Quick alert badge if any issues require attention */}
+                        {(stats?.lowStockCount > 0 || (expiringBatches && expiringBatches.length > 0)) &&
+                            ['admin', 'operator'].includes(user.role) && (
+                                <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+                                    {stats?.lowStockCount > 0 && (
+                                        <Link
+                                            href={route('medicines.index', { status: 'low_stock' })}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/90 hover:bg-amber-500 text-white text-xs font-bold shadow-xs transition backdrop-blur-sm"
+                                        >
+                                            <AlertTriangle className="h-3.5 w-3.5" />
+                                            <span>{stats.lowStockCount} Stok Menipis</span>
+                                        </Link>
+                                    )}
+                                    {expiringBatches && expiringBatches.length > 0 && (
                                         <Link
                                             href={route('expiries.index')}
-                                            className="text-xs font-bold text-rose-700 hover:underline"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-bold shadow-xs transition backdrop-blur-sm"
                                         >
-                                            Kelola
+                                            <ShieldAlert className="h-3.5 w-3.5" />
+                                            <span>{expiringBatches.length} Batch Kadaluarsa</span>
                                         </Link>
                                     )}
                                 </div>
-                            </div>
-                            <div className="space-y-2.5">
-                                {expiringBatches.map((batch) => {
-                                    const expDate = new Date(batch.expiry_date);
-                                    const today = new Date();
-                                    const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                                    const isExpired = diffDays <= 0;
+                            )}
+                    </div>
+                </div>
 
-                                    return (
-                                        <div
-                                            key={batch.id}
-                                            className="p-3 rounded-xl bg-white border border-rose-200/90 shadow-2xs"
-                                        >
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="text-xs font-bold text-slate-900 truncate">
-                                                        {batch.medicine?.name || 'Obat'}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className="font-mono text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
-                                                            Lot: {batch.batch_number}
-                                                        </span>
-                                                        <span className="text-[11px] text-slate-500">
-                                                            Sisa: <strong className="text-slate-800">{batch.current_stock}</strong> {batch.medicine?.unit}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <span
-                                                    className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${
-                                                        isExpired
-                                                            ? 'bg-rose-600 text-white'
-                                                            : diffDays <= 30
-                                                            ? 'bg-rose-100 text-rose-800'
-                                                            : 'bg-amber-100 text-amber-800'
-                                                    }`}
-                                                >
-                                                    {isExpired
-                                                        ? 'Kadaluarsa'
-                                                        : `${diffDays} hr lagi`}
-                                                </span>
-                                            </div>
-                                            <div className="mt-1 text-[10px] text-slate-400">
-                                                Exp: {batch.expiry_date}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
+                {/* Mobile-Style Menu Icons Launcher Grid */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4 px-1">
+                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                            Daftar Menu Aplikasi
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">
+                            {menuItems.length} Layanan Tersedia
+                        </span>
+                    </div>
 
-                    {/* Low Stock List */}
-                    <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                                <AlertTriangle className="h-4 w-4 text-amber-500" />
-                                <span>Obat Stok Menipis</span>
-                            </h3>
-                            {['admin', 'operator'].includes(user.role) && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                        {menuItems.map((item) => {
+                            const Icon = item.icon;
+
+                            return (
                                 <Link
-                                    href={route('medicines.index', { status: 'low_stock' })}
-                                    className="text-xs font-bold text-emerald-700 hover:underline"
+                                    key={item.id}
+                                    href={item.href}
+                                    className="group relative flex flex-col items-center justify-center p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200 active:scale-95 text-center"
                                 >
-                                    Semua
+                                    {/* Icon Container with Gradient Squircle Shape */}
+                                    <div
+                                        className={`relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-gradient-to-tr ${item.gradient} text-white shadow-md transition-transform duration-200 group-hover:scale-105 group-active:scale-95`}
+                                    >
+                                        <Icon className="h-8 w-8 sm:h-10 sm:w-10 stroke-[1.8]" />
+
+                                        {/* Notification / Alert Pill */}
+                                        {item.badge && (
+                                            <span
+                                                className={`absolute -top-1.5 -right-1.5 px-2 py-0.5 rounded-full text-[10px] font-black shadow-sm ${
+                                                    item.badgeColor || 'bg-rose-600 text-white'
+                                                }`}
+                                            >
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Menu Title */}
+                                    <span className="mt-3.5 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">
+                                        {item.title}
+                                    </span>
+
+                                    {/* Menu Subtitle */}
+                                    <span className="mt-1 text-[11px] text-slate-400 font-medium line-clamp-1">
+                                        {item.subtitle}
+                                    </span>
                                 </Link>
-                            )}
-                        </div>
-
-                        <div className="space-y-2.5">
-                            {lowStockItems && lowStockItems.length > 0 ? (
-                                lowStockItems.map((med) => (
-                                    <div
-                                        key={med.id}
-                                        className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200"
-                                    >
-                                        <div className="min-w-0 flex-1 mr-2">
-                                            <div className="text-xs font-bold text-slate-900 truncate">
-                                                {med.name}
-                                            </div>
-                                            <div className="text-[11px] text-slate-500">
-                                                Minimal: {med.min_stock} {med.unit}
-                                            </div>
-                                        </div>
-                                        <span className="inline-flex rounded-lg bg-amber-500 px-2 py-1 text-xs font-extrabold text-white">
-                                            Sisa {med.stock} {med.unit}
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="py-4 text-center text-xs text-slate-400">
-                                    Semua stok obat aman.
-                                </div>
-                            )}
-                        </div>
+                            );
+                        })}
                     </div>
+                </div>
 
-                    {/* Top Selling Medicines */}
-                    <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
-                        <h3 className="text-sm font-extrabold text-slate-900 mb-3 flex items-center gap-2">
-                            <TrendingUp className="h-4 w-4 text-emerald-600" />
-                            <span>Obat Paling Laris</span>
-                        </h3>
-
-                        <div className="space-y-2.5 text-xs">
-                            {topSelling && topSelling.length > 0 ? (
-                                topSelling.map((item, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200"
-                                    >
-                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-slate-200 text-[10px] font-bold text-slate-700">
-                                                {idx + 1}
-                                            </span>
-                                            <span className="font-bold text-slate-800 truncate">
-                                                {item.medicine_name}
-                                            </span>
-                                        </div>
-                                        <span className="font-black text-emerald-700 ml-2">
-                                            {item.total_qty} Terjual
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="py-4 text-center text-xs text-slate-400">
-                                    Belum ada data obat terjual.
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                {/* Bottom Simple System Info Footer */}
+                <div className="text-center py-4 border-t border-slate-200/70 text-xs text-slate-400">
+                    <p className="font-semibold text-slate-500">
+                        {pharmacy?.name || 'Apotek Sehat'} — Sistem Manajemen Farmasi & Kasir
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                        Akses Cepat Layar Sentuh • Aman, Cepat & Terintegrasi
+                    </p>
                 </div>
             </div>
         </AuthenticatedLayout>

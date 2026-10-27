@@ -241,33 +241,33 @@ export default function UsersIndex({ users, filters, roles }) {
             </div>
 
             {/* Tablet & Desktop Table (>= 768px) */}
-            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-xs mb-6">
+            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-xs mb-6">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <tr>
-                                <th className="px-5 py-4">Nama Lengkap & Email</th>
-                                <th className="px-5 py-4">Hak Akses (Role)</th>
-                                <th className="px-5 py-4">Nomor HP</th>
-                                <th className="px-5 py-4">Status</th>
-                                <th className="px-5 py-4 text-right">Aksi</th>
+                                <th className="px-5 py-3.5">Nama Lengkap & Email</th>
+                                <th className="px-5 py-3.5">Hak Akses (Role)</th>
+                                <th className="px-5 py-3.5">Nomor HP</th>
+                                <th className="px-5 py-3.5">Status</th>
+                                <th className="px-5 py-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {users.data && users.data.length > 0 ? (
                                 users.data.map((u) => (
-                                    <tr key={u.id} className="hover:bg-slate-50 transition">
-                                        <td className="px-5 py-4">
+                                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors duration-150">
+                                        <td className="px-5 py-3.5">
                                             <div className="font-extrabold text-sm text-slate-900">
                                                 {u.name}
                                             </div>
                                             <div className="text-xs text-slate-500">{u.email}</div>
                                         </td>
-                                        <td className="px-5 py-4">{roleBadge(u.role)}</td>
-                                        <td className="px-5 py-4 text-slate-700 font-medium">
+                                        <td className="px-5 py-3.5">{roleBadge(u.role)}</td>
+                                        <td className="px-5 py-3.5 text-slate-700 font-medium">
                                             {u.phone || '-'}
                                         </td>
-                                        <td className="px-5 py-4">
+                                        <td className="px-5 py-3.5">
                                             <span
                                                 className={`inline-block h-2 w-2 rounded-full mr-1.5 ${
                                                     u.is_active ? 'bg-emerald-500' : 'bg-slate-400'
@@ -277,12 +277,12 @@ export default function UsersIndex({ users, filters, roles }) {
                                                 {u.is_active ? 'Aktif' : 'Nonaktif'}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-4 text-right">
+                                        <td className="px-5 py-3.5 text-right">
                                             <div className="flex items-center justify-end gap-1.5">
                                                 <button
                                                     type="button"
                                                     onClick={() => openEditModal(u)}
-                                                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100"
+                                                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 hover:text-emerald-700 transition-colors"
                                                     title="Ubah"
                                                 >
                                                     <Edit className="h-4 w-4" />
@@ -290,7 +290,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => confirmDelete(u)}
-                                                    className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50"
+                                                    className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50 transition-colors"
                                                     title="Hapus"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -301,8 +301,8 @@ export default function UsersIndex({ users, filters, roles }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="py-12 text-center text-xs text-slate-400">
-                                        Tidak ada pengguna yang ditemukan.
+                                    <td colSpan="5" className="py-12 text-center text-xs text-slate-400 font-medium">
+                                        Tidak ada data staf pengguna yang ditemukan.
                                     </td>
                                 </tr>
                             )}

@@ -168,33 +168,33 @@ export default function PrescriptionShow({ prescription }) {
                                     </div>
 
                                     {/* Ingredients Table */}
-                                    <div className="rounded-xl bg-white border border-slate-200 overflow-hidden">
-                                        <table className="w-full text-left text-xs">
-                                            <thead className="bg-slate-100/70 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
+                                    <div className="rounded-xl bg-white border border-slate-200/80 overflow-hidden shadow-xs">
+                                        <table className="min-w-full text-left text-xs">
+                                            <thead className="bg-slate-50/90 border-b border-slate-200/80 text-slate-600 font-extrabold uppercase text-[10px] tracking-wider">
                                                 <tr>
-                                                    <th className="px-3 py-2">Bahan Obat</th>
-                                                    <th className="px-3 py-2">Dosis</th>
-                                                    <th className="px-3 py-2 text-center">Jumlah Ambil</th>
-                                                    <th className="px-3 py-2 text-right">Harga Satuan</th>
-                                                    <th className="px-3 py-2 text-right">Subtotal</th>
+                                                    <th className="px-3.5 py-2.5">Bahan Obat</th>
+                                                    <th className="px-3.5 py-2.5">Dosis</th>
+                                                    <th className="px-3.5 py-2.5 text-center">Jumlah Ambil</th>
+                                                    <th className="px-3.5 py-2.5 text-right">Harga Satuan</th>
+                                                    <th className="px-3.5 py-2.5 text-right">Subtotal</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-100">
+                                            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                                                 {item.ingredients?.map((ing) => (
-                                                    <tr key={ing.id}>
-                                                        <td className="px-3 py-2 font-bold text-slate-800">
+                                                    <tr key={ing.id} className="hover:bg-slate-50/70 transition-colors">
+                                                        <td className="px-3.5 py-2.5 font-bold text-slate-800">
                                                             {ing.medicine_name}
                                                         </td>
-                                                        <td className="px-3 py-2 text-slate-600">
+                                                        <td className="px-3.5 py-2.5 text-slate-600">
                                                             {ing.dosage || '-'}
                                                         </td>
-                                                        <td className="px-3 py-2 text-center font-bold text-slate-900">
+                                                        <td className="px-3.5 py-2.5 text-center font-bold text-slate-900">
                                                             {ing.quantity}
                                                         </td>
-                                                        <td className="px-3 py-2 text-right text-slate-600">
+                                                        <td className="px-3.5 py-2.5 text-right text-slate-600">
                                                             {formatCurrency(ing.price)}
                                                         </td>
-                                                        <td className="px-3 py-2 text-right font-black text-slate-900">
+                                                        <td className="px-3.5 py-2.5 text-right font-black text-slate-900">
                                                             {formatCurrency(ing.subtotal)}
                                                         </td>
                                                     </tr>

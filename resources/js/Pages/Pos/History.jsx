@@ -98,11 +98,11 @@ export default function PosHistory({ sales, filters }) {
                 </form>
             </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Standardized Unified Table */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs mb-6">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50/75 font-semibold uppercase text-slate-400 dark:border-slate-800 dark:bg-slate-900/50">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <tr>
                                 <th className="px-5 py-3.5">No. Faktur</th>
                                 <th className="px-5 py-3.5">Tanggal & Waktu</th>
@@ -114,17 +114,17 @@ export default function PosHistory({ sales, filters }) {
                                 <th className="px-5 py-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {sales.data && sales.data.length > 0 ? (
                                 sales.data.map((sale) => (
                                     <tr
                                         key={sale.id}
-                                        className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40"
+                                        className="hover:bg-slate-50/80 transition-colors duration-150"
                                     >
-                                        <td className="px-5 py-3.5 font-bold font-mono text-emerald-600">
+                                        <td className="px-5 py-3.5 font-bold font-mono text-emerald-700">
                                             {sale.invoice_number}
                                         </td>
-                                        <td className="px-5 py-3.5 text-slate-500">
+                                        <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">
                                             {new Date(sale.created_at).toLocaleString('id-ID', {
                                                 day: '2-digit',
                                                 month: '2-digit',
@@ -133,29 +133,29 @@ export default function PosHistory({ sales, filters }) {
                                                 minute: '2-digit',
                                             })}
                                         </td>
-                                        <td className="px-5 py-3.5 text-slate-700 dark:text-slate-300">
+                                        <td className="px-5 py-3.5 text-slate-800 font-medium">
                                             {sale.user?.name || '-'}
                                         </td>
-                                        <td className="px-5 py-3.5 text-slate-700 dark:text-slate-300 font-medium">
+                                        <td className="px-5 py-3.5 text-slate-800 font-medium">
                                             {sale.customer_name}
                                         </td>
                                         <td className="px-5 py-3.5">
-                                            <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-bold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            <span className="inline-block rounded-md bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-700 border border-slate-200/60">
                                                 {sale.payment_method}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-3.5 text-center font-bold text-slate-700 dark:text-slate-300">
+                                        <td className="px-5 py-3.5 text-center font-bold text-slate-700">
                                             {sale.items?.reduce((s, i) => s + i.quantity, 0) || 0}
                                         </td>
-                                        <td className="px-5 py-3.5 text-right font-black text-slate-900 dark:text-white">
+                                        <td className="px-5 py-3.5 text-right font-black text-sm text-slate-900">
                                             {formatCurrency(sale.total_amount)}
                                         </td>
-                                        <td className="px-5 py-3.5 text-right">
+                                        <td className="px-5 py-3.5 text-right whitespace-nowrap">
                                             <Link
                                                 href={route('pos.receipt', sale.id)}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 shadow-2xs transition"
                                             >
-                                                <Printer className="h-3.5 w-3.5" />
+                                                <Printer className="h-3.5 w-3.5 text-emerald-600" />
                                                 <span>Cetak Struk</span>
                                             </Link>
                                         </td>
@@ -165,9 +165,11 @@ export default function PosHistory({ sales, filters }) {
                                 <tr>
                                     <td
                                         colSpan="8"
-                                        className="py-10 text-center text-xs text-slate-400"
+                                        className="py-12 text-center text-xs text-slate-400"
                                     >
-                                        Tidak ada riwayat transaksi penjualan.
+                                        <Receipt className="mx-auto h-8 w-8 text-slate-300 mb-2 stroke-[1.5]" />
+                                        <p className="font-semibold text-slate-600">Tidak ada riwayat transaksi</p>
+                                        <p className="text-[11px] text-slate-400 mt-0.5">Transaksi penjualan yang selesai akan muncul di sini</p>
                                     </td>
                                 </tr>
                             )}
@@ -177,7 +179,7 @@ export default function PosHistory({ sales, filters }) {
 
                 {/* Pagination */}
                 {sales.links && sales.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs dark:border-slate-800">
+                    <div className="flex items-center justify-between border-t border-slate-200/80 px-5 py-3.5 text-xs bg-slate-50/50">
                         <div className="text-slate-500">
                             Menampilkan {sales.from || 0} - {sales.to || 0} dari{' '}
                             {sales.total} faktur

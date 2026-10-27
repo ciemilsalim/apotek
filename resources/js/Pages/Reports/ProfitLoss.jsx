@@ -370,9 +370,9 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                 </div>
 
                 {/* 4. Comprehensive Income Statement Table */}
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <div className="border-b border-slate-200 px-4 py-3 bg-slate-50/70">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                <div className="overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-xs mb-6">
+                    <div className="border-b border-slate-200/80 px-5 py-4 bg-slate-50/90">
+                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
                             Laporan Laba Rugi Komprehensif (Income Statement)
                         </h3>
                         <p className="text-[11px] text-slate-500 mt-0.5">
@@ -381,7 +381,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs">
+                        <table className="min-w-full text-left text-xs">
                             <tbody className="divide-y divide-slate-100">
                                 {/* I. PENDAPATAN OPERASIONAL */}
                                 <tr className="bg-slate-100/70 font-bold text-slate-800">
@@ -586,21 +586,21 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                 Belum ada data penjualan pada periode ini.
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-xs">
-                                    <thead className="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-500">
+                            <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                                <table className="min-w-full text-left text-xs">
+                                    <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                                         <tr>
-                                            <th className="py-2">Kategori</th>
-                                            <th className="py-2 text-center">Unit</th>
-                                            <th className="py-2 text-right">Omset</th>
-                                            <th className="py-2 text-right">Laba Kotor</th>
-                                            <th className="py-2 text-right">Margin</th>
+                                            <th className="px-4 py-3">Kategori</th>
+                                            <th className="px-3 py-3 text-center">Unit</th>
+                                            <th className="px-3 py-3 text-right">Omset</th>
+                                            <th className="px-3 py-3 text-right">Laba Kotor</th>
+                                            <th className="px-3 py-3 text-right">Margin</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-slate-100 text-xs">
                                         {categoryBreakdown.map((cat, idx) => (
-                                            <tr key={idx} className="hover:bg-slate-50">
-                                                <td className="py-2 font-semibold text-slate-800">
+                                            <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="px-4 py-2.5 font-bold text-slate-900">
                                                     {cat.category_name}
                                                 </td>
                                                 <td className="py-2 text-center text-slate-600">

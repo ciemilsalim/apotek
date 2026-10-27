@@ -299,22 +299,22 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                 )}
             </div>
 
-            {/* Tablet & Desktop Table (>= 768px) */}
-            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-xs mb-6">
+            {/* Standardized Unified Table (>= 768px) */}
+            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-xs mb-6">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <tr>
-                                <th className="px-5 py-4">No. Faktur</th>
-                                <th className="px-5 py-4">Waktu</th>
-                                <th className="px-5 py-4">Kasir</th>
-                                <th className="px-5 py-4">Pelanggan</th>
-                                <th className="px-5 py-4 text-center">Metode</th>
-                                <th className="px-5 py-4 text-center">Item</th>
-                                <th className="px-5 py-4 text-right">Total Akhir</th>
+                                <th className="px-5 py-3.5">No. Faktur</th>
+                                <th className="px-5 py-3.5">Waktu</th>
+                                <th className="px-5 py-3.5">Kasir</th>
+                                <th className="px-5 py-3.5">Pelanggan</th>
+                                <th className="px-5 py-3.5 text-center">Metode</th>
+                                <th className="px-5 py-3.5 text-center">Item</th>
+                                <th className="px-5 py-3.5 text-right">Total Akhir</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {sales.data && sales.data.length > 0 ? (
                                 sales.data.map((sale) => (
                                     <tr key={sale.id} className="hover:bg-slate-50 transition">

@@ -583,23 +583,23 @@ export default function FinanceIndex({
                         )}
                     </div>
 
-                    {/* Desktop Table View */}
+                    {/* Standardized Unified Table */}
                     <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full text-left text-xs">
-                            <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                        <table className="min-w-full text-left text-xs">
+                            <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                                 <tr>
-                                    <th className="px-4 py-3">No. Transaksi</th>
-                                    <th className="px-4 py-3">Tanggal</th>
-                                    <th className="px-4 py-3">Jenis</th>
-                                    <th className="px-4 py-3">Kategori</th>
-                                    <th className="px-4 py-3">Keterangan & Ref</th>
-                                    <th className="px-4 py-3 text-right">Nominal (Rp)</th>
-                                    <th className="px-4 py-3 text-center">Metode</th>
-                                    <th className="px-4 py-3">Petugas</th>
-                                    {isAdmin && <th className="px-4 py-3 text-center">Aksi</th>}
+                                    <th className="px-5 py-3.5">No. Transaksi</th>
+                                    <th className="px-5 py-3.5">Tanggal</th>
+                                    <th className="px-5 py-3.5">Jenis</th>
+                                    <th className="px-5 py-3.5">Kategori</th>
+                                    <th className="px-5 py-3.5">Keterangan & Ref</th>
+                                    <th className="px-5 py-3.5 text-right">Nominal (Rp)</th>
+                                    <th className="px-5 py-3.5 text-center">Metode</th>
+                                    <th className="px-5 py-3.5">Petugas</th>
+                                    {isAdmin && <th className="px-5 py-3.5 text-center">Aksi</th>}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                                 {transactions.data.length === 0 ? (
                                     <tr>
                                         <td

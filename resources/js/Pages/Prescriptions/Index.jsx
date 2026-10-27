@@ -372,21 +372,21 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                     )}
                 </div>
 
-                {/* Desktop Table (>= 768px) */}
+                {/* Standardized Unified Table (>= 768px) */}
                 <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50/80 font-bold uppercase text-slate-400">
-                            <tr>
-                                <th className="px-5 py-3.5">No. Resep & Tgl</th>
-                                <th className="px-4 py-3.5">Pasien</th>
-                                <th className="px-4 py-3.5">Dokter Perujuk</th>
-                                <th className="px-4 py-3.5">Komposisi Racikan</th>
-                                <th className="px-4 py-3.5 text-right">Total Biaya</th>
-                                <th className="px-4 py-3.5 text-center">Status</th>
-                                <th className="px-5 py-3.5 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
+                                <tr>
+                                    <th className="px-5 py-3.5">No. Resep & Tgl</th>
+                                    <th className="px-4 py-3.5">Pasien</th>
+                                    <th className="px-4 py-3.5">Dokter Perujuk</th>
+                                    <th className="px-4 py-3.5">Komposisi Racikan</th>
+                                    <th className="px-4 py-3.5 text-right">Total Biaya</th>
+                                    <th className="px-4 py-3.5 text-center">Status</th>
+                                    <th className="px-5 py-3.5 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {prescriptions.data && prescriptions.data.length > 0 ? (
                                 prescriptions.data.map((rx) => (
                                     <tr key={rx.id} className="hover:bg-slate-50 transition">

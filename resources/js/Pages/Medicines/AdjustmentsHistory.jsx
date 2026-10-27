@@ -73,11 +73,11 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                 </form>
             </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Standardized Unified Table */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs mb-6">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50/75 font-semibold uppercase text-slate-400 dark:border-slate-800 dark:bg-slate-900/50">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <tr>
                                 <th className="px-5 py-3.5">Waktu</th>
                                 <th className="px-5 py-3.5">Obat</th>
@@ -89,7 +89,7 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                 <th className="px-5 py-3.5">Petugas</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {adjustments.data && adjustments.data.length > 0 ? (
                                 adjustments.data.map((adj) => {
                                     const isAdd = adj.type === 'in';
@@ -99,7 +99,7 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                     return (
                                         <tr
                                             key={adj.id}
-                                            className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40"
+                                            className="hover:bg-slate-50/80 transition-colors duration-150"
                                         >
                                             <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">
                                                 {new Date(adj.created_at).toLocaleString('id-ID', {
@@ -111,16 +111,16 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                                 })}
                                             </td>
                                             <td className="px-5 py-3.5">
-                                                <div className="font-bold text-slate-900 dark:text-white">
+                                                <div className="font-extrabold text-sm text-slate-900">
                                                     {adj.medicine?.name || 'Obat Dihapus'}
                                                 </div>
-                                                <div className="font-mono text-[10px] text-emerald-600">
+                                                <div className="font-mono text-[10px] text-emerald-700">
                                                     {adj.medicine?.code}
                                                 </div>
                                             </td>
                                             <td className="px-5 py-3.5">
                                                 {batchNo ? (
-                                                    <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                                                    <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800 border border-slate-200/60">
                                                         {batchNo}
                                                     </span>
                                                 ) : (
@@ -129,12 +129,12 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                             </td>
                                             <td className="px-5 py-3.5">
                                                 <span
-                                                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                                                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
                                                         isAdd
-                                                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                                             : isSub
-                                                            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                                                            : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                                                            ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                                                            : 'bg-blue-100 text-blue-800 border border-blue-200'
                                                     }`}
                                                 >
                                                     {isAdd && <ArrowDownRight className="h-3 w-3" />}
@@ -153,10 +153,10 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                                 <span
                                                     className={
                                                         isAdd
-                                                            ? 'text-emerald-600'
+                                                            ? 'text-emerald-700 font-black'
                                                             : isSub
-                                                            ? 'text-rose-600'
-                                                            : 'text-blue-600'
+                                                            ? 'text-rose-700 font-black'
+                                                            : 'text-blue-700 font-black'
                                                     }
                                                 >
                                                     {isAdd ? '+' : isSub ? '-' : ''}
@@ -165,14 +165,14 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                             </td>
                                             <td className="px-5 py-3.5 text-center text-slate-500 font-mono">
                                                 {adj.stock_before} &rarr;{' '}
-                                                <strong className="text-slate-900 dark:text-white">
+                                                <strong className="text-slate-900">
                                                     {adj.stock_after}
                                                 </strong>
                                             </td>
-                                            <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400 max-w-xs truncate">
+                                            <td className="px-5 py-3.5 text-slate-600 max-w-xs truncate">
                                                 {adj.notes || '-'}
                                             </td>
-                                            <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">
+                                            <td className="px-5 py-3.5 text-slate-700 font-medium">
                                                 {adj.user?.name || '-'}
                                             </td>
                                         </tr>
@@ -182,9 +182,11 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                 <tr>
                                     <td
                                         colSpan="8"
-                                        className="py-10 text-center text-xs text-slate-400"
+                                        className="py-12 text-center text-xs text-slate-400"
                                     >
-                                        Belum ada riwayat penyesuaian stok.
+                                        <ClipboardList className="mx-auto h-8 w-8 text-slate-300 mb-2 stroke-[1.5]" />
+                                        <p className="font-semibold text-slate-600">Belum ada riwayat mutasi stok</p>
+                                        <p className="text-[11px] text-slate-400 mt-0.5">Semua riwayat restock dan penyesuaian fisik akan tercatat di sini</p>
                                     </td>
                                 </tr>
                             )}
@@ -194,7 +196,7 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
 
                 {/* Pagination */}
                 {adjustments.links && adjustments.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs dark:border-slate-800">
+                    <div className="flex items-center justify-between border-t border-slate-200/80 px-5 py-3.5 text-xs bg-slate-50/50">
                         <div className="text-slate-500">
                             Menampilkan {adjustments.from || 0} - {adjustments.to || 0} dari{' '}
                             {adjustments.total} catatan

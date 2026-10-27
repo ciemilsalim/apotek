@@ -463,22 +463,22 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 )}
             </div>
 
-            {/* Tablet & Desktop View: Clean Flat Table (Screen >= 768px) */}
-            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-xs mb-6">
+            {/* Standardized Unified Table (Screen >= 768px) */}
+            <div className="hidden md:block overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-xs mb-6">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                        <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-400">
+                    <table className="min-w-full text-left text-xs">
+                        <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                             <tr>
-                                <th className="px-5 py-4">Kode & Nama Obat</th>
-                                <th className="px-5 py-4">Kategori & Rak</th>
-                                <th className="px-5 py-4 text-center">Batch Obat</th>
-                                <th className="px-5 py-4 text-right">Harga Jual</th>
-                                <th className="px-5 py-4 text-center">Total Stok</th>
-                                <th className="px-5 py-4">Exp Terdekat (FEFO)</th>
-                                <th className="px-5 py-4 text-right">Aksi</th>
+                                <th className="px-5 py-3.5">Kode & Nama Obat</th>
+                                <th className="px-5 py-3.5">Kategori & Rak</th>
+                                <th className="px-5 py-3.5 text-center">Batch Obat</th>
+                                <th className="px-5 py-3.5 text-right">Harga Jual</th>
+                                <th className="px-5 py-3.5 text-center">Total Stok</th>
+                                <th className="px-5 py-3.5">Exp Terdekat (FEFO)</th>
+                                <th className="px-5 py-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                             {medicines.data && medicines.data.length > 0 ? (
                                 medicines.data.map((med) => {
                                     const isLow = med.stock <= med.min_stock;
@@ -964,9 +964,9 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         )}
 
                         {/* Batches Table */}
-                        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xs">
-                            <table className="w-full text-left text-xs">
-                                <thead className="border-b border-slate-100 bg-slate-50 font-bold uppercase text-slate-500 text-[10px]">
+                        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xs">
+                            <table className="min-w-full text-left text-xs">
+                                <thead className="border-b border-slate-200/80 bg-slate-50/90 font-extrabold uppercase text-slate-600 text-[10px] tracking-wider">
                                     <tr>
                                         <th className="px-4 py-3">No. Batch</th>
                                         <th className="px-4 py-3">Tanggal Exp</th>
@@ -975,7 +975,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         <th className="px-4 py-3 text-right">Harga Beli</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                                     {selectedMedicineForBatches?.batches && selectedMedicineForBatches.batches.length > 0 ? (
                                         selectedMedicineForBatches.batches.map((b) => {
                                             const statusInfo = getBatchStatus(b);

@@ -874,8 +874,8 @@ export default function PosIndex({
                         </div>
                     </div>
 
-                    {/* Medicine Card Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {/* Medicine Card Grid (Responsive: 2 col mobile, 3 col tablet, 4 col desktop) */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
                         {filteredMedicines.length > 0 ? (
                             filteredMedicines.map((med) => {
                                 const inCartItem = cart.find((c) => c.id === med.id);

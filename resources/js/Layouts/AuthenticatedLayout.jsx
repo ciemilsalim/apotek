@@ -231,54 +231,54 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {/* Sidebar (Desktop & Tablet Slide-over) */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex w-72 md:w-80 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 flex w-72 lg:w-64 xl:w-72 flex-col border-r border-slate-200/90 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* Brand Header */}
-                <div className="flex h-20 items-center justify-between px-6 border-b border-slate-100">
-                    <Link href={route('dashboard')} className="flex items-center gap-3">
+                <div className="flex h-16 sm:h-20 items-center justify-between px-5 sm:px-6 border-b border-slate-100">
+                    <Link href={route('dashboard')} className="flex items-center gap-3 min-w-0">
                         {pharmacy?.logo_url ? (
                             <img
                                 src={pharmacy.logo_url}
                                 alt={pharmacy.name || 'Logo Apotek'}
-                                className="h-11 w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs"
+                                className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs shrink-0"
                             />
                         ) : (
-                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm">
-                                <Pill className="h-6 w-6" />
+                            <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm shrink-0">
+                                <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                         )}
-                        <div className="min-w-0">
-                            <div className="text-base font-extrabold text-slate-900 leading-tight truncate">
+                        <div className="min-w-0 flex-1">
+                            <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight truncate">
                                 {pharmacy?.name || 'Apotek Sehat'}
                             </div>
-                            <div className="text-xs text-slate-500 font-medium truncate">
+                            <div className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
                                 {pharmacy?.tagline || 'Sistem Manajemen Mudah'}
                             </div>
                         </div>
                     </Link>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 lg:hidden"
+                        className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden"
                         aria-label="Tutup Menu"
                     >
-                        <X className="h-6 w-6" />
+                        <X className="h-5 w-5" />
                     </button>
                 </div>
 
                 {/* User Info Card (Clean Flat Design) */}
-                <div className="p-4 mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white font-black text-lg">
+                <div className="p-3.5 mx-3 sm:mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-base">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-bold text-slate-900">
+                            <p className="truncate text-xs sm:text-sm font-bold text-slate-900 leading-tight">
                                 {user.name}
                             </p>
                             <span
-                                className={`inline-block mt-0.5 rounded-lg px-2.5 py-0.5 text-xs font-bold border ${currentRole.badge}`}
+                                className={`inline-block mt-0.5 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-bold border ${currentRole.badge}`}
                             >
                                 {currentRole.name}
                             </span>
@@ -352,9 +352,9 @@ export default function AuthenticatedLayout({ header, children }) {
             </aside>
 
             {/* Main Content Area (Mobile First: Full Width on mobile, offset on desktop) */}
-            <div className="flex-1 lg:pl-72 md:lg:pl-80 flex flex-col">
+            <div className="flex-1 lg:pl-64 xl:pl-72 flex flex-col min-w-0">
                 {/* Top Clean App Bar */}
-                <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 backdrop-blur-md">
+                <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setSidebarOpen(true)}

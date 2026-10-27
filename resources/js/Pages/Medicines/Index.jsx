@@ -357,7 +357,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-slate-800 transition shadow-xs"
+                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-emerald-700 transition shadow-xs"
                         >
                             Filter
                         </button>

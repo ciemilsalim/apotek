@@ -37,7 +37,7 @@ export default function PosHistory({ sales, filters }) {
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
                             Riwayat Transaksi Penjualan
                         </h1>
                         <p className="text-xs text-slate-500">
@@ -56,8 +56,8 @@ export default function PosHistory({ sales, filters }) {
         >
             <Head title="Riwayat Penjualan" />
 
-            {/* Filter */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Filter Bar (Light Theme Consistent) */}
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
                     className="flex flex-col sm:flex-row gap-3 items-center justify-between"
@@ -69,7 +69,7 @@ export default function PosHistory({ sales, filters }) {
                             placeholder="Cari nomor faktur, nama pembeli..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2 text-xs focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
                     </div>
 
@@ -85,12 +85,12 @@ export default function PosHistory({ sales, filters }) {
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-800 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
                         >
                             Filter
                         </button>
@@ -195,8 +195,8 @@ export default function PosHistory({ sales, filters }) {
                                         link.active
                                             ? 'bg-emerald-600 text-white font-bold'
                                             : link.url
-                                            ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                                            : 'text-slate-300 cursor-not-allowed dark:text-slate-700'
+                                            ? 'text-slate-600 hover:bg-slate-100'
+                                            : 'text-slate-300 cursor-not-allowed'
                                     }`}
                                 />
                             ))}

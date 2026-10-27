@@ -378,7 +378,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                     </div>
                     <button
                         type="submit"
-                        className="rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition active:scale-[0.98]"
+                        className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs active:scale-[0.98]"
                     >
                         Cari
                     </button>

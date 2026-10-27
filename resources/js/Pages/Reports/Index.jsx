@@ -210,7 +210,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
 
                     <button
                         type="submit"
-                        className="w-full sm:w-auto mt-2 sm:mt-5 rounded-xl bg-slate-900 px-5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+                        className="w-full sm:w-auto mt-2 sm:mt-5 rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-700 shadow-xs transition"
                     >
                         Terapkan
                     </button>

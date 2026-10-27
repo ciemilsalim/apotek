@@ -289,7 +289,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                         </div>
                         <button
                             type="submit"
-                            className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
                         >
                             Cari
                         </button>

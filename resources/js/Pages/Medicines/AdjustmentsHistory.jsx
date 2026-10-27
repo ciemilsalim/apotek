@@ -33,12 +33,12 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                     <div className="flex items-center gap-3">
                         <Link
                             href={route('medicines.index')}
-                            className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+                            className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50"
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            <h1 className="text-xl font-bold tracking-tight text-slate-900">
                                 Riwayat Mutasi & Penyesuaian Stok
                             </h1>
                             <p className="text-xs text-slate-500">
@@ -51,8 +51,8 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
         >
             <Head title="Riwayat Penyesuaian Stok" />
 
-            {/* Search */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Search (Light Theme Consistent) */}
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
                 <form onSubmit={handleSearch} className="flex gap-2">
                     <div className="relative flex-1 sm:w-80">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -61,12 +61,12 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                             placeholder="Cari kode obat, nama obat..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2 text-xs focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                        className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
                     >
                         Cari
                     </button>
@@ -212,8 +212,8 @@ export default function AdjustmentsHistory({ adjustments, filters }) {
                                         link.active
                                             ? 'bg-emerald-600 text-white font-bold'
                                             : link.url
-                                            ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                                            : 'text-slate-300 cursor-not-allowed dark:text-slate-700'
+                                            ? 'text-slate-600 hover:bg-slate-100'
+                                            : 'text-slate-300 cursor-not-allowed'
                                     }`}
                                 />
                             ))}

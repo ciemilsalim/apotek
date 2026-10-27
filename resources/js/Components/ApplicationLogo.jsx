@@ -12,8 +12,8 @@ export default function ApplicationLogo({ className = 'h-10 w-10', ...props }) {
                 </svg>
             </div>
             <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tight text-slate-800 dark:text-white">
-                    Apotek<span className="text-emerald-600 dark:text-emerald-400">Sehat</span>
+                <span className="text-lg font-black tracking-tight text-slate-800">
+                    Apotek<span className="text-emerald-600">Sehat</span>
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                     Sistem Farmasi

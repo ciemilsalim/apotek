@@ -179,7 +179,7 @@ export default function UsersIndex({ users, filters, roles }) {
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-900 transition"
+                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
                         >
                             Cari
                         </button>

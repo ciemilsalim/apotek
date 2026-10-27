@@ -83,7 +83,7 @@ export default function CategoriesIndex({ categories, filters }) {
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
                             Kategori Obat
                         </h1>
                         <p className="text-xs text-slate-500">
@@ -102,8 +102,8 @@ export default function CategoriesIndex({ categories, filters }) {
         >
             <Head title="Kategori Obat" />
 
-            {/* Search Bar */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {/* Search Bar (Light Theme Consistent) */}
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
                 <form onSubmit={handleSearch} className="flex gap-2">
                     <div className="relative flex-1 sm:w-80">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -112,12 +112,12 @@ export default function CategoriesIndex({ categories, filters }) {
                             placeholder="Cari nama kategori atau deskripsi..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2 text-xs focus:border-emerald-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                        className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
                     >
                         Cari
                     </button>
@@ -202,7 +202,7 @@ export default function CategoriesIndex({ categories, filters }) {
 
                 {/* Pagination */}
                 {categories.links && categories.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs dark:border-slate-800">
+                    <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs">
                         <div className="text-slate-500">
                             Menampilkan {categories.from || 0} - {categories.to || 0} dari{' '}
                             {categories.total} kategori
@@ -218,8 +218,8 @@ export default function CategoriesIndex({ categories, filters }) {
                                         link.active
                                             ? 'bg-emerald-600 text-white font-bold'
                                             : link.url
-                                            ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                                            : 'text-slate-300 cursor-not-allowed dark:text-slate-700'
+                                            ? 'text-slate-600 hover:bg-slate-100'
+                                            : 'text-slate-300 cursor-not-allowed'
                                     }`}
                                 />
                             ))}
@@ -231,14 +231,14 @@ export default function CategoriesIndex({ categories, filters }) {
             {/* Modal Create/Edit */}
             <Modal show={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md">
                 <form onSubmit={handleSubmit} className="p-6">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                        <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h2 className="text-base font-bold text-slate-900">
                             {editingCategory ? 'Ubah Kategori Obat' : 'Tambah Kategori Baru'}
                         </h2>
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100"
                         >
                             <X className="h-4 w-4" />
                         </button>
@@ -246,14 +246,14 @@ export default function CategoriesIndex({ categories, filters }) {
 
                     <div className="mt-4 space-y-4 text-xs">
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-semibold text-slate-700">
                                 Nama Kategori
                             </label>
                             <input
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
                                 placeholder="Contoh: Salep & Kulit"
                                 required
                             />
@@ -263,24 +263,24 @@ export default function CategoriesIndex({ categories, filters }) {
                         </div>
 
                         <div>
-                            <label className="block font-semibold text-slate-700 dark:text-slate-300">
+                            <label className="block font-semibold text-slate-700">
                                 Deskripsi / Catatan Kategori (Opsional)
                             </label>
                             <textarea
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
                                 placeholder="Keterangan obat-obatan dalam kategori ini..."
                             />
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+                    <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
                         <button
                             type="button"
                             onClick={() => setModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>
@@ -302,15 +302,15 @@ export default function CategoriesIndex({ categories, filters }) {
                 maxWidth="sm"
             >
                 <div className="p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 mb-4 dark:bg-rose-950/60 dark:text-rose-400">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 mb-4">
                         <Trash2 className="h-6 w-6" />
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-base font-bold text-slate-900">
                         Hapus Kategori Ini?
                     </h3>
                     <p className="mt-1 text-xs text-slate-500">
                         Apakah Anda yakin ingin menghapus kategori{' '}
-                        <strong className="text-slate-900 dark:text-white">
+                        <strong className="text-slate-900">
                             {categoryToDelete?.name}
                         </strong>
                         ? Kategori hanya dapat dihapus jika tidak ada obat yang terdaftar di dalamnya.
@@ -319,7 +319,7 @@ export default function CategoriesIndex({ categories, filters }) {
                     <div className="mt-6 flex items-center justify-end gap-2">
                         <button
                             onClick={() => setDeleteModalOpen(false)}
-                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                            className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
                         >
                             Batal
                         </button>

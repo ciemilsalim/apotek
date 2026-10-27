@@ -253,7 +253,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             <div className="flex items-end gap-2">
                                 <button
                                     type="submit"
-                                    className="w-full rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                                    className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
                                 >
                                     Terapkan Filter
                                 </button>

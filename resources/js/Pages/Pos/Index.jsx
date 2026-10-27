@@ -5,6 +5,7 @@ import {
     AlertCircle,
     ArrowRight,
     Banknote,
+    Barcode,
     Check,
     CheckCircle2,
     CreditCard,
@@ -18,10 +19,10 @@ import {
     Search,
     ShoppingCart,
     Trash2,
-    User,
+    Volume2,
     X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function PosIndex({ medicines, categories, recentSales, filters }) {
     const { flash } = usePage().props;
@@ -31,6 +32,40 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
     const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
     const [receiptModalOpen, setReceiptModalOpen] = useState(false);
     const [lastCompletedSale, setLastCompletedSale] = useState(null);
+    const [barcodeFeedback, setBarcodeFeedback] = useState(null);
+    const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
+
+    const searchInputRef = useRef(null);
+
+    // Play subtle POS beep for barcode scanner feedback
+    const playBeep = () => {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.08);
+            }
+        } catch (e) {
+            // Ignore if audio context not permitted
+        }
+    };
+
+    // Auto-focus search input when page loads or modal closes
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [receiptModalOpen, cartDrawerOpen]);
 
     // Watch for completed sale in flash session
     useEffect(() => {
@@ -73,7 +108,9 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
     });
 
     // Add to cart
-    const addToCart = (med) => {
+    const addToCart = (med, notify = false) => {
+        let addedSuccessfully = false;
+
         setCart((prev) => {
             const existingIndex = prev.findIndex((item) => item.id === med.id);
             if (existingIndex > -1) {
@@ -84,12 +121,14 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 }
                 const updated = [...prev];
                 updated[existingIndex].quantity += 1;
+                addedSuccessfully = true;
                 return updated;
             } else {
                 if (med.stock < 1) {
                     alert(`Stok ${med.name} habis.`);
                     return prev;
                 }
+                addedSuccessfully = true;
                 return [
                     ...prev,
                     {
@@ -104,15 +143,63 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 ];
             }
         });
+
+        if (notify) {
+            playBeep();
+            setBarcodeFeedback(`✓ ${med.name} (+1 ${med.unit})`);
+            setTimeout(() => setBarcodeFeedback(null), 2500);
+        }
+
+        // Keep search input focused for continuous barcode scanning
+        searchInputRef.current?.focus();
     };
 
+    // Barcode scanner handler on Enter keypress
+    const handleBarcodeKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const query = search.trim();
+            if (!query) return;
+
+            // 1. Check exact match on medicine code (case-insensitive)
+            const exactCodeMatch = medicines.find(
+                (m) => m.code.toLowerCase() === query.toLowerCase()
+            );
+
+            if (exactCodeMatch) {
+                addToCart(exactCodeMatch, true);
+                setSearch('');
+                return;
+            }
+
+            // 2. Check exact match on medicine name
+            const exactNameMatch = medicines.find(
+                (m) => m.name.toLowerCase() === query.toLowerCase()
+            );
+
+            if (exactNameMatch) {
+                addToCart(exactNameMatch, true);
+                setSearch('');
+                return;
+            }
+
+            // 3. If filtered results has exactly 1 item, add it
+            if (filteredMedicines.length === 1) {
+                addToCart(filteredMedicines[0], true);
+                setSearch('');
+                return;
+            }
+        }
+    };
+
+    // Update quantity (with delta +1 or -1)
     const updateQuantity = (id, delta) => {
         setCart((prev) => {
             return prev
                 .map((item) => {
                     if (item.id === id) {
                         const newQty = item.quantity + delta;
-                        if (newQty <= 0) return null;
+                        if (newQty <= 0) return null; // removed
                         if (newQty > item.stock) {
                             alert(`Maksimal stok tersedia adalah ${item.stock} ${item.unit}.`);
                             return item;
@@ -123,16 +210,19 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 })
                 .filter(Boolean);
         });
+        searchInputRef.current?.focus();
     };
 
     const removeFromCart = (id) => {
         setCart((prev) => prev.filter((item) => item.id !== id));
+        searchInputRef.current?.focus();
     };
 
     const clearCart = () => {
         if (confirm('Kosongkan semua obat dari keranjang?')) {
             setCart([]);
             setData((prev) => ({ ...prev, cash_paid: '', discount: 0 }));
+            searchInputRef.current?.focus();
         }
     };
 
@@ -153,7 +243,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
     const handleCheckout = (e) => {
         e.preventDefault();
         if (cart.length === 0) {
-            alert('Keranjang belanja masih kosong. Pilih obat terlebih dahulu.');
+            alert('Keranjang belanja masih kosong. Pilih atau scan barcode obat terlebih dahulu.');
             return;
         }
 
@@ -183,7 +273,11 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
         );
     };
 
-    // Shared Cart Content Component (Used in Sidebar on Tablet/Desktop, and Drawer/Modal on Mobile)
+    const handlePrintThermal = () => {
+        window.print();
+    };
+
+    // Shared Cart Content Component
     const CartContent = () => (
         <div className="flex flex-col h-full">
             {/* Cart Header */}
@@ -193,7 +287,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                         <ShoppingCart className="h-4 w-4" />
                     </div>
                     <span className="font-extrabold text-sm sm:text-base text-slate-900">
-                        Keranjang ({totalItemsCount} obat)
+                        Keranjang Belanja ({totalItemsCount} item)
                     </span>
                 </div>
                 {cart.length > 0 && (
@@ -211,18 +305,18 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
             {/* Customer Name */}
             <div className="mt-3">
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Nama Pembeli / Pelanggan
+                    Nama Pembeli / Pasien
                 </label>
                 <input
                     type="text"
                     value={data.customer_name}
                     onChange={(e) => setData('customer_name', e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50"
+                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50"
                     placeholder="Pelanggan Umum"
                 />
             </div>
 
-            {/* Cart Items List */}
+            {/* Cart Items List with prominent + and - buttons */}
             <div className="my-3 flex-1 overflow-y-auto max-h-60 sm:max-h-72 divide-y divide-slate-100">
                 {cart.length > 0 ? (
                     cart.map((item) => (
@@ -239,29 +333,32 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                 </div>
                             </div>
 
-                            {/* Quantity Selector (Big touch targets: min 36px) */}
+                            {/* Prominent Minus (-) & Plus (+) Buttons in Cart */}
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
                                     onClick={() => updateQuantity(item.id, -1)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+                                    className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+                                    title="Kurangi 1"
                                 >
                                     <Minus className="h-4 w-4" />
                                 </button>
-                                <span className="w-7 text-center font-black text-sm">
+                                <span className="w-8 text-center font-black text-sm text-slate-900">
                                     {item.quantity}
                                 </span>
                                 <button
                                     type="button"
                                     onClick={() => updateQuantity(item.id, 1)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition"
+                                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition"
+                                    title="Tambah 1"
                                 >
                                     <Plus className="h-4 w-4" />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => removeFromCart(item.id)}
-                                    className="p-1 text-slate-300 hover:text-rose-500 ml-1"
+                                    className="p-1.5 text-slate-300 hover:text-rose-600 ml-1"
+                                    title="Hapus dari keranjang"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>
@@ -270,7 +367,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     ))
                 ) : (
                     <div className="py-12 text-center text-xs sm:text-sm text-slate-400">
-                        Keranjang masih kosong. Pilih obat dari katalog di samping.
+                        Keranjang masih kosong. Scan barcode atau klik obat di katalog.
                     </div>
                 )}
             </div>
@@ -292,7 +389,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     </div>
                 </div>
 
-                {/* Payment Method Selector (Big buttons) */}
+                {/* Payment Method Selector */}
                 <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
                         Metode Pembayaran
@@ -333,7 +430,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     <div className="space-y-2 p-3 rounded-2xl bg-slate-50 border border-slate-200">
                         <div className="flex items-center justify-between gap-2">
                             <label className="text-xs font-bold text-slate-700">
-                                Uang Diterima:
+                                Uang Diterima (Rp):
                             </label>
                             <input
                                 type="number"
@@ -389,11 +486,11 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     type="button"
                     onClick={handleCheckout}
                     disabled={processing || cart.length === 0 || isUnderpaid}
-                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 text-base font-black text-white shadow-sm hover:bg-emerald-700 active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 sm:py-4 text-base font-black text-white shadow-sm hover:bg-emerald-700 active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Check className="h-5 w-5" />
                     <span>
-                        {processing ? 'Menyimpan Transaksi...' : 'Bayar & Selesaikan Transaksi'}
+                        {processing ? 'Menyimpan Transaksi...' : 'Bayar & Selesaikan'}
                     </span>
                 </button>
             </div>
@@ -409,7 +506,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             Kasir Penjualan
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                            Pilih obat dari daftar untuk langsung dimasukkan ke keranjang
+                            Scan barcode atau cari nama obat untuk langsung menambahkan ke keranjang
                         </p>
                     </div>
                     <Link
@@ -422,27 +519,79 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 </div>
             }
         >
-            <Head title="Kasir - Apotek Sehat" />
+            <Head title="Kasir POS - Apotek Sehat" />
 
-            {/* Split Screen Layout (Mobile: Full width catalog + Bottom Bar; Tablet/Desktop: 2 Columns) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20 lg:pb-0">
-                {/* Medicine Catalog Section (7 Cols on Desktop, Full Width on Mobile) */}
+            {/* Print Stylesheet for Thermal Roll Printers (58mm / 80mm) */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                @media print {
+                    @page {
+                        size: ${paperSize === '80mm' ? '80mm auto' : '58mm auto'};
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        background: #ffffff !important;
+                        color: #000000 !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    /* Hide everything in print mode except thermal receipt */
+                    body * {
+                        visibility: hidden !important;
+                    }
+                    #thermal-receipt, #thermal-receipt * {
+                        visibility: visible !important;
+                    }
+                    #thermal-receipt {
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: ${paperSize === '80mm' ? '76mm' : '54mm'} !important;
+                        max-width: ${paperSize === '80mm' ? '80mm' : '58mm'} !important;
+                        padding: 2mm 3mm 15mm 3mm !important;
+                        margin: 0 !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        font-family: 'Courier New', Courier, monospace !important;
+                        font-size: ${paperSize === '80mm' ? '12px' : '10.5px'} !important;
+                        line-height: 1.25 !important;
+                        color: #000000 !important;
+                        background: #ffffff !important;
+                    }
+                    .no-print {
+                        display: none !important;
+                    }
+                }
+            ` }} />
+
+            {/* Split Screen Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24 lg:pb-0">
+                {/* Left 7 Columns: Product Catalog & Barcode Scanner Area */}
                 <div className="lg:col-span-7 flex flex-col space-y-4">
-                    {/* Search & Category Filter */}
+                    {/* Barcode Search & Feedback Box */}
                     <div className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs space-y-3">
-                        {/* Big Search Input with Clear Button */}
+                        {/* Search Input with Autofocus & Barcode icon */}
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-slate-400">
+                                <Barcode className="h-5 w-5 text-emerald-600" />
+                            </div>
                             <input
+                                ref={searchInputRef}
                                 type="text"
-                                placeholder="Cari nama obat atau kode (misal: Paracetamol, OBT-001)..."
+                                placeholder="Scan barcode obat atau ketik nama/kode obat..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-10 py-3 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
+                                onKeyDown={handleBarcodeKeyDown}
+                                className="w-full rounded-2xl border-2 border-slate-300 bg-slate-50 pl-11 pr-10 py-3 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none shadow-xs"
+                                autoFocus
                             />
                             {search && (
                                 <button
-                                    onClick={() => setSearch('')}
+                                    onClick={() => {
+                                        setSearch('');
+                                        searchInputRef.current?.focus();
+                                    }}
                                     className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:text-slate-600"
                                 >
                                     <X className="h-4 w-4" />
@@ -450,11 +599,28 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                             )}
                         </div>
 
-                        {/* Category Horizontal Scrolling Chips */}
-                        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+                        {/* Scanner Status & Visual Feedback Badge */}
+                        <div className="flex items-center justify-between text-xs text-slate-500">
+                            <div className="flex items-center gap-1.5 font-medium">
+                                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span>Scanner Barcode Siap</span>
+                            </div>
+
+                            {barcodeFeedback && (
+                                <div className="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 animate-fade-in">
+                                    {barcodeFeedback}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Category Scrolling Filter Chips */}
+                        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                             <button
                                 type="button"
-                                onClick={() => setSelectedCategory('')}
+                                onClick={() => {
+                                    setSelectedCategory('');
+                                    searchInputRef.current?.focus();
+                                }}
                                 className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold transition ${
                                     selectedCategory === ''
                                         ? 'bg-emerald-600 text-white shadow-xs'
@@ -467,7 +633,10 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                 <button
                                     key={cat.id}
                                     type="button"
-                                    onClick={() => setSelectedCategory(cat.id)}
+                                    onClick={() => {
+                                        setSelectedCategory(cat.id);
+                                        searchInputRef.current?.focus();
+                                    }}
                                     className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold transition ${
                                         String(selectedCategory) === String(cat.id)
                                             ? 'bg-emerald-600 text-white shadow-xs'
@@ -480,7 +649,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                         </div>
                     </div>
 
-                    {/* Medicine Card Grid (Optimized for Finger Tap on Mobile & Tablet) */}
+                    {/* Medicine Card Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {filteredMedicines.length > 0 ? (
                             filteredMedicines.map((med) => {
@@ -490,14 +659,16 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                 return (
                                     <div
                                         key={med.id}
-                                        onClick={() => addToCart(med)}
-                                        className={`group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl border-2 bg-white transition active:scale-[0.98] cursor-pointer select-none ${
+                                        className={`group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl border-2 bg-white transition ${
                                             inCartItem
-                                                ? 'border-emerald-600 bg-emerald-50/20'
+                                                ? 'border-emerald-600 bg-emerald-50/15'
                                                 : 'border-slate-200 hover:border-emerald-400'
                                         }`}
                                     >
-                                        <div>
+                                        <div
+                                            onClick={() => addToCart(med)}
+                                            className="cursor-pointer select-none"
+                                        >
                                             <div className="flex items-center justify-between mb-1.5">
                                                 <span className="font-mono text-[11px] font-bold text-slate-500">
                                                     {med.code}
@@ -524,16 +695,55 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                                             )}
                                         </div>
 
+                                        {/* Card Footer: Price & BOTH [+] and [-] Quantity Controls! */}
                                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
                                             <div className="text-sm font-black text-emerald-700">
                                                 {formatCurrency(med.sell_price)}
                                             </div>
-                                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition">
-                                                <Plus className="h-4 w-4" />
-                                            </div>
+
+                                            {inCartItem ? (
+                                                /* If already in cart, show BOTH minus (-) and plus (+) right on the card */
+                                                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            updateQuantity(med.id, -1);
+                                                        }}
+                                                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-slate-700 hover:bg-slate-200 shadow-xs active:scale-90 transition"
+                                                        title="Kurangi 1"
+                                                    >
+                                                        <Minus className="h-3.5 w-3.5" />
+                                                    </button>
+                                                    <span className="w-5 text-center font-black text-xs text-slate-900">
+                                                        {inCartItem.quantity}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            updateQuantity(med.id, 1);
+                                                        }}
+                                                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs active:scale-90 transition"
+                                                        title="Tambah 1"
+                                                    >
+                                                        <Plus className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                /* If not yet in cart, show + Tambah button */
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addToCart(med)}
+                                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition shadow-xs"
+                                                    title="Tambah ke keranjang"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </button>
+                                            )}
                                         </div>
 
-                                        {/* In-cart count badge */}
+                                        {/* In-cart count bubble */}
                                         {inCartItem && (
                                             <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white font-black text-xs shadow-md">
                                                 {inCartItem.quantity}
@@ -550,7 +760,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                     </div>
                 </div>
 
-                {/* Right Panel for Desktop / Tablet: Live Cart (5 Cols on Desktop) */}
+                {/* Right Panel for Tablet & Desktop: Live Cart (5 Cols on Desktop) */}
                 <div className="hidden lg:block lg:col-span-5">
                     <div className="sticky top-24 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
                         <CartContent />
@@ -558,7 +768,7 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 </div>
             </div>
 
-            {/* Mobile Sticky Bottom Bar (Shows when items in cart) */}
+            {/* Mobile Sticky Bottom Checkout Bar */}
             {cart.length > 0 && (
                 <div className="fixed bottom-16 inset-x-0 z-30 lg:hidden p-3 bg-white/95 border-t border-slate-200 backdrop-blur-md shadow-lg">
                     <div className="flex items-center justify-between gap-3 max-w-md mx-auto">
@@ -588,7 +798,10 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
             {/* Mobile Cart Drawer Modal */}
             <Modal
                 show={cartDrawerOpen}
-                onClose={() => setCartDrawerOpen(false)}
+                onClose={() => {
+                    setCartDrawerOpen(false);
+                    searchInputRef.current?.focus();
+                }}
                 maxWidth="md"
             >
                 <div className="p-6">
@@ -596,113 +809,161 @@ export default function PosIndex({ medicines, categories, recentSales, filters }
                 </div>
             </Modal>
 
-            {/* Instant Receipt Popup Modal (Clean Flat Design) */}
+            {/* Instant Receipt Popup Modal with Thermal Printer Support */}
             <Modal
                 show={receiptModalOpen}
-                onClose={() => setReceiptModalOpen(false)}
+                onClose={() => {
+                    setReceiptModalOpen(false);
+                    searchInputRef.current?.focus();
+                }}
                 maxWidth="sm"
             >
                 {lastCompletedSale && (
-                    <div className="p-6 text-xs text-slate-800">
-                        <div className="text-center pb-4 border-b border-dashed border-slate-300">
-                            <div className="flex justify-center mb-1 text-emerald-600">
-                                <CheckCircle2 className="h-10 w-10" />
-                            </div>
-                            <h2 className="text-lg font-black text-slate-900">
-                                APOTEK SEHAT
-                            </h2>
-                            <p className="text-xs text-slate-500">
-                                Struk Pembayaran Sah
-                            </p>
-                            <div className="mt-2 inline-block rounded-lg bg-emerald-50 px-2.5 py-1 font-mono text-xs font-black text-emerald-700 border border-emerald-200">
-                                {lastCompletedSale.invoice_number}
-                            </div>
-                            <p className="text-[11px] text-slate-400 mt-1">
-                                {new Date(lastCompletedSale.created_at).toLocaleString('id-ID')}
-                            </p>
-                        </div>
-
-                        {/* Customer & Cashier */}
-                        <div className="py-3 text-xs space-y-1 border-b border-dashed border-slate-300">
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Pembeli:</span>
-                                <span className="font-bold">{lastCompletedSale.customer_name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Kasir:</span>
-                                <span className="font-bold">{lastCompletedSale.user?.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Metode Bayar:</span>
-                                <span className="font-bold uppercase">
-                                    {lastCompletedSale.payment_method}
-                                </span>
+                    <div className="p-6 text-slate-900">
+                        {/* Thermal Printer Paper Size Selector */}
+                        <div className="no-print mb-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-700">
+                                Format Kertas Termal:
+                            </span>
+                            <div className="flex gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setPaperSize('58mm')}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                                        paperSize === '58mm'
+                                            ? 'bg-emerald-600 text-white border-emerald-600'
+                                            : 'bg-white text-slate-700 border-slate-200'
+                                    }`}
+                                >
+                                    58 mm (Mini)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPaperSize('80mm')}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                                        paperSize === '80mm'
+                                            ? 'bg-emerald-600 text-white border-emerald-600'
+                                            : 'bg-white text-slate-700 border-slate-200'
+                                    }`}
+                                >
+                                    80 mm (Standar)
+                                </button>
                             </div>
                         </div>
 
-                        {/* Itemized List */}
-                        <div className="py-3 space-y-2 border-b border-dashed border-slate-300 font-mono text-xs">
-                            {lastCompletedSale.items?.map((item, idx) => (
-                                <div key={idx} className="flex justify-between items-start">
-                                    <div>
-                                        <div className="font-bold text-slate-900">
+                        {/* Thermal Receipt Body (Has id="thermal-receipt" for @media print) */}
+                        <div
+                            id="thermal-receipt"
+                            className="bg-white p-4 rounded-xl border border-slate-200 font-mono text-xs text-black"
+                            style={{ maxWidth: paperSize === '80mm' ? '80mm' : '58mm', margin: '0 auto' }}
+                        >
+                            {/* Header */}
+                            <div className="text-center pb-2 border-b border-dashed border-black">
+                                <h2 className="text-sm font-black tracking-tight">
+                                    APOTEK SEHAT
+                                </h2>
+                                <p className="text-[10px]">
+                                    Jl. Farmasi Sehat No. 88
+                                </p>
+                                <p className="text-[10px]">
+                                    Telp: (021) 555-0123
+                                </p>
+                                <div className="mt-1 font-bold text-[11px]">
+                                    {lastCompletedSale.invoice_number}
+                                </div>
+                                <p className="text-[9px]">
+                                    {new Date(lastCompletedSale.created_at).toLocaleString('id-ID')}
+                                </p>
+                            </div>
+
+                            {/* Customer & Cashier */}
+                            <div className="py-2 text-[10px] space-y-0.5 border-b border-dashed border-black">
+                                <div className="flex justify-between">
+                                    <span>Kasir:</span>
+                                    <span>{lastCompletedSale.user?.name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Pelanggan:</span>
+                                    <span>{lastCompletedSale.customer_name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Metode:</span>
+                                    <span className="uppercase">{lastCompletedSale.payment_method}</span>
+                                </div>
+                            </div>
+
+                            {/* Itemized List */}
+                            <div className="py-2 space-y-1.5 border-b border-dashed border-black text-[10px]">
+                                {lastCompletedSale.items?.map((item, idx) => (
+                                    <div key={idx}>
+                                        <div className="font-bold">
                                             {item.medicine_name}
                                         </div>
-                                        <div className="text-[11px] text-slate-500">
-                                            {item.quantity} x {formatCurrency(item.price)}
+                                        <div className="flex justify-between">
+                                            <span>
+                                                {item.quantity} x {item.price.toLocaleString('id-ID')}
+                                            </span>
+                                            <span>
+                                                {item.subtotal.toLocaleString('id-ID')}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="font-black text-slate-900">
-                                        {formatCurrency(item.subtotal)}
+                                ))}
+                            </div>
+
+                            {/* Totals */}
+                            <div className="py-2 space-y-1 text-[11px] border-b border-dashed border-black">
+                                <div className="flex justify-between">
+                                    <span>Subtotal:</span>
+                                    <span>{lastCompletedSale.subtotal.toLocaleString('id-ID')}</span>
+                                </div>
+                                {lastCompletedSale.discount > 0 && (
+                                    <div className="flex justify-between">
+                                        <span>Diskon:</span>
+                                        <span>-{lastCompletedSale.discount.toLocaleString('id-ID')}</span>
                                     </div>
+                                )}
+                                <div className="flex justify-between font-black text-xs pt-1">
+                                    <span>TOTAL:</span>
+                                    <span>Rp {lastCompletedSale.total_amount.toLocaleString('id-ID')}</span>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="flex justify-between">
+                                    <span>Bayar:</span>
+                                    <span>Rp {lastCompletedSale.cash_paid.toLocaleString('id-ID')}</span>
+                                </div>
+                                <div className="flex justify-between font-bold">
+                                    <span>Kembali:</span>
+                                    <span>Rp {lastCompletedSale.change_amount.toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
 
-                        {/* Totals */}
-                        <div className="py-3 space-y-1.5 text-xs border-b border-dashed border-slate-300">
-                            <div className="flex justify-between text-slate-600">
-                                <span>Subtotal:</span>
-                                <span>{formatCurrency(lastCompletedSale.subtotal)}</span>
-                            </div>
-                            {lastCompletedSale.discount > 0 && (
-                                <div className="flex justify-between text-slate-600">
-                                    <span>Diskon:</span>
-                                    <span>-{formatCurrency(lastCompletedSale.discount)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between font-black text-slate-900 text-sm pt-1">
-                                <span>TOTAL BELANJA:</span>
-                                <span className="text-emerald-700">
-                                    {formatCurrency(lastCompletedSale.total_amount)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-slate-600">
-                                <span>Uang Diterima:</span>
-                                <span>{formatCurrency(lastCompletedSale.cash_paid)}</span>
-                            </div>
-                            <div className="flex justify-between font-bold text-slate-900">
-                                <span>Uang Kembalian:</span>
-                                <span>{formatCurrency(lastCompletedSale.change_amount)}</span>
+                            {/* Footer */}
+                            <div className="text-center pt-2 text-[9px] space-y-0.5">
+                                <p>Terima kasih atas kunjungan Anda</p>
+                                <p>Semoga lekas sembuh!</p>
+                                <p>Struk pembayaran yang sah</p>
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="mt-5 flex gap-2">
+                        {/* Modal Action Buttons */}
+                        <div className="no-print mt-5 flex gap-2">
                             <button
                                 type="button"
-                                onClick={() => window.print()}
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-2xl border-2 border-slate-200 bg-white py-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                                onClick={handlePrintThermal}
+                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-slate-800 transition"
                             >
                                 <Printer className="h-4 w-4" />
-                                <span>Cetak Struk</span>
+                                <span>Cetak Struk Termal ({paperSize})</span>
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setReceiptModalOpen(false)}
-                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white hover:bg-emerald-700"
+                                onClick={() => {
+                                    setReceiptModalOpen(false);
+                                    searchInputRef.current?.focus();
+                                }}
+                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-black text-white hover:bg-emerald-700 transition"
                             >
-                                Selesai
+                                Transaksi Baru
                             </button>
                         </div>
                     </div>

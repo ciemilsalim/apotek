@@ -1,8 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle2, Printer, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 
 export default function PosReceipt({ sale }) {
+    const [paperSize, setPaperSize] = useState('58mm'); // '58mm' or '80mm'
+
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -18,16 +21,16 @@ export default function PosReceipt({ sale }) {
                     <div className="flex items-center gap-3">
                         <Link
                             href={route('pos.history')}
-                            className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+                            className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50"
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                         <div>
-                            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            <h1 className="text-xl font-bold tracking-tight text-slate-900">
                                 Faktur Struk Penjualan
                             </h1>
-                            <p className="text-xs text-slate-500">
-                                No. Faktur: {sale.invoice_number}
+                            <p className="text-xs text-slate-500 font-mono">
+                                No: {sale.invoice_number}
                             </p>
                         </div>
                     </div>
@@ -35,10 +38,10 @@ export default function PosReceipt({ sale }) {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => window.print()}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-slate-700 transition dark:bg-slate-700 dark:hover:bg-slate-600"
+                            className="inline-flex items-center gap-1.5 rounded-2xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white hover:bg-slate-800 transition"
                         >
                             <Printer className="h-4 w-4" />
-                            <span>Cetak Struk Sekarang</span>
+                            <span>Cetak Termal ({paperSize})</span>
                         </button>
                     </div>
                 </div>
@@ -46,101 +49,184 @@ export default function PosReceipt({ sale }) {
         >
             <Head title={`Struk ${sale.invoice_number} - Apotek Sehat`} />
 
-            <div className="mx-auto max-w-md">
-                {/* Thermal Receipt Paper Card */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-slate-800 dark:bg-slate-950 font-mono text-xs text-slate-800 dark:text-slate-200">
+            {/* Thermal Print CSS */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                @media print {
+                    @page {
+                        size: ${paperSize === '80mm' ? '80mm auto' : '58mm auto'};
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        background: #ffffff !important;
+                        color: #000000 !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    body * {
+                        visibility: hidden !important;
+                    }
+                    #thermal-receipt, #thermal-receipt * {
+                        visibility: visible !important;
+                    }
+                    #thermal-receipt {
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: ${paperSize === '80mm' ? '76mm' : '54mm'} !important;
+                        max-width: ${paperSize === '80mm' ? '80mm' : '58mm'} !important;
+                        padding: 2mm 3mm 15mm 3mm !important;
+                        margin: 0 !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        font-family: 'Courier New', Courier, monospace !important;
+                        font-size: ${paperSize === '80mm' ? '12px' : '10.5px'} !important;
+                        line-height: 1.25 !important;
+                        color: #000000 !important;
+                        background: #ffffff !important;
+                    }
+                    .no-print {
+                        display: none !important;
+                    }
+                }
+            ` }} />
+
+            <div className="mx-auto max-w-sm">
+                {/* Paper Size Switcher */}
+                <div className="no-print mb-4 p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700">
+                        Format Kertas Termal:
+                    </span>
+                    <div className="flex gap-1">
+                        <button
+                            type="button"
+                            onClick={() => setPaperSize('58mm')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                                paperSize === '58mm'
+                                    ? 'bg-emerald-600 text-white border-emerald-600'
+                                    : 'bg-white text-slate-700 border-slate-200'
+                            }`}
+                        >
+                            58 mm (Roll Kecil)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPaperSize('80mm')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                                paperSize === '80mm'
+                                    ? 'bg-emerald-600 text-white border-emerald-600'
+                                    : 'bg-white text-slate-700 border-slate-200'
+                            }`}
+                        >
+                            80 mm (Standar POS)
+                        </button>
+                    </div>
+                </div>
+
+                {/* Thermal Receipt Paper */}
+                <div
+                    id="thermal-receipt"
+                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm font-mono text-xs text-black"
+                    style={{ maxWidth: paperSize === '80mm' ? '80mm' : '58mm', margin: '0 auto' }}
+                >
                     {/* Header */}
-                    <div className="text-center pb-4 border-b border-dashed border-slate-300 dark:border-slate-700">
-                        <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    <div className="text-center pb-3 border-b border-dashed border-black">
+                        <h2 className="text-base font-black tracking-tight">
                             APOTEK SEHAT
                         </h2>
-                        <p className="text-[11px] text-slate-500 font-sans">
-                            Sistem Pelayanan Farmasi & Obat Terpadu
+                        <p className="text-[10px]">
+                            Jl. Farmasi Sehat No. 88
                         </p>
-                        <p className="text-[10px] text-slate-500 font-sans">
-                            Jl. Farmasi Sehat No. 88, Telp: (021) 555-0123
+                        <p className="text-[10px]">
+                            Telp: (021) 555-0123
                         </p>
-                        <div className="mt-3 inline-block rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700 border border-emerald-200">
+                        <div className="mt-1 font-bold text-xs">
                             {sale.invoice_number}
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-1 font-sans">
+                        <p className="text-[9px]">
                             {new Date(sale.created_at).toLocaleString('id-ID')}
                         </p>
                     </div>
 
                     {/* Metadata */}
-                    <div className="py-3 text-[11px] space-y-1 border-b border-dashed border-slate-300 dark:border-slate-700">
+                    <div className="py-2.5 text-[10px] space-y-0.5 border-b border-dashed border-black">
                         <div className="flex justify-between">
-                            <span className="text-slate-500">Pelanggan:</span>
-                            <span className="font-bold">{sale.customer_name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Kasir:</span>
+                            <span>Kasir:</span>
                             <span className="font-bold">{sale.user?.name || '-'}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-slate-500">Metode Bayar:</span>
+                            <span>Pelanggan:</span>
+                            <span className="font-bold">{sale.customer_name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span>Pembayaran:</span>
                             <span className="font-bold uppercase">{sale.payment_method}</span>
                         </div>
                     </div>
 
                     {/* Items Table */}
-                    <div className="py-4 space-y-2 border-b border-dashed border-slate-300 dark:border-slate-700">
+                    <div className="py-2.5 space-y-1.5 border-b border-dashed border-black text-[10px]">
                         {sale.items?.map((item) => (
-                            <div key={item.id} className="flex justify-between items-start">
-                                <div>
-                                    <div className="font-bold text-slate-900 dark:text-white">
-                                        {item.medicine_name}
-                                    </div>
-                                    <div className="text-[10px] text-slate-500">
-                                        {item.quantity} {item.unit} x {formatCurrency(item.price)}
-                                    </div>
+                            <div key={item.id}>
+                                <div className="font-bold">
+                                    {item.medicine_name}
                                 </div>
-                                <div className="font-bold text-slate-900 dark:text-white">
-                                    {formatCurrency(item.subtotal)}
+                                <div className="flex justify-between">
+                                    <span>
+                                        {item.quantity} {item.unit} x {item.price.toLocaleString('id-ID')}
+                                    </span>
+                                    <span>
+                                        {item.subtotal.toLocaleString('id-ID')}
+                                    </span>
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     {/* Financial Summary */}
-                    <div className="py-4 space-y-1.5 text-xs border-b border-dashed border-slate-300 dark:border-slate-700">
-                        <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                    <div className="py-2.5 space-y-1 text-[11px] border-b border-dashed border-black">
+                        <div className="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>{formatCurrency(sale.subtotal)}</span>
+                            <span>{sale.subtotal.toLocaleString('id-ID')}</span>
                         </div>
                         {sale.discount > 0 && (
-                            <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                                <span>Potongan Diskon:</span>
-                                <span>-{formatCurrency(sale.discount)}</span>
+                            <div className="flex justify-between">
+                                <span>Diskon:</span>
+                                <span>-{sale.discount.toLocaleString('id-ID')}</span>
                             </div>
                         )}
-                        <div className="flex justify-between text-sm font-black text-slate-900 dark:text-white pt-1">
+                        <div className="flex justify-between font-black text-xs pt-1">
                             <span>TOTAL BAYAR:</span>
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                                {formatCurrency(sale.total_amount)}
-                            </span>
+                            <span>Rp {sale.total_amount.toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                            <span>Bayar Tunai:</span>
-                            <span>{formatCurrency(sale.cash_paid)}</span>
+                        <div className="flex justify-between">
+                            <span>Uang Diterima:</span>
+                            <span>Rp {sale.cash_paid.toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between font-bold text-slate-900 dark:text-white">
-                            <span>Kembalian:</span>
-                            <span>{formatCurrency(sale.change_amount)}</span>
+                        <div className="flex justify-between font-bold">
+                            <span>Uang Kembalian:</span>
+                            <span>Rp {sale.change_amount.toLocaleString('id-ID')}</span>
                         </div>
                     </div>
 
                     {/* Footer */}
-                    <div className="text-center pt-4 text-[10px] text-slate-400 font-sans space-y-1">
-                        <p className="font-semibold text-slate-600 dark:text-slate-300">
-                            Terima kasih atas kunjungan Anda.
-                        </p>
-                        <p>Semoga lekas sembuh & senantiasa sehat selalu!</p>
-                        <p className="text-[9px]">
-                            Struk ini merupakan bukti pembayaran yang sah.
-                        </p>
+                    <div className="text-center pt-3 text-[9px] space-y-0.5">
+                        <p className="font-bold">Terima kasih atas kunjungan Anda</p>
+                        <p>Semoga lekas sembuh!</p>
+                        <p>Struk ini bukti pembayaran sah</p>
                     </div>
+                </div>
+
+                {/* Print button on screen */}
+                <div className="no-print mt-4">
+                    <button
+                        onClick={() => window.print()}
+                        className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 text-sm font-black text-white hover:bg-emerald-700 transition shadow-xs"
+                    >
+                        <Printer className="h-5 w-5" />
+                        <span>Cetak Struk ke Printer Termal</span>
+                    </button>
                 </div>
             </div>
         </AuthenticatedLayout>

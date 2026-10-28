@@ -1,0 +1,35 @@
+{
+    "release": {
+        "name": "siasek-bos",
+        "version": "2.1",
+        "engine_version": "2.1-universal",
+        "domain_type": "APOTEK"
+    },
+    "period_type": "CURRENT_PERIOD",
+    "period": {
+        "start": "2026-10-01",
+        "end": "2026-10-31",
+        "evidence_cutoff": "2026-10-28"
+    },
+    "project": {
+        "code": "APOTEK-HIBBATILLAH",
+        "name": "Sistem Informasi Manajemen Apotek (Apotek Sehat)",
+        "customer": "Apotek Hibbatillah"
+    },
+    "billing": {
+        "snapshot_status": "VERIFIED_SNAPSHOT",
+        "snapshot_date": "2026-10-28",
+        "final_frozen": false,
+        "source_type": "SYSTEM_SUBSCRIPTION",
+        "quantity": "1 Lisensi + 1 Tahun Hosting",
+        "rate": 600000,
+        "include_hosting": true,
+        "hosting_rate": 200000,
+        "total": 800000,
+        "snapshot_file": "evidence\/billing\/2026\/10-oktober\/billing\/billing-snapshot.json"
+    },
+    "invoice_number": "INV-APT\/2026\/10\/001",
+    "invoice_status": "ISSUED",
+    "qa_status": "PASS",
+    "generated_at": "2026-10-28 09:01:28"
+}

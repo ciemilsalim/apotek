@@ -1,0 +1,89 @@
+# SIASEK BOSP & Multi-Project Evidence Generator Configuration
+version: "2.0"
+
+provider:
+  name: "ZahraDev"
+  developer: "Emil Salim, S.Kom"
+  emails:
+    - "ptzahradev@gmail.com"
+    - "emilsalimramadhan@gmail.com"
+  contact_display: "ptzahradev@gmail.com, emilsalimramadhan@gmail.com"
+
+payment:
+  method: "Transfer Bank"
+  bank: "Bank Jago"
+  account_name: "EMIL SALIM S"
+  account_number: "1087 1358 0283"
+
+profiles:
+  siasek:
+    code: "SIASEK-BIAU"
+    name: "Aplikasi Presensi SIASEK"
+    service_name: "Jasa Layanan Penggunaan Aplikasi Presensi SIASEK"
+    service_description: "Layanan SaaS Presensi Digital, Portal Orang Tua, Executive Analytics & Supervisi Jurnal Guru"
+    customer:
+      name: "SMP Negeri 1 Biau"
+      npsn: "40201234"
+      address: "Jl. Ahmad Yani No. 54, Kelurahan Leok I, Kecamatan Biau, Kabupaten Buol, Provinsi Sulawesi Tengah"
+    billing:
+      unit: "Siswa"
+      rate: 1000
+      mode: "per_student"
+    invoice_series: "SIASEK-BIAU"
+    doc_prefix: "PAKET_BOSP_SIASEK_BIAU"
+
+  apotek:
+    code: "APOTEK-SEHAT"
+    name: "Sistem Informasi Manajemen Apotek (Apotek Sehat)"
+    service_name: "Pembelian Lisensi Perangkat Lunak Sistem Informasi Apotek (One-Time Purchase)"
+    service_description: "Hak Guna Permanen Sistem Informasi Manajemen Apotek, Katalog Obat, Batch Kadaluarsa, Resep Racikan, POS Kasir, dan Laporan Keuangan"
+    customer:
+      name: "Apotek Sehat / Mitra Farmasi"
+      address: "Kabupaten Buol, Provinsi Sulawesi Tengah"
+    customers:
+      sehat:
+        code: "APOTEK-SEHAT"
+        name: "Apotek Sehat"
+        address: "Jl. Farmasi Sehat No. 88, Kabupaten Buol, Sulawesi Tengah"
+        rate: 600000
+      surya:
+        code: "APOTEK-SURYA"
+        name: "Apotek Surya Farma"
+        address: "Jl. Trans Sulawesi No. 10, Kecamatan Biau, Buol"
+        rate: 600000
+      medika:
+        code: "APOTEK-MEDIKA"
+        name: "Apotek & Klinik Medika Prima"
+        address: "Jl. Jenderal Sudirman No. 45, Buol"
+        rate: 750000
+    billing:
+      unit: "Lisensi"
+      rate: 600000
+      mode: "one_time"
+      hosting_rate: 200000
+      hosting_unit: "Tahun"
+      include_hosting: false
+    invoice_series: "INV-APT"
+    doc_prefix: "PAKET_EVIDENCE_APOTEK"
+
+  default:
+    code: "SAAS-SERVICE"
+    name: "Layanan Perangkat Lunak Aplikasi"
+    service_name: "Jasa Layanan & Pemeliharaan Aplikasi Web"
+    service_description: "Layanan Operasional SaaS, Pemeliharaan Sistem, dan Pembaruan Fitur Berkala"
+    customer:
+      name: "Klien / Pengguna Layanan"
+      address: "Indonesia"
+    billing:
+      unit: "Bulan"
+      rate: 200000
+      mode: "flat_monthly"
+    invoice_series: "INV-SRV"
+    doc_prefix: "PAKET_EVIDENCE_LAYANAN"
+
+credentials:
+  source: "secure environment (.env.siasek-bos atau .env)"
+
+evidence:
+  masking_required: true
+  storage_dir: "docs/evidence"

@@ -1,0 +1,32 @@
+{
+    "APOTEK-SEHAT": {
+        "project_name": "Sistem Informasi Manajemen Apotek (Apotek Sehat)",
+        "customer": "Apotek Sehat",
+        "last_sequence": 1,
+        "last_invoice": "INV-APT\/2026\/10\/001",
+        "issued_invoices": [
+            "INV-APT\/2026\/10\/001"
+        ],
+        "customer_address": "Jl. Farmasi Sehat No. 88, Kabupaten Buol, Sulawesi Tengah"
+    },
+    "APOTEK-SURYA-FARMA": {
+        "project_name": "Sistem Informasi Manajemen Apotek (Apotek Sehat)",
+        "customer": "Apotek Surya Farma",
+        "customer_address": "Jl. Trans Sulawesi No. 10, Kecamatan Biau, Buol",
+        "last_sequence": 1,
+        "last_invoice": "INV-APT\/2026\/10\/001",
+        "issued_invoices": [
+            "INV-APT\/2026\/10\/001"
+        ]
+    },
+    "APOTEK-HIBBATILLAH": {
+        "project_name": "Sistem Informasi Manajemen Apotek (Apotek Sehat)",
+        "customer": "Apotek Hibbatillah",
+        "customer_address": "Buol",
+        "last_sequence": 1,
+        "last_invoice": "INV-APT\/2026\/10\/001",
+        "issued_invoices": [
+            "INV-APT\/2026\/10\/001"
+        ]
+    }
+}

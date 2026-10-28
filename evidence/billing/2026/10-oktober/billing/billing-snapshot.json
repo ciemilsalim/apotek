@@ -1,0 +1,20 @@
+{
+    "period": "Oktober 2026",
+    "snapshot_status": "VERIFIED_SNAPSHOT",
+    "snapshot_date": "2026-10-28",
+    "source_type": "SYSTEM_SUBSCRIPTION",
+    "source_role": "admin",
+    "source_page": "\/dashboard",
+    "source_url": "http:\/\/localhost",
+    "active_quantity": 1,
+    "active_student_count": 1,
+    "billing_unit": "Lisensi",
+    "rate_per_unit": 600000,
+    "include_hosting": true,
+    "hosting_rate": 200000,
+    "total": 800000,
+    "status": "VERIFIED",
+    "final_frozen": false,
+    "frozen_at": null,
+    "screenshot_ref": "bukti_01_billing_oktober_2026.png"
+}

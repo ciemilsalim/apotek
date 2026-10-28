@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Modal from '@/Components/Modal';
 import BarcodeScannerModal from '@/Components/BarcodeScannerModal';
+import InteractiveSpotlightTour from '@/Components/InteractiveSpotlightTour';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
@@ -10,6 +11,7 @@ import {
     Camera,
     Check,
     CheckCircle2,
+    Compass,
     CreditCard,
     Minus,
     Package,
@@ -747,6 +749,30 @@ export default function PosIndex({
         </div>
     );
 
+    // Tour steps for interactive animated spotlight on Kasir / POS
+    const posTourSteps = [
+        {
+            target: '[data-tour="pos-search-input"]',
+            title: 'Scan Barcode atau Cari Obat',
+            content: 'Gunakan scanner barcode USB fisik atau ketik nama obat di sini. Tekan Enter untuk langsung memasukkan obat ke keranjang transaksi.',
+        },
+        {
+            target: '[data-tour="pos-camera-btn"]',
+            title: 'Scanner Kamera Perangkat',
+            content: 'Klik tombol ini untuk memindai barcode obat fisik menggunakan kamera smartphone atau webcam tanpa perlu alat scanner eksternal.',
+        },
+        {
+            target: '[data-tour="pos-prescriptions-btn"]',
+            title: 'Tebus Resep Dokter',
+            content: 'Buka daftar resep dokter yang berstatus siap tebus dan masukkan racikan obat ke keranjang dalam satu klik.',
+        },
+        {
+            target: '[data-tour="pos-cart-panel"]',
+            title: 'Keranjang Kasir & Pembayaran',
+            content: 'Kelola jumlah item obat, atur diskon, pilih metode bayar (Tunai, QRIS, dsb), dan cetak struk termal otomatis saat transaksi berhasil.',
+        },
+    ];
+
     return (
         <AuthenticatedLayout
             header={
@@ -762,6 +788,17 @@ export default function PosIndex({
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
+                            onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'pos' } }))}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 shadow-xs transition"
+                            title="Panduan Interaktif Fitur Kasir"
+                        >
+                            <Compass className="h-4 w-4 text-emerald-600" />
+                            <span className="hidden sm:inline">Tour Kasir</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            data-tour="pos-prescriptions-btn"
                             onClick={() => setPrescriptionModalOpen(true)}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-teal-700 shadow-xs transition active:scale-[0.98]"
                         >
@@ -845,6 +882,7 @@ export default function PosIndex({
                             <input
                                 ref={searchInputRef}
                                 type="text"
+                                data-tour="pos-search-input"
                                 placeholder="Scan barcode obat atau ketik nama/kode obat..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -868,6 +906,7 @@ export default function PosIndex({
                                 )}
                                 <button
                                     type="button"
+                                    data-tour="pos-camera-btn"
                                     onClick={() => setCameraScannerOpen(true)}
                                     className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition"
                                     title="Scan Barcode via Kamera HP / Web"
@@ -1051,7 +1090,7 @@ export default function PosIndex({
 
                 {/* Right Panel for Tablet & Desktop: Live Cart (5 Cols on Desktop) */}
                 <div className="hidden lg:block lg:col-span-5">
-                    <div className="sticky top-24 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
+                    <div data-tour="pos-cart-panel" className="sticky top-24 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
                         <CartContent isModal={false} />
                     </div>
                 </div>
@@ -1439,6 +1478,9 @@ export default function PosIndex({
                 onScan={handleCameraBarcodeScanned}
                 title="Scan Barcode Obat Kasir"
             />
+
+            {/* Interactive Spotlight Animated Tour */}
+            <InteractiveSpotlightTour tourKey="pos" steps={posTourSteps} />
         </AuthenticatedLayout>
     );
 }

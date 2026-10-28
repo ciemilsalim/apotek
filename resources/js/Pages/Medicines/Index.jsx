@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Modal from '@/Components/Modal';
 import BarcodeScannerModal from '@/Components/BarcodeScannerModal';
 import BarcodePrintModal from '@/Components/BarcodePrintModal';
+import InteractiveSpotlightTour from '@/Components/InteractiveSpotlightTour';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
@@ -14,6 +15,7 @@ import {
     CheckCircle2,
     ClipboardList,
     Clock,
+    Compass,
     Download,
     Edit,
     FileSpreadsheet,
@@ -325,6 +327,30 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         return { label: 'Aman', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
     };
 
+    // Tour steps for interactive animated spotlight on Medicines Catalog
+    const medicinesTourSteps = [
+        {
+            target: '[data-tour="med-add-btn"]',
+            title: 'Tambah Obat Baru',
+            content: 'Tambahkan data master obat baru lengkap dengan harga beli, harga jual, stok minimum, lokasi rak, nomor batch, dan tanggal kadaluarsa.',
+        },
+        {
+            target: '[data-tour="med-import-btn"]',
+            title: 'Import Stok dari Excel',
+            content: 'Punya banyak data obat dari distributor? Download format Excel dan upload ke sistem untuk import ratusan obat sekaligus.',
+        },
+        {
+            target: '[data-tour="med-status-tabs"]',
+            title: 'Filter Cepat Status Obat',
+            content: 'Pantau obat yang stoknya menipis, obat yang habis, atau obat yang mendekati masa expired hanya dalam satu sentuhan.',
+        },
+        {
+            target: '[data-tour="med-search"]',
+            title: 'Pencarian & Scan Barcode',
+            content: 'Cari cepat berdasarkan nama, kode obat, nomor batch, rak, atau klik ikon kamera untuk scan barcode fisik obat.',
+        },
+    ];
+
     return (
         <AuthenticatedLayout
             header={
@@ -338,6 +364,16 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'medicines' } }))}
+                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 shadow-xs transition"
+                            title="Panduan Interaktif Katalog Obat"
+                        >
+                            <Compass className="h-4 w-4 text-emerald-600" />
+                            <span className="hidden sm:inline">Tour Obat</span>
+                        </button>
+
                         <Link
                             href={route('medicines.adjustments')}
                             className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
@@ -347,6 +383,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </Link>
                         <button
                             type="button"
+                            data-tour="med-import-btn"
                             onClick={() => setImportModalOpen(true)}
                             className="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-3.5 py-2.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100 shadow-xs transition"
                         >
@@ -355,6 +392,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </button>
                         <button
                             onClick={openCreateModal}
+                            data-tour="med-add-btn"
                             className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
                         >
                             <Plus className="h-4 w-4" />
@@ -367,7 +405,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             <Head title="Katalog Obat & Batch - Apotek Sehat" />
 
             {/* Quick Status Filter Tabs (Big touch targets for mobile) */}
-            <div className="mb-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <div data-tour="med-status-tabs" className="mb-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                 {[
                     { id: 'all', label: 'Semua Obat' },
                     { id: 'low_stock', label: '⚠️ Stok Menipis' },
@@ -390,7 +428,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             </div>
 
             {/* Search and Category Filter Bar */}
-            <div className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
+            <div data-tour="med-search" className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
                     className="flex flex-col sm:flex-row gap-3 items-center justify-between"
@@ -1538,6 +1576,9 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 medicine={selectedMedicineForBarcode}
                 pharmacy={pharmacy}
             />
+
+            {/* Interactive Spotlight Animated Tour */}
+            <InteractiveSpotlightTour tourKey="medicines" steps={medicinesTourSteps} />
         </AuthenticatedLayout>
     );
 }

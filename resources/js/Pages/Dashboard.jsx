@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InteractiveSpotlightTour from '@/Components/InteractiveSpotlightTour';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
@@ -172,6 +173,35 @@ export default function Dashboard({
         kasir: 'Kasir Penjualan',
     }[user.role] || user.role;
 
+    // Tour steps for interactive animated spotlight on Dashboard
+    const dashboardTourSteps = [
+        {
+            target: '[data-tour="dashboard-welcome"]',
+            title: 'Selamat Datang di Apotek Sehat!',
+            content: 'Ini adalah pusat kendali apotek Anda. Di sini Anda dapat melihat status apotek, profil pengguna yang aktif, serta akses cepat ke seluruh sistem.',
+        },
+        {
+            target: '[data-tour="dashboard-pos"]',
+            title: 'Menu Kasir & Penjualan (POS)',
+            content: 'Fitur utama untuk melayani transaksi kasir, scan barcode obat fisik atau via kamera hp, cetak struk termal otomatis, dan tebus resep dokter.',
+        },
+        {
+            target: '[data-tour="dashboard-medicines"]',
+            title: 'Katalog Obat & Stok',
+            content: 'Kelola data obat, pantau stok menipis, import data dari Excel, dan cetak stiker barcode untuk produk apotek.',
+        },
+        {
+            target: '[data-tour="dashboard-expiries"]',
+            title: 'Pantau Kadaluarsa & FEFO',
+            content: 'Monitoring otomatis batch obat yang mendekati masa expired agar dapat diprioritaskan penjualannya sesuai prinsip FEFO.',
+        },
+        {
+            target: '[data-tour="dashboard-tour-btn"]',
+            title: 'Panduan & Bantuan Kapan Saja',
+            content: 'Anda dapat mengulang animasi panduan fitur ini kapan saja dengan menekan tombol Tour Fitur ini. Selamat beraktivitas!',
+        },
+    ];
+
     return (
         <AuthenticatedLayout
             header={
@@ -189,7 +219,10 @@ export default function Dashboard({
 
             <div className="py-2 sm:py-4 max-w-6xl mx-auto">
                 {/* Welcome Card Banner (Mobile First, Sleek & Precise) */}
-                <div className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden">
+                <div
+                    data-tour="dashboard-welcome"
+                    className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden"
+                >
                     <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                     <div className="absolute -left-8 -bottom-8 w-44 h-44 rounded-full bg-white/5 blur-2xl pointer-events-none" />
 
@@ -228,7 +261,8 @@ export default function Dashboard({
                         {/* Quick Tour Button */}
                         <button
                             type="button"
-                            onClick={() => window.dispatchEvent(new CustomEvent('open-feature-tour'))}
+                            data-tour="dashboard-tour-btn"
+                            onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'dashboard' } }))}
                             className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition backdrop-blur-xs shrink-0 active:scale-95 shadow-2xs"
                             title="Mulai Tour & Panduan Fitur Apotek"
                         >
@@ -253,11 +287,20 @@ export default function Dashboard({
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-3.5 lg:gap-4">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
+                            const tourAttr =
+                                item.id === 'pos'
+                                    ? 'dashboard-pos'
+                                    : item.id === 'medicines'
+                                    ? 'dashboard-medicines'
+                                    : item.id === 'expiries'
+                                    ? 'dashboard-expiries'
+                                    : undefined;
 
                             return (
                                 <Link
                                     key={item.id}
                                     href={item.href}
+                                    data-tour={tourAttr}
                                     className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 lg:p-4.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 transition-all duration-150 active:scale-95 text-center"
                                 >
                                     {/* Icon Container with Gradient Squircle Shape */}
@@ -303,6 +346,10 @@ export default function Dashboard({
                     </p>
                 </div>
             </div>
+
+            {/* Interactive Spotlight Animated Tour */}
+            <InteractiveSpotlightTour tourKey="dashboard" steps={dashboardTourSteps} />
         </AuthenticatedLayout>
+
     );
 }

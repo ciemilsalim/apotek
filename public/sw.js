@@ -1,5 +1,5 @@
 // Apotek Sehat - Service Worker for PWA
-const CACHE_NAME = 'apotek-sehat-v1';
+const CACHE_NAME = 'apotek-sehat-v2';
 const PRECACHE_ASSETS = [
     '/',
     '/manifest.json',

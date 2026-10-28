@@ -1,22 +1,61 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
-export default function GuestLayout({ children, maxWidth = 'sm:max-w-lg' }) {
+export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
+    const { pharmacy } = usePage().props;
+    const currentYear = new Date().getFullYear();
+
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50/80 via-slate-50 to-teal-50/50 p-4 sm:p-6 font-sans text-slate-800 antialiased">
-            <div className="mb-4 flex flex-col items-center text-center">
-                <Link href="/" className="transition hover:opacity-90">
-                    <ApplicationLogo className="h-12 w-12" />
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden bg-slate-50/90 p-4 sm:p-6 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+            {/* Ambient Background Decorative Gradients */}
+            <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-emerald-400/15 blur-3xl" />
+            <div className="pointer-events-none fixed -bottom-40 right-10 h-96 w-96 rounded-full bg-teal-400/15 blur-3xl" />
+
+            {/* Brand Header with Dynamic Pharmacy Profile */}
+            <div className="relative z-10 mb-4 sm:mb-5 flex flex-col items-center text-center">
+                <Link href="/" className="inline-flex items-center gap-3 transition hover:opacity-95">
+                    {pharmacy?.logo_url ? (
+                        <>
+                            <img
+                                src={pharmacy.logo_url}
+                                alt={pharmacy.name || 'Logo Apotek'}
+                                className="h-11 w-11 object-contain rounded-2xl shadow-xs border border-emerald-100 bg-white p-1"
+                            />
+                            <div className="flex flex-col text-left">
+                                <span className="text-xl font-black tracking-tight text-slate-900 leading-tight">
+                                    {pharmacy?.name || 'Apotek Sehat'}
+                                </span>
+                                <span className="text-[11px] font-semibold text-emerald-700 tracking-wide">
+                                    {pharmacy?.tagline || 'Sistem Informasi Farmasi & Kasir'}
+                                </span>
+                            </div>
+                        </>
+                    ) : (
+                        <ApplicationLogo
+                            name={pharmacy?.name}
+                            tagline={pharmacy?.tagline || 'Sistem Informasi Farmasi & Kasir'}
+                        />
+                    )}
                 </Link>
             </div>
 
-            <div className={`w-full ${maxWidth} overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xl shadow-emerald-950/5`}>
+            {/* Main Glass Card */}
+            <div className={`relative z-10 w-full ${maxWidth} overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 backdrop-blur-md p-5 sm:p-8 shadow-xl shadow-slate-900/5`}>
                 {children}
             </div>
 
-            <div className="mt-6 text-center text-xs text-slate-400">
-                &copy; 2026 <strong>Apotek Sehat</strong> • Sistem Informasi Farmasi Terpadu
+            {/* Dynamic Footer */}
+            <div className="relative z-10 mt-5 text-center text-xs text-slate-400 space-y-0.5">
+                <p>
+                    &copy; {currentYear} <strong>{pharmacy?.name || 'Apotek Sehat'}</strong> • Layanan Farmasi Terpadu
+                </p>
+                {pharmacy?.address && (
+                    <p className="text-[11px] text-slate-400 font-normal">
+                        {pharmacy.address}
+                    </p>
+                )}
             </div>
         </div>
     );
 }
+

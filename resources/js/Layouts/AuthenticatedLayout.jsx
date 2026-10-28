@@ -492,17 +492,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-2.5">
-                        {/* Tour Fitur Button */}
-                        <button
-                            type="button"
-                            onClick={() => setTourOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70 hover:border-emerald-300 transition shadow-2xs"
-                            title="Tour Singkat Fitur Apotek"
-                        >
-                            <Compass className="h-4 w-4 text-emerald-600" />
-                            <span className="hidden md:inline">Tour Fitur</span>
-                        </button>
-
                         {/* Current Role Pill */}
                         <div
                             className={`rounded-xl px-2.5 py-1 text-xs font-bold border ${currentRole.badge}`}

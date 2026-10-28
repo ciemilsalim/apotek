@@ -54,6 +54,17 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
                         {pharmacy.address}
                     </p>
                 )}
+                <p className="text-[11px] text-slate-400 font-normal pt-0.5">
+                    Created By{' '}
+                    <a
+                        href="https://zahradev.id"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition"
+                    >
+                        zahradev
+                    </a>
+                </p>
             </div>
         </div>
     );

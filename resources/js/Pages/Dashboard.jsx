@@ -6,6 +6,7 @@ import {
     Building2,
     Calendar,
     ClipboardList,
+    Compass,
     FileBarChart2,
     FileText,
     History,
@@ -223,6 +224,18 @@ export default function Dashboard({
                                 </p>
                             </div>
                         </div>
+
+                        {/* Quick Tour Button */}
+                        <button
+                            type="button"
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-feature-tour'))}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition backdrop-blur-xs shrink-0 active:scale-95 shadow-2xs"
+                            title="Mulai Tour & Panduan Fitur Apotek"
+                        >
+                            <Compass className="h-4 w-4 text-emerald-200" />
+                            <span className="hidden sm:inline">Tour Fitur</span>
+                            <span className="sm:hidden">Tour</span>
+                        </button>
                     </div>
                 </div>
 

@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import FeatureTourModal from '@/Components/FeatureTourModal';
 import { Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
@@ -7,6 +8,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ClipboardList,
+    Compass,
     FileBarChart2,
     FileText,
     History,
@@ -35,6 +37,7 @@ export default function AuthenticatedLayout({ header, children }) {
     const user = auth.user;
     const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
     const [dismissFlash, setDismissFlash] = useState(false);
+    const [tourOpen, setTourOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('apotek_sidebar_collapsed');
@@ -42,6 +45,13 @@ export default function AuthenticatedLayout({ header, children }) {
         }
         return true; // Default collapsed on desktop
     });
+
+    // Listen for global open tour event from any page
+    useEffect(() => {
+        const handleOpenTour = () => setTourOpen(true);
+        window.addEventListener('open-feature-tour', handleOpenTour);
+        return () => window.removeEventListener('open-feature-tour', handleOpenTour);
+    }, []);
 
     const toggleSidebar = () => {
         setSidebarCollapsed((prev) => {
@@ -481,7 +491,18 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-2.5">
+                        {/* Tour Fitur Button */}
+                        <button
+                            type="button"
+                            onClick={() => setTourOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70 hover:border-emerald-300 transition shadow-2xs"
+                            title="Tour Singkat Fitur Apotek"
+                        >
+                            <Compass className="h-4 w-4 text-emerald-600" />
+                            <span className="hidden md:inline">Tour Fitur</span>
+                        </button>
+
                         {/* Current Role Pill */}
                         <div
                             className={`rounded-xl px-2.5 py-1 text-xs font-bold border ${currentRole.badge}`}
@@ -685,6 +706,29 @@ export default function AuthenticatedLayout({ header, children }) {
                             </span>
                         </div>
 
+                        {/* Quick Tour Button in Mobile Sheet */}
+                        <div className="px-5 pt-3 pb-1">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setBottomSheetOpen(false);
+                                    setTourOpen(true);
+                                }}
+                                className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold text-xs active:scale-[0.98] transition"
+                            >
+                                <div className="flex items-center gap-2.5">
+                                    <div className="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                                        <Compass className="h-4.5 w-4.5 text-white" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                        <div className="font-extrabold text-white leading-tight">Tour & Panduan Fitur</div>
+                                        <div className="text-[10px] text-emerald-100 font-normal truncate">Pelajari kemampuan lengkap sistem</div>
+                                    </div>
+                                </div>
+                                <ChevronRight className="h-4 w-4 text-white/80 shrink-0" />
+                            </button>
+                        </div>
+
                         {/* Scrollable Navigation Menu List */}
                         <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
                             {sidebarNavItems.map((group, gIdx) => {
@@ -766,6 +810,12 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
             )}
+            {/* Interactive Feature Tour Modal */}
+            <FeatureTourModal
+                isOpen={tourOpen}
+                onClose={() => setTourOpen(false)}
+                currentRole={user.role}
+            />
         </div>
     );
 }

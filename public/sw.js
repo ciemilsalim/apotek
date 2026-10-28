@@ -1,7 +1,6 @@
 // Apotek Sehat - Service Worker for PWA
-const CACHE_NAME = 'apotek-sehat-v2';
+const CACHE_NAME = 'apotek-sehat-v3';
 const PRECACHE_ASSETS = [
-    '/',
     '/manifest.json',
     '/icons/icon-192x192.svg',
     '/icons/icon-512x512.svg',
@@ -32,15 +31,29 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // Skip non-GET requests and non-http schemes (e.g. chrome-extension)
+    // Only handle GET requests with http/https schemes
     if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
         return;
     }
 
     const url = new URL(event.request.url);
 
-    // Cache-first for static icons and fonts
-    if (url.pathname.startsWith('/icons/') || url.hostname.includes('fonts.gstatic.com')) {
+    // CRITICAL: NEVER cache or intercept HTML navigation requests or dynamic auth/app pages!
+    // This prevents stale CSRF tokens (HTTP 419 Page Expired) and stale session states.
+    if (
+        event.request.mode === 'navigate' ||
+        event.request.headers.get('accept')?.includes('text/html') ||
+        event.request.headers.get('X-Inertia')
+    ) {
+        return; // Always bypass service worker for dynamic HTML and Inertia navigation
+    }
+
+    // Cache-first for truly static assets (icons, build assets, fonts)
+    if (
+        url.pathname.startsWith('/icons/') ||
+        url.pathname.startsWith('/build/assets/') ||
+        url.hostname.includes('fonts.gstatic.com')
+    ) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
                 if (cachedResponse) return cachedResponse;
@@ -53,22 +66,5 @@ self.addEventListener('fetch', (event) => {
                 });
             })
         );
-        return;
     }
-
-    // Network-first for Inertia pages and API data with cache fallback
-    event.respondWith(
-        fetch(event.request)
-            .then((networkResponse) => {
-                return networkResponse;
-            })
-            .catch(() => {
-                return caches.match(event.request).then((cached) => {
-                    if (cached) return cached;
-                    if (event.request.headers.get('accept')?.includes('text/html')) {
-                        return caches.match('/');
-                    }
-                });
-            })
-    );
 });

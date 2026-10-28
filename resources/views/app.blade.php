@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
         <title inertia>{{ config('app.name', 'Apotek Sehat') }}</title>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- PWA Manifest & App Meta -->
         <link rel="manifest" href="/manifest.json">

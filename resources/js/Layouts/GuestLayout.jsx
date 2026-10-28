@@ -1,5 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
     const { pharmacy } = usePage().props;
@@ -7,6 +7,15 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
 
     return (
         <div className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden bg-slate-50/90 p-4 sm:p-6 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+            <Head>
+                {pharmacy?.logo_url && (
+                    <>
+                        <link rel="icon" type="image/png" href={pharmacy.logo_url} />
+                        <link rel="shortcut icon" href={pharmacy.logo_url} />
+                        <link rel="apple-touch-icon" href={pharmacy.logo_url} />
+                    </>
+                )}
+            </Head>
             {/* Ambient Background Decorative Gradients */}
             <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-emerald-400/15 blur-3xl" />
             <div className="pointer-events-none fixed -bottom-40 right-10 h-96 w-96 rounded-full bg-teal-400/15 blur-3xl" />

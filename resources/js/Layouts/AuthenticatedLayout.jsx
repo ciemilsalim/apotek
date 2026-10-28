@@ -1,6 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import FeatureTourModal from '@/Components/FeatureTourModal';
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     AlertTriangle,
@@ -270,6 +270,15 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800 flex flex-col pb-20 lg:pb-0">
+            <Head>
+                {pharmacy?.logo_url && (
+                    <>
+                        <link rel="icon" type="image/png" href={pharmacy.logo_url} />
+                        <link rel="shortcut icon" href={pharmacy.logo_url} />
+                        <link rel="apple-touch-icon" href={pharmacy.logo_url} />
+                    </>
+                )}
+            </Head>
             {/* Desktop Fixed Sidebar (>= 1024px) */}
             <aside
                 className={`hidden lg:flex fixed inset-y-0 left-0 z-40 flex-col border-r border-slate-200/90 bg-white transition-all duration-200 ease-in-out ${

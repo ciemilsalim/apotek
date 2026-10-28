@@ -19,6 +19,7 @@ class PharmacyProfileController extends Controller
 
         return Inertia::render('Settings/PharmacyProfile', [
             'profile' => $profile,
+            'pharmacy' => $profile,
         ]);
     }
 
@@ -56,6 +57,7 @@ class PharmacyProfileController extends Controller
         unset($validated['logo']);
 
         $profile->update($validated);
+        PharmacyProfile::syncPwaManifest($profile->fresh());
 
         return redirect()->back()->with('success', 'Profil Apotek berhasil diperbarui!');
     }

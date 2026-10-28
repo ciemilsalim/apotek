@@ -94,12 +94,12 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="text-xl font-bold leading-tight text-slate-800">
+                        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
                             Laporan Laba Rugi Apotek
                         </h2>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
                             Analisis pendapatan bersih, harga pokok penjualan (HPP), beban operasional, dan laba bersih.
                         </p>
                     </div>
@@ -108,14 +108,14 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             href={getExportUrl('pdf')}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <FileText className="h-4 w-4 text-red-600" />
                             <span>Ekspor PDF</span>
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Ekspor Excel (CSV)</span>

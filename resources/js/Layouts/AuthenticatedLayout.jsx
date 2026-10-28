@@ -461,32 +461,32 @@ export default function AuthenticatedLayout({ header, children }) {
                 }`}
             >
                 {/* Top Clean App Bar */}
-                <header className="sticky top-0 z-30 flex h-16 sm:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
-                    <div className="flex items-center gap-3">
-                        {/* Mobile & Tablet Clean Brand Header (No hamburger icon) */}
-                        <div className="flex items-center gap-2.5 lg:hidden">
-                            {pharmacy?.logo_url ? (
-                                <img
-                                    src={pharmacy.logo_url}
-                                    alt={pharmacy.name || 'Logo Apotek'}
-                                    className="h-9 w-9 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs"
-                                />
-                            ) : (
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white font-bold">
-                                    <Pill className="h-5 w-5" />
-                                </div>
-                            )}
-                            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[220px]">
-                                {pharmacy?.name || 'Apotek Hibbatillah'}
-                            </span>
-                        </div>
+                <header className="sticky top-0 z-30 flex min-h-16 lg:h-20 items-center justify-between border-b border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
+                    {/* Mobile & Tablet Clean Brand Header (No hamburger icon) */}
+                    <div className="flex items-center gap-2.5 lg:hidden">
+                        {pharmacy?.logo_url ? (
+                            <img
+                                src={pharmacy.logo_url}
+                                alt={pharmacy.name || 'Logo Apotek'}
+                                className="h-9 w-9 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs"
+                            />
+                        ) : (
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white font-bold">
+                                <Pill className="h-5 w-5" />
+                            </div>
+                        )}
+                        <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[220px]">
+                            {pharmacy?.name || 'Apotek Hibbatillah'}
+                        </span>
+                    </div>
 
-                        {/* Desktop Sidebar Toggle & Page Header */}
-                        <div className="hidden lg:flex items-center gap-3">
+                    {/* Desktop Full-Width Page Header & Actions */}
+                    <div className="hidden lg:flex items-center justify-between gap-4 flex-1 min-w-0">
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
                             <button
                                 type="button"
                                 onClick={toggleSidebar}
-                                className="p-2 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-red-700 transition shadow-xs"
+                                className="p-2 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-red-700 transition shadow-xs shrink-0"
                                 title={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
                                 aria-label={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
                             >
@@ -496,35 +496,54 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <PanelLeftClose className="h-4 w-4" />
                                 )}
                             </button>
-                            {header}
+                            <div className="flex-1 min-w-0">
+                                {header}
+                            </div>
+                        </div>
+
+                        {/* Desktop Top Right Utility Cluster (Quick POS & Logout) */}
+                        <div className="flex items-center gap-2 shrink-0">
+                            {['admin', 'kasir'].includes(user.role) && !route().current('pos.*') && (
+                                <Link
+                                    href={route('pos.index')}
+                                    className="inline-flex items-center gap-1.5 rounded-xl border border-green-300 bg-green-50 px-3.5 py-2 text-xs font-bold text-green-700 hover:bg-green-100 transition shadow-xs"
+                                >
+                                    <ShoppingCart className="h-4 w-4 text-green-600" />
+                                    <span>Kasir Penjualan</span>
+                                </Link>
+                            )}
+
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 transition shadow-xs"
+                                title="Keluar Akun"
+                            >
+                                <LogOut className="h-4 w-4" />
+                            </Link>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-2.5">
-                        {/* Current Role Pill */}
-                        <div
-                            className={`rounded-xl px-2.5 py-1 text-xs font-bold border ${currentRole.badge}`}
-                        >
+                    {/* Mobile Top Right Utilities */}
+                    <div className="flex lg:hidden items-center gap-2">
+                        <div className={`rounded-xl px-2.5 py-1 text-xs font-bold border ${currentRole.badge}`}>
                             {currentRole.name}
                         </div>
-
-                        {/* Quick POS Button for Kasir / Admin */}
                         {['admin', 'kasir'].includes(user.role) && !route().current('pos.*') && (
                             <Link
                                 href={route('pos.index')}
-                                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-red-700 transition"
                             >
-                                <ShoppingCart className="h-4 w-4" />
-                                <span>Buka Kasir</span>
+                                <ShoppingCart className="h-3.5 w-3.5" />
+                                <span>Kasir</span>
                             </Link>
                         )}
-
-                        {/* Quick Logout Button */}
                         <Link
                             href={route('logout')}
                             method="post"
                             as="button"
-                            className="rounded-xl border border-slate-200 p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                            className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 transition"
                             title="Keluar Akun"
                         >
                             <LogOut className="h-4 w-4" />

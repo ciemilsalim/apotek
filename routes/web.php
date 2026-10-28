@@ -60,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/import/template', [MedicineController::class, 'downloadTemplate'])->name('import.template');
             Route::post('/import', [MedicineController::class, 'import'])->name('import');
             Route::post('/', [MedicineController::class, 'store'])->name('store');
-            Route::put('/{medicine}', [MedicineController::class, 'update'])->name('update');
+            Route::match(['put', 'post'], '/{medicine}', [MedicineController::class, 'update'])->name('update');
             Route::delete('/{medicine}', [MedicineController::class, 'destroy'])->name('destroy');
             Route::post('/{medicine}/adjust-stock', [MedicineController::class, 'adjustStock'])->name('adjust-stock');
             Route::post('/{medicine}/batches', [MedicineController::class, 'storeBatch'])->name('batches.store');

@@ -35,20 +35,20 @@ export default function PosHistory({ sales, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3 w-full">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Riwayat Transaksi Penjualan
                         </h1>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
                             Daftar seluruh faktur struk penjualan yang telah selesai
                         </p>
                     </div>
                     <Link
                         href={route('pos.index')}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-green-300 bg-green-50 px-3.5 py-2 text-xs font-bold text-green-700 hover:bg-green-100 transition shadow-xs"
                     >
-                        <ShoppingCart className="h-4 w-4" />
+                        <ShoppingCart className="h-4 w-4 text-green-600" />
                         <span>Buka Kasir</span>
                     </Link>
                 </div>

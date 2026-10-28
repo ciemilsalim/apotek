@@ -180,4 +180,56 @@ class MedicineManagementTest extends TestCase
         $response = $this->actingAs($kasir)->post('/medicines/import', []);
         $response->assertForbidden();
     }
+
+    public function test_operator_can_create_and_update_medicine_with_optional_image(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $operator = User::factory()->create(['role' => 'operator']);
+        $category = Category::create([
+            'name' => 'Antibiotik',
+            'slug' => 'antibiotik',
+        ]);
+
+        $imageFile = \Illuminate\Http\UploadedFile::fake()->image('amoxicillin.jpg', 600, 600);
+
+        // 1. Create with image
+        $response = $this->actingAs($operator)->post('/medicines', [
+            'code' => 'OBT-IMG01',
+            'name' => 'Amoxicillin 500mg Kapsul',
+            'generic_name' => 'Amoxicillin Trihydrate',
+            'category_id' => $category->id,
+            'unit' => 'Strip',
+            'buy_price' => 5000,
+            'sell_price' => 10000,
+            'stock' => 30,
+            'min_stock' => 5,
+            'expiry_date' => '2028-01-01',
+            'image' => $imageFile,
+        ]);
+
+        $response->assertRedirect('/medicines');
+
+        $medicine = Medicine::where('code', 'OBT-IMG01')->firstOrFail();
+        $this->assertNotNull($medicine->image);
+        $this->assertStringStartsWith('medicines/', $medicine->image);
+        $this->assertNotNull($medicine->image_url);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($medicine->image);
+
+        // 2. Remove image
+        $response = $this->actingAs($operator)->put('/medicines/' . $medicine->id, [
+            'code' => 'OBT-IMG01',
+            'name' => 'Amoxicillin 500mg Kapsul',
+            'category_id' => $category->id,
+            'unit' => 'Strip',
+            'buy_price' => 5000,
+            'sell_price' => 10000,
+            'min_stock' => 5,
+            'remove_image' => true,
+        ]);
+
+        $response->assertRedirect('/medicines');
+        $medicine->refresh();
+        $this->assertNull($medicine->image);
+    }
 }

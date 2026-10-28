@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -80,7 +81,12 @@ class MedicineController extends Controller
             'expiry_date' => ['nullable', 'date'],
             'location' => ['nullable', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('medicines', 'public');
+        }
 
         DB::transaction(function () use ($validated, $request) {
             $stock = (int) $validated['stock'];
@@ -138,7 +144,21 @@ class MedicineController extends Controller
             'expiry_date' => ['nullable', 'date'],
             'location' => ['nullable', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->boolean('remove_image')) {
+            if ($medicine->image) {
+                Storage::disk('public')->delete($medicine->image);
+            }
+            $validated['image'] = null;
+        } elseif ($request->hasFile('image')) {
+            if ($medicine->image) {
+                Storage::disk('public')->delete($medicine->image);
+            }
+            $validated['image'] = $request->file('image')->store('medicines', 'public');
+        }
 
         $medicine->update($validated);
 
@@ -397,6 +417,10 @@ class MedicineController extends Controller
     {
         if ($medicine->saleItems()->count() > 0) {
             return redirect()->route('medicines.index')->with('error', 'Obat tidak dapat dihapus karena telah tercatat dalam riwayat transaksi penjualan.');
+        }
+
+        if ($medicine->image) {
+            Storage::disk('public')->delete($medicine->image);
         }
 
         $medicine->delete();

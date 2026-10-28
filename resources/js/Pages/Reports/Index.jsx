@@ -69,7 +69,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Laporan Penjualan
@@ -80,19 +80,19 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                     </div>
 
                     {/* Clean Soft Export Buttons */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         <a
                             href={getExportUrl('pdf')}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
+                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <FileText className="h-4 w-4 text-red-600" />
                             <span>Cetak PDF</span>
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
+                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Unduh Excel</span>

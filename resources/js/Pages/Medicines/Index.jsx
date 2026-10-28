@@ -74,6 +74,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     const [medicineToDelete, setMedicineToDelete] = useState(null);
 
     // Form for Create / Edit Medicine
+    const [imagePreview, setImagePreview] = useState(null);
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             code: '',
@@ -89,6 +90,8 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             expiry_date: '',
             location: 'Rak A-1',
             description: '',
+            image: null,
+            remove_image: false,
         });
 
     // Form for Restock / Adjust Stock
@@ -182,6 +185,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         setEditingMedicine(null);
         reset();
         clearErrors();
+        setImagePreview(null);
         // Generate barcode custom 12-digit otomatis
         const randomDigits = Math.floor(100000000 + Math.random() * 900000000);
         const newCode = `200${randomDigits}`;
@@ -202,6 +206,8 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             expiry_date: nextYear.toISOString().substring(0, 10),
             location: 'Rak A-1',
             description: '',
+            image: null,
+            remove_image: false,
         });
         setModalOpen(true);
     };
@@ -209,6 +215,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     const openEditModal = (med) => {
         setEditingMedicine(med);
         clearErrors();
+        setImagePreview(med.image_url || null);
         setData({
             code: med.code,
             name: med.name,
@@ -223,18 +230,38 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             expiry_date: med.expiry_date ? med.expiry_date.substring(0, 10) : '',
             location: med.location || '',
             description: med.description || '',
+            image: null,
+            remove_image: false,
         });
         setModalOpen(true);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData((prev) => ({ ...prev, image: file, remove_image: false }));
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setData((prev) => ({ ...prev, image: null, remove_image: true }));
+        setImagePreview(null);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingMedicine) {
-            put(route('medicines.update', editingMedicine.id), {
+            router.post(route('medicines.update', editingMedicine.id), {
+                ...data,
+                _method: 'put',
+            }, {
+                forceFormData: true,
                 onSuccess: () => setModalOpen(false),
             });
         } else {
             post(route('medicines.store'), {
+                forceFormData: true,
                 onSuccess: () => setModalOpen(false),
             });
         }
@@ -354,7 +381,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Data Obat, Stok & Batch
@@ -363,11 +390,11 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             Kelola persediaan obat, kontrol nomor batch, pantau kadaluarsa, dan alur FEFO
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'medicines' } }))}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                             title="Panduan Interaktif Katalog Obat"
                         >
                             <Compass className="h-4 w-4 text-red-600" />
@@ -376,7 +403,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                         <Link
                             href={route('medicines.adjustments')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <ClipboardList className="h-4 w-4" />
                             <span className="hidden sm:inline">Riwayat Mutasi</span>
@@ -385,7 +412,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             type="button"
                             data-tour="med-import-btn"
                             onClick={() => setImportModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-green-50/50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Import Excel</span>
@@ -393,7 +420,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             onClick={openCreateModal}
                             data-tour="med-add-btn"
-                            className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 active:scale-[0.98] transition"
+                            className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white shadow-xs hover:bg-red-700 active:scale-[0.98] transition"
                         >
                             <Plus className="h-4 w-4" />
                             <span>Tambah Obat</span>
@@ -505,17 +532,31 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 key={med.id}
                                 className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-3"
                             >
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <div className="text-base font-extrabold text-slate-900">
-                                            {med.name}
+                                <div className="flex justify-between items-start gap-3">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="h-12 w-12 shrink-0 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center p-1">
+                                            {med.image_url ? (
+                                                <img
+                                                    src={med.image_url}
+                                                    alt={med.name}
+                                                    className="h-full w-full object-contain"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <Pill className="h-6 w-6 text-slate-300" />
+                                            )}
                                         </div>
-                                        <div className="text-xs text-slate-500 font-mono mt-0.5">
-                                            {med.code} • {med.category?.name || '-'}
+                                        <div className="min-w-0">
+                                            <div className="text-base font-extrabold text-slate-900 truncate">
+                                                {med.name}
+                                            </div>
+                                            <div className="text-xs text-slate-500 font-mono mt-0.5 truncate">
+                                                {med.code} • {med.category?.name || '-'}
+                                            </div>
                                         </div>
                                     </div>
                                     <span
-                                        className={`rounded-xl px-2.5 py-1 text-xs font-black ${
+                                        className={`shrink-0 rounded-xl px-2.5 py-1 text-xs font-black ${
                                             isOut
                                                 ? 'bg-rose-100 text-rose-700 border border-rose-200'
                                                 : isLow
@@ -623,12 +664,28 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                                     return (
                                         <tr key={med.id} className="hover:bg-slate-50 transition">
-                                            <td className="px-5 py-4">
-                                                <div className="font-extrabold text-sm text-slate-900">
-                                                    {med.name}
-                                                </div>
-                                                <div className="text-[11px] text-slate-500 font-mono">
-                                                    {med.code} {med.generic_name && `• ${med.generic_name}`}
+                                            <td className="px-5 py-3.5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-10 w-10 shrink-0 rounded-xl bg-slate-50 border border-slate-200/90 overflow-hidden flex items-center justify-center p-0.5">
+                                                        {med.image_url ? (
+                                                            <img
+                                                                src={med.image_url}
+                                                                alt={med.name}
+                                                                className="h-full w-full object-contain"
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            <Pill className="h-5 w-5 text-slate-300" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-extrabold text-sm text-slate-900">
+                                                            {med.name}
+                                                        </div>
+                                                        <div className="text-[11px] text-slate-500 font-mono">
+                                                            {med.code} {med.generic_name && `• ${med.generic_name}`}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-5 py-4">
@@ -1380,6 +1437,59 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 onChange={(e) => setData('expiry_date', e.target.value)}
                                 className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                             />
+                        </div>
+
+                        {/* Foto Produk Obat (Opsional) */}
+                        <div className="sm:col-span-2">
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Foto Produk Obat (Opsional)
+                            </label>
+                            <div className="flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div className="h-20 w-20 shrink-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center p-1 shadow-2xs">
+                                    {imagePreview ? (
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview Foto Obat"
+                                            className="h-full w-full object-contain"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center text-slate-300 gap-0.5">
+                                            <Pill className="h-6 w-6 text-slate-300" />
+                                            <span className="text-[9px] text-slate-400 font-medium">Tanpa Foto</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 space-y-1.5 w-full">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-red-700 transition shadow-2xs">
+                                            <UploadCloud className="h-4 w-4 text-red-600" />
+                                            <span>{imagePreview ? 'Ganti Foto' : 'Pilih Foto Obat'}</span>
+                                            <input
+                                                type="file"
+                                                accept="image/png, image/jpeg, image/jpg, image/webp"
+                                                onChange={handleImageChange}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                        {imagePreview && (
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveImage}
+                                                className="inline-flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition"
+                                            >
+                                                <X className="h-3.5 w-3.5" />
+                                                <span>Hapus Foto</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] text-slate-500">
+                                        Format JPG, PNG, atau WebP (maks. 2MB). Foto akan ditampilkan di kartu katalog kasir POS dan tabel obat.
+                                    </p>
+                                    {errors.image && (
+                                        <p className="text-xs text-rose-600 font-bold">{errors.image}</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -85,7 +85,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                             <Stethoscope className="h-6 w-6 text-red-600" />
@@ -98,7 +98,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
 
                     <Link
                         href={route('prescriptions.create')}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition active:scale-[0.98]"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-red-700 transition active:scale-[0.98]"
                     >
                         <Plus className="h-4 w-4" />
                         <span>+ Buat Resep Racikan Baru</span>

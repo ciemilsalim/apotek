@@ -24,6 +24,11 @@ class Medicine extends Model
         'expiry_date',
         'location',
         'description',
+        'image',
+    ];
+
+    protected $appends = [
+        'image_url',
     ];
 
     protected function casts(): array
@@ -35,6 +40,19 @@ class Medicine extends Model
             'min_stock' => 'integer',
             'expiry_date' => 'date',
         ];
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
     }
 
     public function category(): BelongsTo

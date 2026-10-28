@@ -120,7 +120,7 @@ export default function UsersIndex({ users, filters, roles }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Manajemen Staf & Pengguna
@@ -131,10 +131,10 @@ export default function UsersIndex({ users, filters, roles }) {
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 transition"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-red-700 transition active:scale-[0.98]"
                     >
                         <UserPlus className="h-4 w-4" />
-                        <span>Tambah Pengguna Baru</span>
+                        <span>+ Tambah Pengguna Baru</span>
                     </button>
                 </div>
             }

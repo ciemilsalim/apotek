@@ -205,13 +205,15 @@ export default function Dashboard({
     return (
         <AuthenticatedLayout
             header={
-                <div>
-                    <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                        Menu Utama
-                    </h1>
-                    <p className="text-xs text-slate-500 font-medium">
-                        Pilih menu untuk memulai aktivitas operasional apotek
-                    </p>
+                <div className="flex items-center justify-between gap-3 w-full">
+                    <div>
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                            Menu Utama
+                        </h1>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                            Pilih menu untuk memulai aktivitas operasional apotek
+                        </p>
+                    </div>
                 </div>
             }
         >

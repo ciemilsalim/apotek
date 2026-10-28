@@ -776,7 +776,7 @@ export default function PosIndex({
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Kasir Penjualan
@@ -785,11 +785,11 @@ export default function PosIndex({
                             Scan barcode atau cari nama obat untuk langsung menambahkan ke keranjang
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'pos' } }))}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-red-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                             title="Panduan Interaktif Fitur Kasir"
                         >
                             <Compass className="h-4 w-4 text-red-600" />
@@ -800,12 +800,12 @@ export default function PosIndex({
                             type="button"
                             data-tour="pos-prescriptions-btn"
                             onClick={() => setPrescriptionModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-teal-200 bg-teal-50 px-3.5 py-2 text-xs font-bold text-teal-800 hover:bg-teal-100 shadow-xs transition active:scale-[0.98]"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-green-300 bg-green-50 px-3.5 py-2 text-xs font-bold text-green-700 hover:bg-green-100 shadow-xs transition active:scale-[0.98]"
                         >
-                            <Stethoscope className="h-4 w-4 text-teal-600" />
+                            <Stethoscope className="h-4 w-4 text-green-600" />
                             <span>Tebus Resep</span>
                             {readyPrescriptions.length > 0 && (
-                                <span className="rounded-full bg-teal-600 text-white text-[10px] font-black px-1.5 py-0.2">
+                                <span className="rounded-full bg-green-600 text-white text-[10px] font-black px-1.5 py-0.2">
                                     {readyPrescriptions.length}
                                 </span>
                             )}
@@ -987,51 +987,74 @@ export default function PosIndex({
                                 return (
                                     <div
                                         key={med.id}
-                                        className={`group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl border-2 bg-white transition ${
+                                        className={`group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-2xl border-2 bg-white transition shadow-xs ${
                                             inCartItem
-                                                ? 'border-red-600 bg-red-50/15'
-                                                : 'border-slate-200 hover:border-red-400'
+                                                ? 'border-red-500 bg-red-50/15'
+                                                : 'border-slate-200/90 hover:border-red-300'
                                         }`}
                                     >
                                         <div
                                             onClick={() => addToCart(med)}
                                             className="cursor-pointer select-none"
                                         >
+                                            {/* Code & Stock Badge */}
                                             <div className="flex items-center justify-between mb-1.5">
-                                                <span className="font-mono text-[11px] font-bold text-slate-500">
+                                                <span className="font-mono text-[11px] font-bold text-slate-400">
                                                     {med.code}
                                                 </span>
                                                 <span
-                                                    className={`rounded-lg px-2 py-0.5 text-[10px] font-extrabold ${
+                                                    className={`rounded-lg px-2 py-0.5 text-[10px] font-extrabold border ${
                                                         isLowStock
-                                                            ? 'bg-amber-100 text-amber-800'
-                                                            : 'bg-slate-100 text-slate-600'
+                                                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                                            : 'bg-green-50 text-green-700 border-green-200/80'
                                                     }`}
                                                 >
                                                     Stok: {med.stock}
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-red-700 line-clamp-2">
+                                            {/* Medicine Image Container */}
+                                            <div className="my-1.5 h-24 sm:h-28 w-full flex items-center justify-center bg-slate-50/70 rounded-xl overflow-hidden p-1.5 border border-slate-100 group-hover:bg-slate-50 transition">
+                                                {med.image_url ? (
+                                                    <img
+                                                        src={med.image_url}
+                                                        alt={med.name}
+                                                        className="h-full w-full object-contain transition group-hover:scale-105 duration-200"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <div className="flex flex-col items-center justify-center text-slate-300 gap-1">
+                                                        <Pill className="h-7 w-7 text-slate-300 group-hover:text-red-400 transition" />
+                                                        <span className="text-[10px] text-slate-400 font-medium">Tanpa Foto</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Title & Generic Name */}
+                                            <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-red-700 line-clamp-1 leading-snug">
                                                 {med.name}
                                             </h3>
 
-                                            {med.generic_name && (
-                                                <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                                            {med.generic_name ? (
+                                                <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
                                                     {med.generic_name}
+                                                </p>
+                                            ) : (
+                                                <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                                                    {med.category?.name || '-'}
                                                 </p>
                                             )}
                                         </div>
 
                                         {/* Card Footer: Price & BOTH [+] and [-] Quantity Controls! */}
-                                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                                            <div className="text-sm font-extrabold text-slate-900">
+                                        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+                                            <div className="text-sm font-black text-slate-900">
                                                 {formatCurrency(med.sell_price)}
                                             </div>
 
                                             {inCartItem ? (
                                                 /* If already in cart, show BOTH minus (-) and plus (+) right on the card */
-                                                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                                                <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl">
                                                     <button
                                                         type="button"
                                                         onClick={(e) => {
@@ -1063,7 +1086,7 @@ export default function PosIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() => addToCart(med)}
-                                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-700 group-hover:bg-red-600 group-hover:text-white transition shadow-xs"
+                                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition shadow-xs active:scale-90"
                                                     title="Tambah ke keranjang"
                                                 >
                                                     <Plus className="h-4 w-4" />

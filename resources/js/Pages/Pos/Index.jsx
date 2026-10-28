@@ -459,7 +459,7 @@ export default function PosIndex({
                 }`}
             >
                 <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700">
                         <ShoppingCart className="h-4 w-4" />
                     </div>
                     <div>
@@ -534,7 +534,7 @@ export default function PosIndex({
                         type="text"
                         value={data.customer_name}
                         onChange={(e) => setData('customer_name', e.target.value)}
-                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50"
+                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-semibold focus:border-red-500 focus:outline-none bg-slate-50"
                         placeholder="Pelanggan Umum"
                     />
                 </div>
@@ -562,7 +562,7 @@ export default function PosIndex({
                                             <div className="text-sm font-bold text-slate-900 truncate">
                                                 {item.name}
                                             </div>
-                                            <div className="text-xs font-semibold text-emerald-700">
+                                            <div className="text-xs font-semibold text-slate-700">
                                                 {formatCurrency(item.price)} / {item.unit}
                                                 <span className="text-slate-400 font-normal ml-1.5">
                                                     (Subtotal: {formatCurrency(item.price * item.quantity)})
@@ -586,7 +586,7 @@ export default function PosIndex({
                                             <button
                                                 type="button"
                                                 onClick={() => updateQuantity(item.id, 1)}
-                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition"
+                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white hover:bg-red-700 active:scale-95 transition"
                                                 title="Tambah 1"
                                             >
                                                 <Plus className="h-3.5 w-3.5" />
@@ -612,16 +612,16 @@ export default function PosIndex({
                 </div>
 
                 {/* Total Bayar Banner */}
-                <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl bg-red-50/60 border-2 border-red-200 flex items-center justify-between">
                     <div>
-                        <div className="text-xs font-bold text-emerald-900 uppercase">
+                        <div className="text-xs font-bold text-red-900 uppercase">
                             Total Tagihan
                         </div>
                         <div className="text-xs text-slate-500 font-medium">
                             {totalItemsCount} item obat ({cart.length} jenis)
                         </div>
                     </div>
-                    <div className="text-xl sm:text-2xl font-black text-emerald-700">
+                    <div className="text-xl sm:text-2xl font-black text-red-700">
                         {formatCurrency(totalAmount)}
                     </div>
                 </div>
@@ -650,7 +650,7 @@ export default function PosIndex({
                                     }}
                                     className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold border-2 transition ${
                                         data.payment_method === m.id
-                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                            ? 'bg-red-600 text-white border-red-600 shadow-xs'
                                             : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                                     }`}
                                 >
@@ -678,7 +678,7 @@ export default function PosIndex({
                                     inputMode="numeric"
                                     value={formatNumberDots(data.cash_paid)}
                                     onChange={handleCashPaidChange}
-                                    className="w-full rounded-xl border border-slate-300 pl-8 pr-3 py-2 text-right font-black text-base text-slate-900 focus:border-emerald-600 focus:outline-none bg-white shadow-xs"
+                                    className="w-full rounded-xl border border-slate-300 pl-8 pr-3 py-2 text-right font-black text-base text-slate-900 focus:border-red-500 focus:outline-none bg-white shadow-xs"
                                     placeholder="0"
                                 />
                             </div>
@@ -689,7 +689,7 @@ export default function PosIndex({
                             <button
                                 type="button"
                                 onClick={() => setQuickCash(totalAmount)}
-                                className="rounded-lg bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-bold hover:bg-emerald-200 transition"
+                                className="rounded-lg bg-green-100 text-green-800 px-2.5 py-1 text-xs font-bold hover:bg-green-200 transition"
                             >
                                 Uang Pas
                             </button>
@@ -712,7 +712,7 @@ export default function PosIndex({
                             </span>
                             <span
                                 className={`text-base font-black ${
-                                    isUnderpaid ? 'text-rose-600' : 'text-emerald-700'
+                                    isUnderpaid ? 'text-rose-600' : 'text-green-700'
                                 }`}
                             >
                                 {isUnderpaid
@@ -736,7 +736,7 @@ export default function PosIndex({
                     type="button"
                     onClick={handleCheckout}
                     disabled={processing || cart.length === 0 || isUnderpaid}
-                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 sm:py-4 text-base font-black text-white shadow-sm hover:bg-emerald-700 active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-red-600 py-3.5 sm:py-4 text-base font-black text-white shadow-sm hover:bg-red-700 active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Check className="h-5 w-5" />
                     <span>
@@ -789,10 +789,10 @@ export default function PosIndex({
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'pos' } }))}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-red-50 shadow-xs transition"
                             title="Panduan Interaktif Fitur Kasir"
                         >
-                            <Compass className="h-4 w-4 text-emerald-600" />
+                            <Compass className="h-4 w-4 text-red-600" />
                             <span className="hidden sm:inline">Tour Kasir</span>
                         </button>
 
@@ -877,7 +877,7 @@ export default function PosIndex({
                         {/* Search Input with Autofocus & Barcode icon */}
                         <div className="relative">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-slate-400">
-                                <Barcode className="h-5 w-5 text-emerald-600" />
+                                <Barcode className="h-5 w-5 text-red-600" />
                             </div>
                             <input
                                 ref={searchInputRef}
@@ -887,7 +887,7 @@ export default function PosIndex({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={handleBarcodeKeyDown}
-                                className="w-full rounded-2xl border-2 border-slate-300 bg-slate-50 pl-11 pr-20 py-3 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none shadow-xs"
+                                className="w-full rounded-2xl border-2 border-slate-300 bg-slate-50 pl-11 pr-20 py-3 text-sm font-semibold focus:border-red-500 focus:bg-white focus:outline-none shadow-xs"
                                 autoFocus
                             />
                             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
@@ -908,10 +908,10 @@ export default function PosIndex({
                                     type="button"
                                     data-tour="pos-camera-btn"
                                     onClick={() => setCameraScannerOpen(true)}
-                                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition"
+                                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs shadow-2xs transition"
                                     title="Scan Barcode via Kamera HP / Web"
                                 >
-                                    <Camera className="h-4 w-4 text-emerald-600" />
+                                    <Camera className="h-4 w-4 text-red-600" />
                                     <span className="hidden sm:inline text-[11px]">Kamera</span>
                                 </button>
                             </div>
@@ -921,21 +921,21 @@ export default function PosIndex({
                         <div className="flex items-center justify-between text-xs text-slate-500">
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1.5 font-medium">
-                                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                                     <span>Scanner Siap</span>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => setCameraScannerOpen(true)}
-                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 text-[11px] font-semibold transition"
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 text-[11px] font-semibold transition"
                                 >
-                                    <Camera className="h-3 w-3 text-emerald-600" />
+                                    <Camera className="h-3 w-3 text-red-600" />
                                     <span>Scan Kamera</span>
                                 </button>
                             </div>
 
                             {barcodeFeedback && (
-                                <div className="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 animate-fade-in">
+                                <div className="font-extrabold text-red-700 bg-red-50 px-2.5 py-0.5 rounded-lg border border-red-200 animate-fade-in">
                                     {barcodeFeedback}
                                 </div>
                             )}
@@ -951,7 +951,7 @@ export default function PosIndex({
                                 }}
                                 className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold transition ${
                                     selectedCategory === ''
-                                        ? 'bg-emerald-600 text-white shadow-xs'
+                                        ? 'bg-red-600 text-white shadow-xs'
                                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                 }`}
                             >
@@ -967,7 +967,7 @@ export default function PosIndex({
                                     }}
                                     className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold transition ${
                                         String(selectedCategory) === String(cat.id)
-                                            ? 'bg-emerald-600 text-white shadow-xs'
+                                            ? 'bg-red-600 text-white shadow-xs'
                                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                     }`}
                                 >
@@ -989,8 +989,8 @@ export default function PosIndex({
                                         key={med.id}
                                         className={`group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl border-2 bg-white transition ${
                                             inCartItem
-                                                ? 'border-emerald-600 bg-emerald-50/15'
-                                                : 'border-slate-200 hover:border-emerald-400'
+                                                ? 'border-red-600 bg-red-50/15'
+                                                : 'border-slate-200 hover:border-red-400'
                                         }`}
                                     >
                                         <div
@@ -1012,7 +1012,7 @@ export default function PosIndex({
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 line-clamp-2">
+                                            <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-red-700 line-clamp-2">
                                                 {med.name}
                                             </h3>
 
@@ -1025,7 +1025,7 @@ export default function PosIndex({
 
                                         {/* Card Footer: Price & BOTH [+] and [-] Quantity Controls! */}
                                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                                            <div className="text-sm font-black text-emerald-700">
+                                            <div className="text-sm font-black text-red-600">
                                                 {formatCurrency(med.sell_price)}
                                             </div>
 
@@ -1052,7 +1052,7 @@ export default function PosIndex({
                                                             e.stopPropagation();
                                                             updateQuantity(med.id, 1);
                                                         }}
-                                                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs active:scale-90 transition"
+                                                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-600 text-white hover:bg-red-700 shadow-xs active:scale-90 transition"
                                                         title="Tambah 1"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />
@@ -1063,7 +1063,7 @@ export default function PosIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() => addToCart(med)}
-                                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition shadow-xs"
+                                                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-700 group-hover:bg-red-600 group-hover:text-white transition shadow-xs"
                                                     title="Tambah ke keranjang"
                                                 >
                                                     <Plus className="h-4 w-4" />
@@ -1073,7 +1073,7 @@ export default function PosIndex({
 
                                         {/* In-cart count bubble */}
                                         {inCartItem && (
-                                            <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white font-black text-xs shadow-md">
+                                            <div className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-white font-black text-xs shadow-md">
                                                 {inCartItem.quantity}
                                             </div>
                                         )}
@@ -1107,14 +1107,14 @@ export default function PosIndex({
                             <span className="text-xs font-bold text-slate-500">
                                 {totalItemsCount} Obat Dipilih ({cart.length} jenis)
                             </span>
-                            <span className="text-lg font-black text-emerald-700">
+                            <span className="text-lg font-black text-red-700">
                                 {formatCurrency(totalAmount)}
                             </span>
                         </div>
                         <button
                             type="button"
                             onClick={() => setCartDrawerOpen(true)}
-                            className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-emerald-700 active:scale-95 transition"
+                            className="flex items-center gap-2 rounded-2xl bg-red-600 px-6 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700 active:scale-95 transition"
                         >
                             <span>Bayar Sekarang</span>
                             <ArrowRight className="h-4 w-4" />
@@ -1186,14 +1186,14 @@ export default function PosIndex({
                         <div className="shrink-0 p-4 border-b border-slate-200 bg-white">
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700">
                                         <CheckCircle2 className="h-4 w-4" />
                                     </div>
                                     <div>
                                         <span className="font-extrabold text-sm text-slate-900 block leading-tight">
                                             Transaksi Berhasil!
                                         </span>
-                                        <span className="text-[10px] text-emerald-600 font-bold">
+                                        <span className="text-[10px] text-green-600 font-bold">
                                             {autoPrintThermal ? 'Struk otomatis dicetak ke printer termal' : 'Struk siap dicetak'}
                                         </span>
                                     </div>
@@ -1217,7 +1217,7 @@ export default function PosIndex({
                                         onClick={() => setPaperSize('58mm')}
                                         className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
                                             paperSize === '58mm'
-                                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                                ? 'bg-red-600 text-white border-red-600'
                                                 : 'bg-white text-slate-700 border-slate-200'
                                         }`}
                                     >
@@ -1228,7 +1228,7 @@ export default function PosIndex({
                                         onClick={() => setPaperSize('80mm')}
                                         className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
                                             paperSize === '80mm'
-                                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                                ? 'bg-red-600 text-white border-red-600'
                                                 : 'bg-white text-slate-700 border-slate-200'
                                         }`}
                                     >
@@ -1248,12 +1248,12 @@ export default function PosIndex({
                                             setAutoPrintThermal(val);
                                             localStorage.setItem('apotek_pos_auto_print', val);
                                         }}
-                                        className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        className="rounded border-slate-300 text-red-600 focus:ring-red-500"
                                     />
                                     <span>Cetak Otomatis saat Bayar</span>
                                 </label>
                                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                                    autoPrintThermal ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                                    autoPrintThermal ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-700'
                                 }`}>
                                     {autoPrintThermal ? 'Aktif' : 'Manual'}
                                 </span>
@@ -1277,7 +1277,7 @@ export default function PosIndex({
                                         />
                                     )}
                                     <h2 className="text-sm font-black tracking-tight uppercase">
-                                        {pharmacy?.name || 'APOTEK SEHAT'}
+                                        {pharmacy?.name || 'APOTEK HIBBATILLAH'}
                                     </h2>
                                     {pharmacy?.tagline && (
                                         <p className="text-[9px] italic text-slate-600 mb-0.5">
@@ -1285,7 +1285,7 @@ export default function PosIndex({
                                         </p>
                                     )}
                                     <p className="text-[10px]">
-                                        {pharmacy?.address || 'Jl. Farmasi Sehat No. 88'}
+                                        {pharmacy?.address || 'Buol'}
                                     </p>
                                     {pharmacy?.phone && (
                                         <p className="text-[10px]">
@@ -1391,7 +1391,7 @@ export default function PosIndex({
                             <button
                                 type="button"
                                 onClick={handleCloseReceiptModal}
-                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-emerald-600 py-3 text-xs font-black text-white hover:bg-emerald-700 active:scale-95 transition"
+                                className="flex-1 inline-flex items-center justify-center rounded-2xl bg-red-600 py-3 text-xs font-black text-white hover:bg-red-700 active:scale-95 transition"
                             >
                                 Transaksi Baru
                             </button>

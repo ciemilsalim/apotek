@@ -208,7 +208,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                 {/* Header */}
                 <div className="no-print flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-xs">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-600 text-white shadow-xs">
                             <Tag className="h-5 w-5" />
                         </div>
                         <div>
@@ -232,9 +232,9 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                 {/* Content Body */}
                 <div className="no-print flex-1 overflow-y-auto p-6 space-y-6">
                     {/* Item Summary Banner */}
-                    <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex flex-wrap items-center justify-between gap-3">
+                    <div className="p-4 rounded-2xl bg-red-50/60 border border-red-100 flex flex-wrap items-center justify-between gap-3">
                         <div>
-                            <div className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
+                            <div className="text-xs font-semibold text-red-800 uppercase tracking-wider">
                                 Target Obat
                             </div>
                             <h4 className="text-base font-black text-slate-900">
@@ -250,7 +250,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                         </div>
 
                         {/* Barcode code & copy button */}
-                        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-emerald-200 shadow-2xs">
+                        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-red-200 shadow-2xs">
                             <div className="text-right">
                                 <div className="text-[10px] text-slate-400 font-bold uppercase">Barcode / SKU</div>
                                 <div className="text-sm font-mono font-black text-slate-900 tracking-wider">
@@ -260,10 +260,10 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                             <button
                                 type="button"
                                 onClick={handleCopyCode}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-red-700 hover:bg-red-50 transition"
                                 title="Salin Kode Barcode"
                             >
-                                {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                                {copied ? <Check className="h-4 w-4 text-red-600" /> : <Copy className="h-4 w-4" />}
                             </button>
                         </div>
                     </div>
@@ -318,7 +318,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                     max="200"
                                     value={quantity}
                                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                    className="flex-1 text-center font-black text-lg py-2 rounded-xl border border-slate-300 focus:border-emerald-600 focus:outline-none"
+                                    className="flex-1 text-center font-black text-lg py-2 rounded-xl border border-slate-300 focus:border-red-600 focus:outline-none"
                                 />
                                 <button
                                     type="button"
@@ -351,8 +351,8 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                         onClick={() => setQuantity(Math.min(200, medicine.stock))}
                                         className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
                                             quantity === medicine.stock
-                                                ? 'bg-emerald-600 text-white border-emerald-600'
-                                                : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                                                ? 'bg-red-600 text-white border-red-600'
+                                                : 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'
                                         }`}
                                     >
                                         Sesuai Stok ({medicine.stock})
@@ -373,7 +373,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                     onClick={() => setPaperMode('thermal')}
                                     className={`py-2 px-3 rounded-xl text-xs font-bold border text-left transition ${
                                         paperMode === 'thermal'
-                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                            ? 'bg-red-600 text-white border-red-600 shadow-2xs'
                                             : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                                     }`}
                                 >
@@ -385,7 +385,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                     onClick={() => setPaperMode('a4')}
                                     className={`py-2 px-3 rounded-xl text-xs font-bold border text-left transition ${
                                         paperMode === 'a4'
-                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                            ? 'bg-red-600 text-white border-red-600 shadow-2xs'
                                             : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                                     }`}
                                 >
@@ -433,7 +433,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                 type="checkbox"
                                 checked={showPharmacy}
                                 onChange={(e) => setShowPharmacy(e.target.checked)}
-                                className="rounded text-emerald-600 focus:ring-emerald-500"
+                                className="rounded text-red-600 focus:ring-red-500"
                             />
                             <span className="font-semibold text-slate-700">Nama Apotek</span>
                         </label>
@@ -442,7 +442,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                 type="checkbox"
                                 checked={showPrice}
                                 onChange={(e) => setShowPrice(e.target.checked)}
-                                className="rounded text-emerald-600 focus:ring-emerald-500"
+                                className="rounded text-red-600 focus:ring-red-500"
                             />
                             <span className="font-semibold text-slate-700">Harga Jual</span>
                         </label>
@@ -451,7 +451,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                                 type="checkbox"
                                 checked={showExpiry}
                                 onChange={(e) => setShowExpiry(e.target.checked)}
-                                className="rounded text-emerald-600 focus:ring-emerald-500"
+                                className="rounded text-red-600 focus:ring-red-500"
                             />
                             <span className="font-semibold text-slate-700">Kadaluarsa / Lokasi</span>
                         </label>
@@ -471,7 +471,7 @@ export default function BarcodePrintModal({ isOpen, onClose, medicine, pharmacy 
                     <button
                         type="button"
                         onClick={handlePrint}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-2.5 text-xs font-black text-white hover:bg-emerald-700 transition shadow-xs"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-6 py-2.5 text-xs font-black text-white hover:bg-red-700 transition shadow-xs"
                     >
                         <Printer className="h-4 w-4" />
                         <span>Cetak {quantity} Stiker Barcode</span>

@@ -33,8 +33,8 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
             route: 'pos.index',
             roleAccess: 'Kasir & Admin',
             icon: Sparkles,
-            gradient: 'from-emerald-600 to-teal-500',
-            bgLight: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+            gradient: 'from-red-600 to-red-500',
+            bgLight: 'bg-red-50 border-red-200 text-red-900',
             description:
                 'Layanan kasir cepat untuk transaksi obat bebas, obat resep, maupun suplemen dengan dukungan scanner dan printer kasir.',
             highlights: [
@@ -188,7 +188,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/80">
                     <div className="flex items-center gap-2.5">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white shadow-xs">
                             <Compass className="h-5 w-5" />
                         </div>
                         <div>
@@ -240,7 +240,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-100 text-red-800">
                                         Langkah {currentStep + 1} dari {tourSteps.length}
                                     </span>
                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">
@@ -258,7 +258,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                             <Link
                                 href={route(step.route)}
                                 onClick={onClose}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs shrink-0 self-end sm:self-center"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-xs shrink-0 self-end sm:self-center"
                             >
                                 <span>Buka Fitur</span>
                                 <ExternalLink className="h-3.5 w-3.5" />
@@ -282,7 +282,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                                     key={hIdx}
                                     className="flex items-start gap-2.5 p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs text-slate-800"
                                 >
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
                                     <span className="leading-snug">{item}</span>
                                 </div>
                             ))}
@@ -322,7 +322,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                                 aria-label={`Ke langkah ${dotIdx + 1}`}
                                 className={`h-2 rounded-full transition-all ${
                                     currentStep === dotIdx
-                                        ? 'w-6 bg-emerald-600'
+                                        ? 'w-6 bg-red-600'
                                         : 'w-2 bg-slate-200 hover:bg-slate-300'
                                 }`}
                             />
@@ -332,7 +332,7 @@ export default function FeatureTourModal({ isOpen, onClose, currentRole = 'admin
                     <button
                         type="button"
                         onClick={handleNext}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                     >
                         <span>{isLast ? 'Selesai & Tutup' : 'Selanjutnya'}</span>
                         {!isLast && <ArrowRight className="h-4 w-4" />}

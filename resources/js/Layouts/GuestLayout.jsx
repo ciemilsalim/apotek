@@ -6,7 +6,7 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
     const currentYear = new Date().getFullYear();
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden bg-slate-50/90 p-4 sm:p-6 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden bg-slate-50/90 p-4 sm:p-6 font-sans text-slate-800 antialiased selection:bg-red-600 selection:text-white">
             <Head>
                 {pharmacy?.logo_url && (
                     <>
@@ -17,8 +17,8 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
                 )}
             </Head>
             {/* Ambient Background Decorative Gradients */}
-            <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-emerald-400/15 blur-3xl" />
-            <div className="pointer-events-none fixed -bottom-40 right-10 h-96 w-96 rounded-full bg-teal-400/15 blur-3xl" />
+            <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-red-500/10 blur-3xl" />
+            <div className="pointer-events-none fixed -bottom-40 right-10 h-96 w-96 rounded-full bg-green-500/10 blur-3xl" />
 
             {/* Brand Header with Dynamic Pharmacy Profile */}
             <div className="relative z-10 mb-4 sm:mb-5 flex flex-col items-center text-center">
@@ -28,13 +28,13 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
                             <img
                                 src={pharmacy.logo_url}
                                 alt={pharmacy.name || 'Logo Apotek'}
-                                className="h-11 w-11 object-contain rounded-2xl shadow-xs border border-emerald-100 bg-white p-1"
+                                className="h-11 w-11 object-contain rounded-2xl shadow-xs border border-slate-200/80 bg-white p-1"
                             />
                             <div className="flex flex-col text-left">
                                 <span className="text-xl font-black tracking-tight text-slate-900 leading-tight">
-                                    {pharmacy?.name || 'Apotek Sehat'}
+                                    {pharmacy?.name || 'Apotek Hibbatillah'}
                                 </span>
-                                <span className="text-[11px] font-semibold text-emerald-700 tracking-wide">
+                                <span className="text-[11px] font-semibold text-slate-500 tracking-wide">
                                     {pharmacy?.tagline || 'Sistem Informasi Farmasi & Kasir'}
                                 </span>
                             </div>
@@ -69,7 +69,7 @@ export default function GuestLayout({ children, maxWidth = 'sm:max-w-xl' }) {
                         href="https://zahradev.id"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition"
+                        className="font-medium text-red-600 hover:text-red-700 hover:underline transition"
                     >
                         zahradev
                     </a>

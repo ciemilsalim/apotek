@@ -34,7 +34,7 @@ export default function PrescriptionEtiket({ prescription }) {
                 <button
                     type="button"
                     onClick={handlePrint}
-                    className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-black text-white shadow-sm hover:bg-teal-700 transition active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-black text-white shadow-sm hover:bg-red-700 transition active:scale-[0.98]"
                 >
                     <Printer className="h-4 w-4" />
                     <span>Cetak Semua Etiket</span>

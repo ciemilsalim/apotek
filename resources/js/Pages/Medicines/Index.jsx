@@ -324,7 +324,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
         } else if (diffMonths <= 3) {
             return { label: 'Segera Exp', color: 'bg-amber-100 text-amber-800 border-amber-200' };
         }
-        return { label: 'Aman', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+        return { label: 'Aman', color: 'bg-green-100 text-green-800 border-green-200' };
     };
 
     // Tour steps for interactive animated spotlight on Medicines Catalog
@@ -367,10 +367,10 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'medicines' } }))}
-                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50 shadow-xs transition"
                             title="Panduan Interaktif Katalog Obat"
                         >
-                            <Compass className="h-4 w-4 text-emerald-600" />
+                            <Compass className="h-4 w-4 text-red-600" />
                             <span className="hidden sm:inline">Tour Obat</span>
                         </button>
 
@@ -385,15 +385,15 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             type="button"
                             data-tour="med-import-btn"
                             onClick={() => setImportModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-3.5 py-2.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-extrabold text-red-800 hover:bg-red-100 shadow-xs transition"
                         >
-                            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                            <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Import Excel</span>
                         </button>
                         <button
                             onClick={openCreateModal}
                             data-tour="med-add-btn"
-                            className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 transition"
                         >
                             <Plus className="h-4 w-4" />
                             <span>Tambah Obat</span>
@@ -418,7 +418,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         onClick={() => handleQuickFilter(tab.id)}
                         className={`shrink-0 rounded-2xl px-4 py-2.5 text-xs font-extrabold border-2 transition ${
                             status === tab.id
-                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                ? 'bg-red-600 text-white border-red-600 shadow-xs'
                                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                         }`}
                     >
@@ -440,7 +440,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             placeholder="Cari nama obat, kode, nomor batch, atau lokasi rak..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-24 py-2.5 text-xs sm:text-sm font-semibold focus:border-emerald-600 focus:outline-none bg-slate-50/70"
+                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-24 py-2.5 text-xs sm:text-sm font-semibold focus:border-red-600 focus:outline-none bg-slate-50/70"
                         />
                         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                             {search && (
@@ -459,10 +459,10 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <button
                                 type="button"
                                 onClick={() => setCameraScannerOpen(true)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 font-bold text-xs shadow-2xs transition"
                                 title="Scan Barcode via Kamera HP / Web"
                             >
-                                <Camera className="h-3.5 w-3.5 text-emerald-600" />
+                                <Camera className="h-3.5 w-3.5 text-red-600" />
                                 <span className="hidden sm:inline text-[11px]">Scan</span>
                             </button>
                         </div>
@@ -472,7 +472,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <select
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
-                            className="w-full sm:w-48 rounded-2xl border border-slate-300 px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none bg-white"
+                            className="w-full sm:w-48 rounded-2xl border border-slate-300 px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-red-600 focus:outline-none bg-white"
                         >
                             <option value="">Semua Kategori</option>
                             {categories.map((c) => (
@@ -484,7 +484,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-emerald-700 transition shadow-xs"
+                            className="rounded-2xl bg-red-600 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Filter
                         </button>
@@ -520,7 +520,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                 ? 'bg-rose-100 text-rose-700 border border-rose-200'
                                                 : isLow
                                                 ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                                : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                                : 'bg-green-100 text-green-800 border border-green-200'
                                         }`}
                                     >
                                         Stok: {med.stock} {med.unit}
@@ -532,15 +532,15 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     <button
                                         type="button"
                                         onClick={() => openBatchesModal(med)}
-                                        className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-emerald-700"
+                                        className="inline-flex items-center gap-1.5 font-bold text-slate-700 hover:text-red-600"
                                     >
-                                        <Boxes className="h-4 w-4 text-emerald-600" />
+                                        <Boxes className="h-4 w-4 text-red-600" />
                                         <span>{batchesCount} Batch</span>
-                                        <span className="text-[10px] text-emerald-600 font-semibold underline">
+                                        <span className="text-[10px] text-red-600 font-semibold underline">
                                             (Kelola)
                                         </span>
                                     </button>
-                                    <div className="font-black text-sm text-emerald-700">
+                                    <div className="font-black text-sm text-red-600">
                                         {formatCurrency(med.sell_price)}
                                     </div>
                                 </div>
@@ -550,7 +550,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         <button
                                             type="button"
                                             onClick={() => openRestockModal(med)}
-                                            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+                                            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-red-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-red-700 transition"
                                         >
                                             <Plus className="h-4 w-4" />
                                             <span>Mutasi</span>
@@ -558,7 +558,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         <button
                                             type="button"
                                             onClick={() => openBarcodePrintModal(med)}
-                                            className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition"
+                                            className="rounded-xl border border-slate-200 p-2.5 text-slate-700 hover:bg-slate-100 hover:text-red-600 transition"
                                             title="Cetak Stiker Barcode"
                                         >
                                             <Barcode className="h-4 w-4" />
@@ -644,13 +644,13 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                 <button
                                                     type="button"
                                                     onClick={() => openBatchesModal(med)}
-                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition"
+                                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition"
                                                     title="Kelola Batch Obat"
                                                 >
-                                                    <Boxes className="h-3.5 w-3.5 text-emerald-600" />
+                                                    <Boxes className="h-3.5 w-3.5 text-red-600" />
                                                     <span>{batches.length} Batch</span>
                                                     {activeBatchesCount > 0 && (
-                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                                        <span className="h-2 w-2 rounded-full bg-green-500" />
                                                     )}
                                                 </button>
                                             </td>
@@ -664,7 +664,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                             ? 'bg-rose-100 text-rose-700'
                                                             : isLow
                                                             ? 'bg-amber-100 text-amber-800'
-                                                            : 'bg-emerald-100 text-emerald-800'
+                                                            : 'bg-green-100 text-green-800'
                                                     }`}
                                                 >
                                                     {med.stock} {med.unit}
@@ -687,7 +687,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     <button
                                                         type="button"
                                                         onClick={() => openRestockModal(med)}
-                                                        className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-2xs"
+                                                        className="inline-flex items-center gap-1 rounded-xl bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 transition shadow-2xs"
                                                         title="Mutasi Stok & Batch"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />
@@ -696,7 +696,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                     <button
                                                         type="button"
                                                         onClick={() => openBarcodePrintModal(med)}
-                                                        className="rounded-xl border border-slate-200 p-1.5 text-slate-700 hover:bg-slate-100 hover:text-emerald-700 transition"
+                                                        className="rounded-xl border border-slate-200 p-1.5 text-slate-700 hover:bg-slate-100 hover:text-red-600 transition"
                                                         title="Cetak Stiker Barcode Obat"
                                                     >
                                                         <Barcode className="h-4 w-4" />
@@ -757,7 +757,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                 className={`rounded-xl px-3 py-1.5 font-bold ${
                                     link.active
-                                        ? 'bg-emerald-600 text-white'
+                                        ? 'bg-red-600 text-white'
                                         : link.url
                                         ? 'text-slate-700 hover:bg-slate-100'
                                         : 'text-slate-300 cursor-not-allowed'
@@ -813,7 +813,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                             onClick={() => restockForm.setData('type', t.id)}
                                             className={`flex items-center justify-center gap-1 py-2.5 px-2 rounded-xl font-bold border-2 transition ${
                                                 restockForm.data.type === t.id
-                                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                                    ? 'bg-red-600 text-white border-red-600 shadow-2xs'
                                                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                                             }`}
                                         >
@@ -867,7 +867,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                 type="text"
                                                 value={restockForm.data.batch_number}
                                                 onChange={(e) => restockForm.setData('batch_number', e.target.value)}
-                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none bg-white"
+                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-red-600 focus:outline-none bg-white"
                                                 placeholder="Contoh: B-PCT-2601"
                                                 required
                                             />
@@ -880,7 +880,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                                 type="date"
                                                 value={restockForm.data.expiry_date}
                                                 onChange={(e) => restockForm.setData('expiry_date', e.target.value)}
-                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none bg-white"
+                                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-600 focus:outline-none bg-white"
                                                 required
                                             />
                                         </div>
@@ -893,7 +893,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         <select
                                             value={restockForm.data.batch_id}
                                             onChange={(e) => restockForm.setData('batch_id', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none bg-white"
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-red-600 focus:outline-none bg-white"
                                             required
                                         >
                                             {targetMedicine?.batches?.map((b) => (
@@ -916,7 +916,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 <select
                                     value={restockForm.data.batch_id}
                                     onChange={(e) => restockForm.setData('batch_id', e.target.value)}
-                                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none bg-white"
+                                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 focus:border-red-600 focus:outline-none bg-white"
                                 >
                                     <option value="">Otomatis FEFO (Kadaluarsa Terdekat)</option>
                                     {targetMedicine?.batches?.map((b) => (
@@ -940,7 +940,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="1"
                                 value={restockForm.data.quantity}
                                 onChange={(e) => restockForm.setData('quantity', e.target.value)}
-                                className="w-full rounded-2xl border border-slate-300 p-3 text-lg font-black text-slate-900 focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-lg font-black text-slate-900 focus:border-red-600 focus:outline-none"
                                 required
                             />
                         </div>
@@ -954,7 +954,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 type="text"
                                 value={restockForm.data.notes}
                                 onChange={(e) => restockForm.setData('notes', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-semibold focus:border-red-600 focus:outline-none"
                                 placeholder="Contoh: Penerimaan dari PBF Kimia Farma"
                                 required
                             />
@@ -972,7 +972,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             type="submit"
                             disabled={restockForm.processing}
-                            className="rounded-xl bg-emerald-600 px-5 py-2.5 font-extrabold text-white shadow-xs hover:bg-emerald-700 transition disabled:opacity-50"
+                            className="rounded-xl bg-red-600 px-5 py-2.5 font-extrabold text-white shadow-xs hover:bg-red-700 transition disabled:opacity-50"
                         >
                             {restockForm.processing ? 'Menyimpan...' : 'Simpan Mutasi'}
                         </button>
@@ -989,7 +989,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 <div className="flex flex-col max-h-[88vh]">
                     <div className="shrink-0 p-5 border-b border-slate-200 bg-white flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600">
                                 <Boxes className="h-5 w-5" />
                             </div>
                             <div>
@@ -1029,9 +1029,9 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         {showAddBatchForm && (
                             <form
                                 onSubmit={handleAddBatchSubmit}
-                                className="p-4 rounded-2xl bg-emerald-50/60 border-2 border-emerald-200 space-y-3 animate-fade-in"
+                                className="p-4 rounded-2xl bg-red-50/60 border-2 border-red-200 space-y-3 animate-fade-in"
                             >
-                                <div className="font-extrabold text-emerald-900">
+                                <div className="font-extrabold text-red-900">
                                     Form Input Batch Baru
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1043,7 +1043,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                             type="text"
                                             value={batchForm.data.batch_number}
                                             onChange={(e) => batchForm.setData('batch_number', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold bg-white focus:border-emerald-600 focus:outline-none"
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold bg-white focus:border-red-600 focus:outline-none"
                                             placeholder="Contoh: B-PCT-2601"
                                             required
                                         />
@@ -1056,7 +1056,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                             type="date"
                                             value={batchForm.data.expiry_date}
                                             onChange={(e) => batchForm.setData('expiry_date', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-emerald-600 focus:outline-none"
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-red-600 focus:outline-none"
                                             required
                                         />
                                     </div>
@@ -1069,7 +1069,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                             min="1"
                                             value={batchForm.data.stock}
                                             onChange={(e) => batchForm.setData('stock', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-black bg-white focus:border-emerald-600 focus:outline-none"
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-black bg-white focus:border-red-600 focus:outline-none"
                                             required
                                         />
                                     </div>
@@ -1082,7 +1082,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                             min="0"
                                             value={batchForm.data.buy_price}
                                             onChange={(e) => batchForm.setData('buy_price', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-emerald-600 focus:outline-none"
+                                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold bg-white focus:border-red-600 focus:outline-none"
                                             placeholder="Gunakan harga beli standar obat"
                                         />
                                     </div>
@@ -1098,7 +1098,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     <button
                                         type="submit"
                                         disabled={batchForm.processing}
-                                        className="rounded-xl bg-emerald-600 px-4 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700"
+                                        className="rounded-xl bg-red-600 px-4 py-1.5 text-xs font-extrabold text-white hover:bg-red-700"
                                     >
                                         {batchForm.processing ? 'Menyimpan...' : 'Simpan Batch'}
                                     </button>
@@ -1202,7 +1202,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         type="text"
                                         value={data.code}
                                         onChange={(e) => setData('code', e.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 pl-3 pr-8 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-300 pl-3 pr-8 py-2 text-xs font-mono font-bold focus:border-red-600 focus:outline-none"
                                         placeholder="Scan barcode kemasan atau ketik kode..."
                                         required
                                     />
@@ -1212,7 +1212,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                     <button
                                         type="button"
                                         onClick={() => setFormCameraScannerOpen(true)}
-                                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-2xs"
+                                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-red-700 transition shadow-2xs"
                                         title="Scan Barcode Kemasan via Kamera Perangkat"
                                     >
                                         <Camera className="h-4 w-4" />
@@ -1241,7 +1241,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <select
                                 value={data.category_id}
                                 onChange={(e) => setData('category_id', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none bg-white"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-red-600 focus:outline-none bg-white"
                                 required
                             >
                                 {categories.map((cat) => (
@@ -1260,7 +1260,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-red-600 focus:outline-none"
                                 placeholder="Contoh: Paracetamol 500mg"
                                 required
                             />
@@ -1273,7 +1273,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <select
                                 value={data.unit}
                                 onChange={(e) => setData('unit', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-emerald-600 focus:outline-none bg-white"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold focus:border-red-600 focus:outline-none bg-white"
                                 required
                             >
                                 {units.map((u) => (
@@ -1292,7 +1292,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 type="text"
                                 value={data.location}
                                 onChange={(e) => setData('location', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                                 placeholder="Contoh: Rak A-1"
                             />
                         </div>
@@ -1306,7 +1306,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="0"
                                 value={data.buy_price}
                                 onChange={(e) => setData('buy_price', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                                 required
                             />
                         </div>
@@ -1320,7 +1320,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="0"
                                 value={data.sell_price}
                                 onChange={(e) => setData('sell_price', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-emerald-700 focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-red-600 focus:border-red-600 focus:outline-none"
                                 required
                             />
                         </div>
@@ -1336,7 +1336,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         min="0"
                                         value={data.stock}
                                         onChange={(e) => setData('stock', e.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                                         required
                                     />
                                 </div>
@@ -1349,7 +1349,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         type="text"
                                         value={data.batch_number}
                                         onChange={(e) => setData('batch_number', e.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-emerald-600 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono font-bold focus:border-red-600 focus:outline-none"
                                         placeholder="Contoh: B-MED-2601"
                                     />
                                 </div>
@@ -1365,7 +1365,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 min="0"
                                 value={data.min_stock}
                                 onChange={(e) => setData('min_stock', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                                 required
                             />
                         </div>
@@ -1378,7 +1378,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                 type="date"
                                 value={data.expiry_date}
                                 onChange={(e) => setData('expiry_date', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-red-600 focus:outline-none"
                             />
                         </div>
                     </div>
@@ -1394,7 +1394,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50"
+                            className="rounded-xl bg-red-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-red-700 disabled:opacity-50"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Data Obat'}
                         </button>
@@ -1441,7 +1441,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                 <form onSubmit={handleImportSubmit} className="flex flex-col">
                     <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600">
                                 <FileSpreadsheet className="h-5 w-5" />
                             </div>
                             <div>
@@ -1464,20 +1464,20 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                     <div className="p-6 space-y-4">
                         {/* Download Template Banner */}
-                        <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="p-4 rounded-2xl bg-red-50/60 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div>
-                                <div className="text-xs font-bold text-emerald-900">
+                                <div className="text-xs font-bold text-red-900">
                                     Unduh Format Template Standar
                                 </div>
-                                <div className="text-[11px] text-emerald-700 mt-0.5">
+                                <div className="text-[11px] text-red-600 mt-0.5">
                                     Gunakan format kolom yang sudah disesuaikan agar proses import berjalan lancar.
                                 </div>
                             </div>
                             <a
                                 href={route('medicines.import.template')}
-                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs font-bold shadow-xs hover:bg-emerald-100/50 transition shrink-0"
+                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-red-200 text-red-800 text-xs font-bold shadow-xs hover:bg-red-100/50 transition shrink-0"
                             >
-                                <Download className="h-3.5 w-3.5 text-emerald-600" />
+                                <Download className="h-3.5 w-3.5 text-red-600" />
                                 <span>Unduh Template .xlsx</span>
                             </a>
                         </div>
@@ -1487,11 +1487,11 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
                                 Pilih Berkas Excel (.xlsx, .xls) atau CSV (.csv)
                             </label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl hover:border-emerald-500 transition bg-slate-50/50">
+                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl hover:border-red-500 transition bg-slate-50/50">
                                 <div className="space-y-2 text-center">
-                                    <UploadCloud className="mx-auto h-10 w-10 text-emerald-600" />
+                                    <UploadCloud className="mx-auto h-10 w-10 text-red-600" />
                                     <div className="flex text-xs text-slate-600 justify-center">
-                                        <label className="relative cursor-pointer rounded-md font-bold text-emerald-600 hover:text-emerald-700">
+                                        <label className="relative cursor-pointer rounded-md font-bold text-red-600 hover:text-red-600">
                                             <span>Pilih dokumen</span>
                                             <input
                                                 type="file"
@@ -1507,7 +1507,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                                         XLSX, XLS, atau CSV hingga 10MB
                                     </p>
                                     {importForm.data.file && (
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100/80 text-emerald-800 rounded-lg text-xs font-semibold">
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100/80 text-red-800 rounded-lg text-xs font-semibold">
                                             <FileSpreadsheet className="h-3.5 w-3.5" />
                                             <span>{importForm.data.file.name}</span>
                                         </div>
@@ -1543,7 +1543,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             type="submit"
                             disabled={importForm.processing || !importForm.data.file}
-                            className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700 disabled:opacity-50 transition"
+                            className="rounded-xl bg-red-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-red-700 disabled:opacity-50 transition"
                         >
                             {importForm.processing ? 'Mengunggah & Memproses...' : 'Mulai Import'}
                         </button>

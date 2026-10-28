@@ -48,7 +48,7 @@ export default function PrescriptionShow({ prescription }) {
                 );
             case 'completed':
                 return (
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 border border-emerald-200">
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-green-100 px-3 py-1 text-xs font-black text-green-800 border border-green-200">
                         <CheckCircle2 className="h-4 w-4" />
                         <span>Sudah Ditebus (Selesai)</span>
                     </span>
@@ -102,7 +102,7 @@ export default function PrescriptionShow({ prescription }) {
                             <button
                                 type="button"
                                 onClick={() => updateStatus('processed')}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700 transition active:scale-[0.98]"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition active:scale-[0.98]"
                             >
                                 <Check className="h-4 w-4" />
                                 <span>Tandai Selesai Diracik</span>
@@ -112,7 +112,7 @@ export default function PrescriptionShow({ prescription }) {
                         {prescription.status === 'completed' && prescription.sale_id && (
                             <Link
                                 href={route('pos.receipt', prescription.sale_id)}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition"
                             >
                                 <Receipt className="h-4 w-4" />
                                 <span>Lihat Struk Kasir</span>
@@ -129,7 +129,7 @@ export default function PrescriptionShow({ prescription }) {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
                         <h2 className="text-base font-extrabold text-slate-900 pb-3 mb-4 border-b border-slate-100 flex items-center gap-2">
-                            <Pill className="h-5 w-5 text-teal-600" />
+                            <Pill className="h-5 w-5 text-red-600" />
                             <span>Formula Racikan & Rincian Obat</span>
                         </h2>
 
@@ -142,7 +142,7 @@ export default function PrescriptionShow({ prescription }) {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-600 text-[10px] font-black text-white">
+                                                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-red-600 text-[10px] font-black text-white">
                                                     {idx + 1}
                                                 </span>
                                                 <h3 className="font-extrabold text-sm text-slate-900">
@@ -152,7 +152,7 @@ export default function PrescriptionShow({ prescription }) {
                                                     {item.racikan_type}
                                                 </span>
                                             </div>
-                                            <div className="mt-1 text-xs font-bold text-teal-800 bg-teal-100/70 px-2.5 py-1 rounded-lg inline-block">
+                                            <div className="mt-1 text-xs font-bold text-red-800 bg-red-100/70 px-2.5 py-1 rounded-lg inline-block">
                                                 Signa: {item.signa}
                                             </div>
                                         </div>
@@ -283,7 +283,7 @@ export default function PrescriptionShow({ prescription }) {
                                     {formatCurrency(prescription.service_fee)}
                                 </span>
                             </div>
-                            <div className="flex justify-between text-base font-black text-teal-700 pt-2 border-t border-slate-100">
+                            <div className="flex justify-between text-base font-black text-red-700 pt-2 border-t border-slate-100">
                                 <span>Grand Total:</span>
                                 <span>{formatCurrency(prescription.grand_total)}</span>
                             </div>

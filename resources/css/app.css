@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --primary-red: #DC2626;
+    --primary-red-hover: #B91C1C;
+    --primary-red-light: #FEE2E2;
+    --pharmacy-green: #16A34A;
+    --pharmacy-green-dark: #166534;
+    --pharmacy-green-light: #DCFCE7;
+    --page-bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --border: #E5E7EB;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+}
+
+::selection {
+    background-color: #DC2626;
+    color: #FFFFFF;
+}
+
 @keyframes sheetSlideUp {
     from {
         transform: translateY(100%);

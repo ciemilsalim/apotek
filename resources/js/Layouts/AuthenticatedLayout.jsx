@@ -92,7 +92,7 @@ export default function AuthenticatedLayout({ header, children }) {
         },
         kasir: {
             name: 'Kasir Penjualan',
-            badge: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+            badge: 'bg-green-100 text-green-800 border-green-200',
         },
     };
 
@@ -305,7 +305,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     className="h-10 w-10 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs"
                                 />
                             ) : (
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-lg shadow-sm">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white font-bold text-lg shadow-sm">
                                     <Pill className="h-5 w-5" />
                                 </div>
                             )}
@@ -320,13 +320,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                         className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl border border-slate-200/80 bg-white p-1 shadow-xs shrink-0"
                                     />
                                 ) : (
-                                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xl shadow-sm shrink-0">
+                                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-red-600 text-white font-bold text-xl shadow-sm shrink-0">
                                         <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
                                     </div>
                                 )}
                                 <div className="min-w-0 flex-1">
                                     <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight truncate">
-                                        {pharmacy?.name || 'Apotek Sehat'}
+                                        {pharmacy?.name || 'Apotek Hibbatillah'}
                                     </div>
                                     <div className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
                                         {pharmacy?.tagline || 'Sistem Manajemen Mudah'}
@@ -349,7 +349,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 {!sidebarCollapsed && (
                     <div className="p-3.5 mx-3 sm:mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black text-base">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white font-black text-base">
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -398,8 +398,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     : 'gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold'
                                             } ${
                                                 item.active
-                                                    ? 'bg-emerald-600 text-white shadow-xs'
-                                                    : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70'
+                                                    ? 'bg-red-600 text-white shadow-xs'
+                                                    : 'text-slate-600 hover:text-red-700 hover:bg-red-50/70'
                                             }`}
                                         >
                                             <Icon
@@ -415,7 +415,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     <div
                                                         className={`text-[11px] font-normal truncate ${
                                                             item.active
-                                                                ? 'text-emerald-100'
+                                                                ? 'text-red-100'
                                                                 : 'text-slate-400'
                                                         }`}
                                                     >
@@ -472,12 +472,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     className="h-9 w-9 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs"
                                 />
                             ) : (
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white font-bold">
                                     <Pill className="h-5 w-5" />
                                 </div>
                             )}
                             <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight truncate max-w-[150px] sm:max-w-[220px]">
-                                {pharmacy?.name || 'Apotek Sehat'}
+                                {pharmacy?.name || 'Apotek Hibbatillah'}
                             </span>
                         </div>
 
@@ -486,7 +486,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <button
                                 type="button"
                                 onClick={toggleSidebar}
-                                className="p-2 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-emerald-700 transition shadow-xs"
+                                className="p-2 rounded-xl border border-slate-200/80 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-red-700 transition shadow-xs"
                                 title={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
                                 aria-label={sidebarCollapsed ? 'Perlebar Sidebar' : 'Ciutkan Sidebar'}
                             >
@@ -512,7 +512,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         {['admin', 'kasir'].includes(user.role) && !route().current('pos.*') && (
                             <Link
                                 href={route('pos.index')}
-                                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition"
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 <span>Buka Kasir</span>
@@ -543,28 +543,28 @@ export default function AuthenticatedLayout({ header, children }) {
                 {!dismissFlash && (flash?.success || flash?.error) && (
                     <div className="mx-4 mt-4 sm:mx-6">
                         {flash.success && (
-                            <div className="flex items-center justify-between rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 text-sm font-semibold text-emerald-900 shadow-sm">
+                            <div className="flex items-center justify-between rounded-2xl border-2 border-green-300 bg-green-50 p-4 text-sm font-semibold text-green-900 shadow-sm">
                                 <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+                                    <CheckCircle2 className="h-6 w-6 text-green-600 shrink-0" />
                                     <span>{flash.success}</span>
                                 </div>
                                 <button
                                     onClick={() => setDismissFlash(true)}
-                                    className="rounded-lg p-1 text-emerald-700 hover:bg-emerald-100"
+                                    className="rounded-lg p-1 text-green-700 hover:bg-green-100"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
                             </div>
                         )}
                         {flash.error && (
-                            <div className="flex items-center justify-between rounded-2xl border-2 border-rose-300 bg-rose-50 p-4 text-sm font-semibold text-rose-900 shadow-sm">
+                            <div className="flex items-center justify-between rounded-2xl border-2 border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-900 shadow-sm">
                                 <div className="flex items-center gap-3">
-                                    <AlertCircle className="h-6 w-6 text-rose-600 shrink-0" />
+                                    <AlertCircle className="h-6 w-6 text-red-600 shrink-0" />
                                     <span>{flash.error}</span>
                                 </div>
                                 <button
                                     onClick={() => setDismissFlash(true)}
-                                    className="rounded-lg p-1 text-rose-700 hover:bg-rose-100"
+                                    className="rounded-lg p-1 text-red-700 hover:bg-red-100"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
@@ -590,13 +590,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 href={item.href}
                                 className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all ${
                                     item.active
-                                        ? 'text-emerald-700 font-extrabold'
+                                        ? 'text-red-700 font-extrabold'
                                         : 'text-slate-500 hover:text-slate-800 font-medium'
                                 }`}
                             >
                                 <div
                                     className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
-                                        item.active ? 'bg-emerald-100 text-emerald-700' : ''
+                                        item.active ? 'bg-red-100 text-red-700' : ''
                                     }`}
                                 >
                                     <Icon className="h-5 w-5" />
@@ -613,14 +613,14 @@ export default function AuthenticatedLayout({ header, children }) {
                         onClick={() => setBottomSheetOpen(true)}
                         className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all ${
                             bottomSheetOpen
-                                ? 'text-emerald-700 font-extrabold'
+                                ? 'text-red-700 font-extrabold'
                                 : 'text-slate-500 hover:text-slate-800 font-medium'
                         }`}
                         aria-label="Buka Semua Menu"
                     >
                         <div
                             className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
-                                bottomSheetOpen ? 'bg-emerald-100 text-emerald-700' : ''
+                                bottomSheetOpen ? 'bg-red-100 text-red-700' : ''
                             }`}
                         >
                             <LayoutGrid className="h-5 w-5" />
@@ -661,7 +661,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         className="h-10 w-10 object-contain rounded-xl border border-slate-200/80 bg-white p-0.5 shadow-xs shrink-0"
                                     />
                                 ) : (
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold shrink-0">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white font-bold shrink-0">
                                         <Pill className="h-5 w-5" />
                                     </div>
                                 )}
@@ -670,7 +670,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Semua Menu & Layanan
                                     </h3>
                                     <p className="text-[11px] text-slate-500 font-medium truncate">
-                                        {pharmacy?.name || 'Apotek Sehat'} • Akses Lengkap
+                                        {pharmacy?.name || 'Apotek Hibbatillah'} • Akses Lengkap
                                     </p>
                                 </div>
                             </div>
@@ -687,7 +687,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         {/* User Profile Info Strip */}
                         <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2.5 min-w-0">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white font-black text-xs">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white font-black text-xs">
                                     {user.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="min-w-0">
@@ -712,7 +712,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     setBottomSheetOpen(false);
                                     setTourOpen(true);
                                 }}
-                                className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold text-xs active:scale-[0.98] transition"
+                                className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-xs font-bold text-xs active:scale-[0.98] transition"
                             >
                                 <div className="flex items-center gap-2.5">
                                     <div className="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -720,7 +720,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </div>
                                     <div className="text-left min-w-0">
                                         <div className="font-extrabold text-white leading-tight">Tour & Panduan Fitur</div>
-                                        <div className="text-[10px] text-emerald-100 font-normal truncate">Pelajari kemampuan lengkap sistem</div>
+                                        <div className="text-[10px] text-red-100 font-normal truncate">Pelajari kemampuan lengkap sistem</div>
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-white/80 shrink-0" />
@@ -750,7 +750,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                         onClick={() => setBottomSheetOpen(false)}
                                                         className={`flex items-center justify-between p-3 rounded-2xl transition active:scale-[0.98] ${
                                                             item.active
-                                                                ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                                                                ? 'bg-red-600 text-white shadow-xs font-bold'
                                                                 : 'bg-white border border-slate-200/80 text-slate-800 hover:bg-slate-50 font-semibold'
                                                         }`}
                                                     >
@@ -771,7 +771,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                 <div
                                                                     className={`text-[10px] truncate ${
                                                                         item.active
-                                                                            ? 'text-emerald-100'
+                                                                            ? 'text-red-100'
                                                                             : 'text-slate-400'
                                                                     }`}
                                                                 >

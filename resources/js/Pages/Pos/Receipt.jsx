@@ -105,7 +105,7 @@ export default function PosReceipt({ sale }) {
                             onClick={() => setPaperSize('58mm')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
                                 paperSize === '58mm'
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
+                                    ? 'bg-red-600 text-white border-red-600'
                                     : 'bg-white text-slate-700 border-slate-200'
                             }`}
                         >
@@ -116,7 +116,7 @@ export default function PosReceipt({ sale }) {
                             onClick={() => setPaperSize('80mm')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
                                 paperSize === '80mm'
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
+                                    ? 'bg-red-600 text-white border-red-600'
                                     : 'bg-white text-slate-700 border-slate-200'
                             }`}
                         >
@@ -257,7 +257,7 @@ export default function PosReceipt({ sale }) {
                 <div className="no-print mt-4">
                     <button
                         onClick={() => window.print()}
-                        className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 text-sm font-black text-white hover:bg-emerald-700 transition shadow-xs"
+                        className="w-full flex items-center justify-center gap-2 rounded-2xl bg-red-600 py-3.5 text-sm font-black text-white hover:bg-red-700 transition shadow-xs"
                     >
                         <Printer className="h-5 w-5" />
                         <span>Cetak Struk ke Printer Termal</span>

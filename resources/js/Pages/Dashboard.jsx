@@ -38,7 +38,7 @@ export default function Dashboard({
             subtitle: 'Layanan penjualan obat',
             href: route('pos.index'),
             icon: ShoppingCart,
-            gradient: 'from-emerald-600 to-teal-500 shadow-emerald-500/20',
+            gradient: 'from-green-600 to-green-500 shadow-green-500/20',
             roles: ['admin', 'kasir'],
             badge: null,
         },
@@ -130,7 +130,7 @@ export default function Dashboard({
             subtitle: 'Pemasukan & pengeluaran',
             href: route('finance.index'),
             icon: Wallet,
-            gradient: 'from-emerald-700 to-emerald-500 shadow-emerald-600/20',
+            gradient: 'from-green-700 to-green-600 shadow-green-600/20',
             roles: ['admin', 'operator'],
             badge: null,
         },
@@ -221,7 +221,7 @@ export default function Dashboard({
                 {/* Welcome Card Banner (Mobile First, Sleek & Precise) */}
                 <div
                     data-tour="dashboard-welcome"
-                    className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden"
+                    className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-red-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden"
                 >
                     <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                     <div className="absolute -left-8 -bottom-8 w-44 h-44 rounded-full bg-white/5 blur-2xl pointer-events-none" />
@@ -244,16 +244,16 @@ export default function Dashboard({
                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border border-white/20">
                                         {roleName}
                                     </span>
-                                    <span className="flex items-center gap-1 text-[11px] text-emerald-100 font-medium">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                                    <span className="flex items-center gap-1 text-[11px] text-red-100 font-medium">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
                                         Online
                                     </span>
                                 </div>
-                                <h2 className="text-sm sm:text-lg lg:text-xl font-black text-white tracking-tight mt-0.5 truncate">
+                                <h2 className="text-sm sm:lg lg:text-xl font-black text-white tracking-tight mt-0.5 truncate">
                                     Selamat Datang, {user.name}
                                 </h2>
-                                <p className="text-[11px] sm:text-xs text-emerald-100/90 font-medium truncate">
-                                    {pharmacy?.name || 'Apotek Sehat'} • {todayFormatted}
+                                <p className="text-[11px] sm:text-xs text-red-100/90 font-medium truncate">
+                                    {pharmacy?.name || 'Apotek Hibbatillah'} • {todayFormatted}
                                 </p>
                             </div>
                         </div>
@@ -266,7 +266,7 @@ export default function Dashboard({
                             className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition backdrop-blur-xs shrink-0 active:scale-95 shadow-2xs"
                             title="Mulai Tour & Panduan Fitur Apotek"
                         >
-                            <Compass className="h-4 w-4 text-emerald-200" />
+                            <Compass className="h-4 w-4 text-white" />
                             <span className="hidden sm:inline">Tour Fitur</span>
                             <span className="sm:hidden">Tour</span>
                         </button>
@@ -301,7 +301,7 @@ export default function Dashboard({
                                     key={item.id}
                                     href={item.href}
                                     data-tour={tourAttr}
-                                    className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 lg:p-4.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 transition-all duration-150 active:scale-95 text-center"
+                                    className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 lg:p-4.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-red-300 hover:-translate-y-0.5 transition-all duration-150 active:scale-95 text-center"
                                 >
                                     {/* Icon Container with Gradient Squircle Shape */}
                                     <div
@@ -322,7 +322,7 @@ export default function Dashboard({
                                     </div>
 
                                     {/* Menu Title */}
-                                    <span className="mt-2.5 text-xs sm:text-xs lg:text-[13px] font-extrabold text-slate-800 group-hover:text-emerald-700 transition-colors leading-snug line-clamp-1">
+                                    <span className="mt-2.5 text-xs sm:text-xs lg:text-[13px] font-extrabold text-slate-800 group-hover:text-red-700 transition-colors leading-snug line-clamp-1">
                                         {item.title}
                                     </span>
 

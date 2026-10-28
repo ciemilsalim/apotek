@@ -236,25 +236,25 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                     onClick={() => handleTabChange('safe')}
                     className={`cursor-pointer rounded-2xl p-4 sm:p-5 border transition active:scale-[0.98] ${
                         activeTab === 'safe'
-                            ? 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-400'
-                            : 'bg-white border-emerald-200 hover:border-emerald-300 shadow-2xs'
+                            ? 'bg-green-50 border-green-400 ring-2 ring-green-400'
+                            : 'bg-white border-green-200 hover:border-green-300 shadow-2xs'
                     }`}
                 >
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                        <span className="text-xs font-bold uppercase tracking-wider text-green-800">
                             Stok Aman (&gt; 90 Hari)
                         </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-100 text-green-700">
                             <CheckCircle2 className="h-4 w-4" />
                         </div>
                     </div>
-                    <div className="text-2xl font-black text-emerald-700">
-                        {stats.safe_count} <span className="text-xs font-bold text-emerald-600">Batch</span>
+                    <div className="text-2xl font-black text-green-700">
+                        {stats.safe_count} <span className="text-xs font-bold text-green-600">Batch</span>
                     </div>
-                    <div className="mt-1 text-[11px] text-emerald-800 font-medium">
+                    <div className="mt-1 text-[11px] text-green-800 font-medium">
                         Kondisi masa simpan optimal
                     </div>
-                    <div className="mt-2 text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded-md inline-block">
+                    <div className="mt-2 text-[10px] text-green-700 font-semibold bg-green-100 px-2 py-0.5 rounded-md inline-block">
                         Layak Jual Penuh
                     </div>
                 </div>
@@ -323,8 +323,8 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                             onClick={() => handleTabChange('safe')}
                             className={`shrink-0 rounded-xl px-3.5 py-2 text-xs font-bold transition ${
                                 activeTab === 'safe'
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-green-100 text-green-800 hover:bg-green-200'
                             }`}
                         >
                             Aman (&gt; 90 Hari)
@@ -336,7 +336,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                         <select
                             value={categoryId}
                             onChange={(e) => handleCategoryChange(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500"
                         >
                             <option value="">Semua Kategori</option>
                             {categories.map((c) => (
@@ -357,7 +357,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Cari nama obat, kode, atau nomor lot batch..."
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500"
                         />
                         {search && (
                             <button
@@ -378,7 +378,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                     </div>
                     <button
                         type="submit"
-                        className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs active:scale-[0.98]"
+                        className="rounded-xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs active:scale-[0.98]"
                     >
                         Cari
                     </button>
@@ -441,7 +441,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                                                     ? 'bg-amber-100 text-amber-900 border border-amber-300'
                                                     : isWarning
                                                     ? 'bg-yellow-100 text-yellow-900 border border-yellow-300'
-                                                    : 'bg-emerald-100 text-emerald-900'
+                                                    : 'bg-green-100 text-green-900'
                                             }`}
                                         >
                                             {isExpired
@@ -467,7 +467,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                                         </div>
                                         <div>
                                             <span className="text-slate-400 block text-[10px]">Sisa Stok Aktif:</span>
-                                            <span className="font-extrabold text-emerald-700">
+                                            <span className="font-extrabold text-green-700">
                                                 {batch.current_stock} {batch.medicine?.unit}
                                             </span>
                                         </div>
@@ -565,7 +565,7 @@ export default function ExpiryIndex({ batches, stats, filters = {}, categories =
                                                             ? 'bg-amber-100 text-amber-900 border border-amber-300'
                                                             : isWarning
                                                             ? 'bg-yellow-100 text-yellow-900 border border-yellow-300'
-                                                            : 'bg-emerald-100 text-emerald-900'
+                                                            : 'bg-green-100 text-green-900'
                                                     }`}
                                                 >
                                                     {isExpired && <AlertOctagon className="h-3 w-3 text-rose-600" />}

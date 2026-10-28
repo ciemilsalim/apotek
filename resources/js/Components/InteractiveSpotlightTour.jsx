@@ -213,12 +213,12 @@ export default function InteractiveSpotlightTour({
                     }}
                 >
                     {/* Pulsing Beacon Ring */}
-                    <span className="absolute inset-0 rounded-2xl ring-2 ring-emerald-400 ring-offset-2 ring-offset-transparent animate-pulse" />
+                    <span className="absolute inset-0 rounded-2xl ring-2 ring-red-400 ring-offset-2 ring-offset-transparent animate-pulse" />
 
                     {/* Glowing Ping Corner Beacon */}
                     <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80" />
-                        <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 shadow-sm" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-80" />
+                        <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 shadow-sm" />
                     </span>
                 </div>
             ) : (
@@ -240,15 +240,15 @@ export default function InteractiveSpotlightTour({
             <div
                 ref={popoverRef}
                 style={popoverStyle}
-                className="z-[99999] rounded-2xl bg-white p-4 sm:p-5 shadow-2xl border border-emerald-100 animate-in fade-in zoom-in-95 duration-200"
+                className="z-[99999] rounded-2xl bg-white p-4 sm:p-5 shadow-2xl border border-red-100 animate-in fade-in zoom-in-95 duration-200"
             >
                 {/* Popover Header */}
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1.5">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-600 text-white shadow-2xs">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-red-600 text-white shadow-2xs">
                             <Compass className="h-3.5 w-3.5" />
                         </span>
-                        <span className="text-[10.5px] font-black uppercase tracking-wider text-emerald-800">
+                        <span className="text-[10.5px] font-black uppercase tracking-wider text-red-800">
                             Panduan {currentStepIndex + 1} dari {steps.length}
                         </span>
                     </div>
@@ -280,7 +280,7 @@ export default function InteractiveSpotlightTour({
                                 key={dotIdx}
                                 className={`h-1.5 rounded-full transition-all ${
                                     currentStepIndex === dotIdx
-                                        ? 'w-4 bg-emerald-600'
+                                        ? 'w-4 bg-red-600'
                                         : 'w-1.5 bg-slate-200'
                                 }`}
                             />
@@ -301,7 +301,7 @@ export default function InteractiveSpotlightTour({
                         <button
                             type="button"
                             onClick={handleNext}
-                            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-[11px] font-extrabold text-white shadow-xs transition active:scale-95"
+                            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-[11px] font-extrabold text-white shadow-xs transition active:scale-95"
                         >
                             <span>{isLast ? 'Selesai' : 'Lanjut'}</span>
                             {!isLast && <ArrowRight className="h-3.5 w-3.5" />}

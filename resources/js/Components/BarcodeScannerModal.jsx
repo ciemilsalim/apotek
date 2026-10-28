@@ -175,7 +175,7 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScan, title = '
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/80">
                     <div className="flex items-center gap-2.5">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white shadow-xs">
                             <Camera className="h-5 w-5" />
                         </div>
                         <div>
@@ -219,14 +219,14 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScan, title = '
                             <button
                                 type="button"
                                 onClick={handleSwitchToHttps}
-                                className="w-full flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 text-left transition group shadow-2xs"
+                                className="w-full flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 hover:border-red-300 hover:bg-red-50/40 text-left transition group shadow-2xs"
                             >
                                 <div className="flex items-center gap-2.5">
-                                    <div className="h-8 w-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                    <div className="h-8 w-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center shrink-0">
                                         <Lock className="h-4 w-4" />
                                     </div>
                                     <div>
-                                        <div className="font-bold text-xs text-slate-900 group-hover:text-emerald-800">
+                                        <div className="font-bold text-xs text-slate-900 group-hover:text-red-800">
                                             Buka via HTTPS (Rekomendasi)
                                         </div>
                                         <div className="text-[10px] text-slate-500">
@@ -234,7 +234,7 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScan, title = '
                                         </div>
                                     </div>
                                 </div>
-                                <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 shrink-0" />
+                                <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-red-600 shrink-0" />
                             </button>
 
                             {/* Option 2: Switch to localhost */}
@@ -296,7 +296,7 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScan, title = '
                             <select
                                 value={selectedCameraId || ''}
                                 onChange={(e) => handleCameraSwitch(e.target.value)}
-                                className="w-full text-xs rounded-xl border border-slate-200 py-1.5 px-2 bg-slate-50 font-medium text-slate-800 focus:border-emerald-600 focus:outline-none truncate"
+                                className="w-full text-xs rounded-xl border border-slate-200 py-1.5 px-2 bg-slate-50 font-medium text-slate-800 focus:border-red-500 focus:outline-none truncate"
                             >
                                 {cameras.map((cam) => (
                                     <option key={cam.id} value={cam.id}>

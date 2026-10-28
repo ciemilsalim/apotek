@@ -92,7 +92,7 @@ export default function CategoriesIndex({ categories, filters }) {
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                        className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition"
                     >
                         <FolderPlus className="h-4 w-4" />
                         <span>Tambah Kategori</span>
@@ -112,12 +112,12 @@ export default function CategoriesIndex({ categories, filters }) {
                             placeholder="Cari nama kategori atau deskripsi..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+                        className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                     >
                         Cari
                     </button>
@@ -145,7 +145,7 @@ export default function CategoriesIndex({ categories, filters }) {
                                     >
                                         <td className="px-5 py-3.5">
                                             <div className="flex items-center gap-2.5">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 font-bold shrink-0">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700 font-bold shrink-0">
                                                     <Layers className="h-4 w-4" />
                                                 </div>
                                                 <div className="font-extrabold text-sm text-slate-900">
@@ -166,7 +166,7 @@ export default function CategoriesIndex({ categories, filters }) {
                                             <div className="flex items-center justify-end gap-1.5">
                                                 <button
                                                     onClick={() => openEditModal(cat)}
-                                                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 shadow-2xs transition"
+                                                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-red-700 shadow-2xs transition"
                                                     title="Ubah kategori"
                                                 >
                                                     <Edit className="h-3.5 w-3.5" />
@@ -216,7 +216,7 @@ export default function CategoriesIndex({ categories, filters }) {
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     className={`rounded-lg px-2.5 py-1 ${
                                         link.active
-                                            ? 'bg-emerald-600 text-white font-bold'
+                                            ? 'bg-red-600 text-white font-bold'
                                             : link.url
                                             ? 'text-slate-600 hover:bg-slate-100'
                                             : 'text-slate-300 cursor-not-allowed'
@@ -253,7 +253,7 @@ export default function CategoriesIndex({ categories, filters }) {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-red-500 focus:outline-none"
                                 placeholder="Contoh: Salep & Kulit"
                                 required
                             />
@@ -270,7 +270,7 @@ export default function CategoriesIndex({ categories, filters }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-red-500 focus:outline-none"
                                 placeholder="Keterangan obat-obatan dalam kategori ini..."
                             />
                         </div>
@@ -287,7 +287,7 @@ export default function CategoriesIndex({ categories, filters }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition disabled:opacity-50"
+                            className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition disabled:opacity-50"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Kategori'}
                         </button>

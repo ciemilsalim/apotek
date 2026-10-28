@@ -65,7 +65,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                 );
             case 'completed':
                 return (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[11px] font-black text-emerald-800 border border-emerald-200">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-green-100 px-2 py-0.5 text-[11px] font-black text-green-800 border border-green-200">
                         <CheckCircle2 className="h-3 w-3" />
                         <span>Selesai Ditebus</span>
                     </span>
@@ -88,7 +88,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                            <Stethoscope className="h-6 w-6 text-teal-600" />
+                            <Stethoscope className="h-6 w-6 text-red-600" />
                             <span>Resep Dokter & Racikan Klinik</span>
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium">
@@ -98,7 +98,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
 
                     <Link
                         href={route('prescriptions.create')}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-teal-700 transition active:scale-[0.98]"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition active:scale-[0.98]"
                     >
                         <Plus className="h-4 w-4" />
                         <span>+ Buat Resep Racikan Baru</span>
@@ -162,22 +162,22 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                     onClick={() => handleTabChange('completed')}
                     className={`cursor-pointer rounded-2xl p-4 sm:p-5 border transition active:scale-[0.98] ${
                         activeTab === 'completed'
-                            ? 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-400'
-                            : 'bg-white border-slate-200/90 shadow-2xs hover:border-emerald-300'
+                            ? 'bg-green-50 border-green-400 ring-2 ring-green-400'
+                            : 'bg-white border-slate-200/90 shadow-2xs hover:border-green-300'
                     }`}
                 >
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                        <span className="text-xs font-bold uppercase tracking-wider text-green-800">
                             Selesai Hari Ini
                         </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-100 text-green-700">
                             <CheckCircle2 className="h-4 w-4" />
                         </div>
                     </div>
-                    <div className="text-2xl font-black text-emerald-700">
-                        {stats.completed_today} <span className="text-xs font-bold text-emerald-600">Resep</span>
+                    <div className="text-2xl font-black text-green-700">
+                        {stats.completed_today} <span className="text-xs font-bold text-green-600">Resep</span>
                     </div>
-                    <div className="mt-1 text-[11px] text-emerald-800 font-medium">
+                    <div className="mt-1 text-[11px] text-green-800 font-medium">
                         Sudah diserahkan ke pasien
                     </div>
                 </div>
@@ -255,8 +255,8 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                             onClick={() => handleTabChange('completed')}
                             className={`shrink-0 rounded-xl px-3.5 py-2 text-xs font-bold transition ${
                                 activeTab === 'completed'
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-green-100 text-green-800 hover:bg-green-200'
                             }`}
                         >
                             Selesai Ditebus
@@ -272,7 +272,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="No. Resep, Pasien, Dokter..."
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-7 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:ring-1 focus:ring-teal-500"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-7 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500"
                             />
                             {search && (
                                 <button
@@ -289,7 +289,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                         </div>
                         <button
                             type="submit"
-                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+                            className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Cari
                         </button>
@@ -320,7 +320,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                             <div key={rx.id} className="p-4 hover:bg-slate-50/70 transition">
                                 <div className="flex items-start justify-between gap-2 mb-2">
                                     <div>
-                                        <span className="font-mono text-xs font-black text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
+                                        <span className="font-mono text-xs font-black text-red-700 bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
                                             {rx.prescription_number}
                                         </span>
                                         <div className="font-black text-sm text-slate-900 mt-1">
@@ -344,7 +344,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                                     </div>
                                     <div className="flex justify-between font-black text-slate-900 pt-1 border-t border-slate-200">
                                         <span>Total Biaya Resep:</span>
-                                        <span className="text-teal-700">{formatCurrency(rx.grand_total)}</span>
+                                        <span className="text-slate-900">{formatCurrency(rx.grand_total)}</span>
                                     </div>
                                 </div>
 
@@ -358,7 +358,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                                     </Link>
                                     <Link
                                         href={route('prescriptions.show', rx.id)}
-                                        className="inline-flex items-center gap-1 rounded-xl bg-teal-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal-700 transition"
+                                        className="inline-flex items-center gap-1 rounded-xl bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-red-700 transition"
                                     >
                                         <span>Detail Formula</span>
                                     </Link>
@@ -391,7 +391,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                                 prescriptions.data.map((rx) => (
                                     <tr key={rx.id} className="hover:bg-slate-50 transition">
                                         <td className="px-5 py-3.5">
-                                            <div className="font-mono font-bold text-teal-700">
+                                            <div className="font-mono font-bold text-slate-900">
                                                 {rx.prescription_number}
                                             </div>
                                             <div className="text-[11px] text-slate-400 mt-0.5">
@@ -458,7 +458,7 @@ export default function PrescriptionIndex({ prescriptions, stats, filters = {} }
                                                 </Link>
                                                 <Link
                                                     href={route('prescriptions.show', rx.id)}
-                                                    className="inline-flex items-center gap-1 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-teal-700 transition"
+                                                    className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 transition"
                                                 >
                                                     <span>Lihat</span>
                                                 </Link>

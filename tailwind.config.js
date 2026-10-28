@@ -15,6 +15,16 @@ export default {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                brand: {
+                    red: '#DC2626',
+                    'red-hover': '#B91C1C',
+                    'red-light': '#FEE2E2',
+                    green: '#16A34A',
+                    'green-dark': '#166534',
+                    'green-light': '#DCFCE7',
+                },
+            },
         },
     },
 

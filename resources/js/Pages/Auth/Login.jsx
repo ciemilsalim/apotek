@@ -41,10 +41,10 @@ export default function Login({ status }) {
             label: 'Kasir',
             desc: 'Penjualan & Struk',
             icon: ShoppingCart,
-            activeClass: 'border-emerald-500 bg-emerald-50/60 ring-2 ring-emerald-500/20 shadow-xs',
-            badgeClass: 'text-emerald-600',
-            iconActive: 'bg-emerald-600 text-white shadow-2xs',
-            iconInactive: 'bg-emerald-100 text-emerald-700',
+            activeClass: 'border-green-500 bg-green-50/60 ring-2 ring-green-500/20 shadow-xs',
+            badgeClass: 'text-green-600',
+            iconActive: 'bg-green-600 text-white shadow-2xs',
+            iconInactive: 'bg-green-100 text-green-700',
         },
         {
             id: 'operator',
@@ -63,10 +63,10 @@ export default function Login({ status }) {
             label: 'Admin Apotek',
             desc: 'Akses Penuh & Kas',
             icon: ShieldCheck,
-            activeClass: 'border-purple-500 bg-purple-50/60 ring-2 ring-purple-500/20 shadow-xs',
-            badgeClass: 'text-purple-600',
-            iconActive: 'bg-purple-600 text-white shadow-2xs',
-            iconInactive: 'bg-purple-100 text-purple-700',
+            activeClass: 'border-red-500 bg-red-50/60 ring-2 ring-red-500/20 shadow-xs',
+            badgeClass: 'text-red-600',
+            iconActive: 'bg-red-600 text-white shadow-2xs',
+            iconInactive: 'bg-red-100 text-red-700',
         },
     ];
 
@@ -84,8 +84,8 @@ export default function Login({ status }) {
             <Head title="Masuk Sistem - Apotek Sehat" />
 
             <div className="mb-4 sm:mb-5 text-center">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/80 px-3 py-1 text-[11px] font-bold text-emerald-800 border border-emerald-200/60 mb-2">
-                    <Sparkles className="h-3 w-3 text-emerald-600" />
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold text-red-800 border border-red-200 mb-2">
+                    <Sparkles className="h-3 w-3 text-red-600" />
                     <span>Sistem Informasi Farmasi & Kasir</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -100,7 +100,7 @@ export default function Login({ status }) {
             <div className="mb-4 sm:mb-5 rounded-2xl bg-slate-50/90 p-3 sm:p-3.5 border border-slate-200">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                        <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                        <UserCheck className="h-3.5 w-3.5 text-red-600" />
                         <span>Pilih Cepat Peran Staf (1-Klik)</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium">Auto-fill akun</span>
@@ -148,7 +148,7 @@ export default function Login({ status }) {
             </div>
 
             {status && (
-                <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-medium text-emerald-800">
+                <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-xs font-medium text-green-800">
                     {status}
                 </div>
             )}
@@ -166,7 +166,7 @@ export default function Login({ status }) {
                             type="email"
                             name="email"
                             value={data.email}
-                            className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-2.5 text-sm font-medium text-slate-900 shadow-2xs transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                            className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-2.5 text-sm font-medium text-slate-900 shadow-2xs transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                             autoComplete="username"
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="nama@apotek.test"
@@ -190,7 +190,7 @@ export default function Login({ status }) {
                             type={showPassword ? 'text' : 'password'}
                             name="password"
                             value={data.password}
-                            className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 py-2.5 text-sm font-medium text-slate-900 shadow-2xs transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                            className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 py-2.5 text-sm font-medium text-slate-900 shadow-2xs transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                             autoComplete="current-password"
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="••••••••"
@@ -232,7 +232,7 @@ export default function Login({ status }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 active:scale-[0.99] transition disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white shadow-md shadow-red-600/20 hover:bg-red-700 active:scale-[0.99] transition disabled:opacity-50"
                     >
                         <LogIn className="h-4 w-4" />
                         <span>{processing ? 'Memverifikasi Akun...' : 'Masuk ke Sistem Apotek'}</span>
@@ -241,7 +241,7 @@ export default function Login({ status }) {
             </form>
 
             <div className="mt-5 flex items-center justify-center gap-2 text-[11px] text-slate-400 border-t border-slate-100 pt-3.5">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <ShieldCheck className="h-4 w-4 text-red-600" />
                 <span>Koneksi Aman & Akses Berbasis Peran Terlindungi</span>
             </div>
         </GuestLayout>

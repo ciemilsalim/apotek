@@ -115,7 +115,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-semibold text-green-700 shadow-sm transition hover:bg-green-50"
                         >
                             <FileSpreadsheet className="h-4 w-4" />
                             <span>Ekspor Excel (CSV)</span>
@@ -137,7 +137,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                     </Link>
                     <Link
                         href={route('reports.profit-loss')}
-                        className="border-b-2 border-emerald-600 px-4 py-2.5 text-xs font-bold text-emerald-700 transition"
+                        className="border-b-2 border-red-600 px-4 py-2.5 text-xs font-bold text-red-700 transition"
                     >
                         Laporan Laba Rugi & HPP
                     </Link>
@@ -154,7 +154,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                     <form onSubmit={handleApplyFilter} className="space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
-                                <Filter className="h-4 w-4 text-emerald-600" />
+                                <Filter className="h-4 w-4 text-red-600" />
                                 <span>Periode Perhitungan Laba Rugi</span>
                             </div>
                             <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
@@ -163,7 +163,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                     onClick={() => setPeriod('monthly')}
                                     className={`rounded-md px-3 py-1 transition ${
                                         period === 'monthly'
-                                            ? 'bg-white font-bold text-emerald-700 shadow-sm'
+                                            ? 'bg-white font-bold text-red-700 shadow-sm'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -174,7 +174,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                     onClick={() => setPeriod('daily')}
                                     className={`rounded-md px-3 py-1 transition ${
                                         period === 'daily'
-                                            ? 'bg-white font-bold text-emerald-700 shadow-sm'
+                                            ? 'bg-white font-bold text-red-700 shadow-sm'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -185,7 +185,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                     onClick={() => setPeriod('custom')}
                                     className={`rounded-md px-3 py-1 transition ${
                                         period === 'custom'
-                                            ? 'bg-white font-bold text-emerald-700 shadow-sm'
+                                            ? 'bg-white font-bold text-red-700 shadow-sm'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -204,7 +204,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                         type="date"
                                         value={date}
                                         onChange={(e) => setDate(e.target.value)}
-                                        className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                        className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-red-500 focus:ring-red-500"
                                     />
                                 </div>
                             )}
@@ -218,7 +218,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                         type="month"
                                         value={month}
                                         onChange={(e) => setMonth(e.target.value)}
-                                        className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                        className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-red-500 focus:ring-red-500"
                                     />
                                 </div>
                             )}
@@ -233,7 +233,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                             type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
-                                            className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                            className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-red-500 focus:ring-red-500"
                                         />
                                     </div>
                                     <div>
@@ -244,7 +244,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                             type="date"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
-                                            className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                            className="w-full rounded-lg border-slate-200 text-xs shadow-sm focus:border-red-500 focus:ring-red-500"
                                         />
                                     </div>
                                 </>
@@ -253,7 +253,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             <div className="flex items-end gap-2">
                                 <button
                                     type="submit"
-                                    className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
+                                    className="w-full rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-red-700"
                                 >
                                     Terapkan Filter
                                 </button>
@@ -278,7 +278,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                                 Pendapatan Penjualan Bersih
                             </span>
-                            <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+                            <div className="rounded-lg bg-green-50 p-2 text-green-600">
                                 <CircleDollarSign className="h-5 w-5" />
                             </div>
                         </div>
@@ -336,7 +336,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                     <div
                         className={`rounded-xl border p-4 shadow-sm ${
                             netOperatingProfit >= 0
-                                ? 'border-emerald-200 bg-emerald-50/50'
+                                ? 'border-green-200 bg-green-50/50'
                                 : 'border-rose-200 bg-rose-50/50'
                         }`}
                     >
@@ -347,7 +347,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             <div
                                 className={`rounded-lg p-2 ${
                                     netOperatingProfit >= 0
-                                        ? 'bg-emerald-100 text-emerald-700'
+                                        ? 'bg-green-100 text-green-700'
                                         : 'bg-rose-100 text-rose-700'
                                 }`}
                             >
@@ -357,12 +357,12 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                         <div className="mt-2">
                             <div
                                 className={`text-xl font-black ${
-                                    netOperatingProfit >= 0 ? 'text-emerald-800' : 'text-rose-700'
+                                    netOperatingProfit >= 0 ? 'text-green-800' : 'text-rose-700'
                                 }`}
                             >
                                 {formatCurrency(netOperatingProfit)}
                             </div>
-                            <div className="mt-1 text-[11px] font-bold text-emerald-700">
+                            <div className="mt-1 text-[11px] font-bold text-green-700">
                                 Margin Laba Bersih: {netProfitMargin}%
                             </div>
                         </div>
@@ -409,7 +409,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                     <td className="px-4 py-2 pl-6">
                                         TOTAL PENDAPATAN PENJUALAN BERSIH
                                     </td>
-                                    <td className="px-4 py-2 text-right text-emerald-700">
+                                    <td className="px-4 py-2 text-right text-green-700">
                                         {formatCurrency(netSales)}
                                     </td>
                                 </tr>
@@ -427,7 +427,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                             <td className="px-4 py-2 pl-6">
                                                 TOTAL SELURUH PENDAPATAN
                                             </td>
-                                            <td className="px-4 py-2 text-right text-emerald-700">
+                                            <td className="px-4 py-2 text-right text-green-700">
                                                 {formatCurrency(totalRevenue)}
                                             </td>
                                         </tr>
@@ -500,7 +500,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                 <tr
                                     className={`font-black text-sm border-t-2 ${
                                         netOperatingProfit >= 0
-                                            ? 'bg-emerald-100/60 border-emerald-500 text-emerald-900'
+                                            ? 'bg-green-100/60 border-green-500 text-green-900'
                                             : 'bg-rose-100/60 border-rose-500 text-rose-900'
                                     }`}
                                 >
@@ -525,7 +525,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                             <div className="flex items-center gap-2">
-                                <Award className="h-4 w-4 text-emerald-600" />
+                                <Award className="h-4 w-4 text-green-600" />
                                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                                     Top 5 Obat Penyumbang Laba Terbesar
                                 </h4>
@@ -544,7 +544,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                         className="rounded-lg border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between"
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-black text-emerald-800">
+                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-[11px] font-black text-green-800">
                                                 {index + 1}
                                             </span>
                                             <div>
@@ -557,7 +557,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-xs font-black text-emerald-600">
+                                            <div className="text-xs font-black text-green-600">
                                                 +{formatCurrency(med.profit)}
                                             </div>
                                             <div className="text-[10px] font-bold text-sky-600">
@@ -609,7 +609,7 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                                                 <td className="py-2 text-right text-slate-600">
                                                     {formatCurrency(cat.revenue)}
                                                 </td>
-                                                <td className="py-2 text-right font-bold text-emerald-600">
+                                                <td className="py-2 text-right font-bold text-green-600">
                                                     {formatCurrency(cat.profit)}
                                                 </td>
                                                 <td className="py-2 text-right font-bold text-sky-600">

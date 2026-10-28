@@ -60,7 +60,7 @@ export default function PharmacyProfile({ pharmacy }) {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
                                 <Store className="w-3.5 h-3.5" />
                                 Pengaturan Sistem
                             </span>
@@ -74,8 +74,8 @@ export default function PharmacyProfile({ pharmacy }) {
                     </div>
 
                     {recentlySuccessful && (
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-semibold shadow-sm animate-fade-in">
-                            <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 text-green-800 rounded-xl text-sm font-semibold shadow-sm animate-fade-in">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
                             Data profil apotek berhasil diperbarui!
                         </div>
                     )}
@@ -91,7 +91,7 @@ export default function PharmacyProfile({ pharmacy }) {
                         {/* Section 1: Identitas Utama */}
                         <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 sm:p-7">
                             <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                                <div className="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                                <div className="h-10 w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
                                     <Building2 className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -113,8 +113,8 @@ export default function PharmacyProfile({ pharmacy }) {
                                         type="text"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        className="w-full rounded-xl border-slate-300 shadow-xs focus:border-emerald-500 focus:ring-emerald-500 text-sm font-semibold text-slate-900"
-                                        placeholder="Contoh: Apotek Sehat Farma"
+                                        className="w-full rounded-xl border-slate-300 shadow-xs focus:border-red-500 focus:ring-red-500 text-sm font-semibold text-slate-900"
+                                        placeholder="Contoh: Apotek Hibbatillah"
                                         required
                                     />
                                     {errors.name && (
@@ -130,7 +130,7 @@ export default function PharmacyProfile({ pharmacy }) {
                                         type="text"
                                         value={data.tagline}
                                         onChange={(e) => setData('tagline', e.target.value)}
-                                        className="w-full rounded-xl border-slate-300 shadow-xs focus:border-emerald-500 focus:ring-emerald-500 text-sm text-slate-900"
+                                        className="w-full rounded-xl border-slate-300 shadow-xs focus:border-red-500 focus:ring-red-500 text-sm text-slate-900"
                                         placeholder="Contoh: Sahabat Sehat Keluarga Anda"
                                     />
                                     {errors.tagline && (
@@ -148,7 +148,7 @@ export default function PharmacyProfile({ pharmacy }) {
                                             type="text"
                                             value={data.phone}
                                             onChange={(e) => setData('phone', e.target.value)}
-                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-emerald-500 focus:ring-emerald-500 text-sm text-slate-900"
+                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-red-500 focus:ring-red-500 text-sm text-slate-900"
                                             placeholder="Contoh: 0812-3456-7890"
                                         />
                                     </div>
@@ -167,8 +167,8 @@ export default function PharmacyProfile({ pharmacy }) {
                                             type="email"
                                             value={data.email}
                                             onChange={(e) => setData('email', e.target.value)}
-                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-emerald-500 focus:ring-emerald-500 text-sm text-slate-900"
-                                            placeholder="Contoh: kontak@apoteksehat.com"
+                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-red-500 focus:ring-red-500 text-sm text-slate-900"
+                                            placeholder="Contoh: kontak@apotekhibbatillah.com"
                                         />
                                     </div>
                                     {errors.email && (
@@ -186,8 +186,8 @@ export default function PharmacyProfile({ pharmacy }) {
                                             rows={2}
                                             value={data.address}
                                             onChange={(e) => setData('address', e.target.value)}
-                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-emerald-500 focus:ring-emerald-500 text-sm text-slate-900"
-                                            placeholder="Contoh: Jl. Sudirman No. 123, Kel. Sehat, Kec. Berseri, Kota Sejahtera"
+                                            className="w-full pl-10 rounded-xl border-slate-300 shadow-xs focus:border-red-500 focus:ring-red-500 text-sm text-slate-900"
+                                            placeholder="Contoh: Jl. Sudirman No. 123, Buol"
                                         />
                                     </div>
                                     {errors.address && (
@@ -333,7 +333,7 @@ export default function PharmacyProfile({ pharmacy }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm shadow-emerald-500/20 text-sm transition-all duration-200 active:scale-95 disabled:opacity-50"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-sm shadow-red-500/20 text-sm transition-all duration-200 active:scale-95 disabled:opacity-50"
                             >
                                 <Save className="w-4 h-4" />
                                 {processing ? 'Menyimpan Perubahan...' : 'Simpan Profil Apotek'}
@@ -346,7 +346,7 @@ export default function PharmacyProfile({ pharmacy }) {
                         {/* Logo Upload Card */}
                         <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
                             <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                                <ImageIcon className="w-4 h-4 text-emerald-600" />
+                                <ImageIcon className="w-4 h-4 text-red-600" />
                                 <h3 className="text-sm font-bold text-slate-900">Logo Apotek</h3>
                             </div>
 
@@ -367,7 +367,7 @@ export default function PharmacyProfile({ pharmacy }) {
                                 )}
 
                                 <label className="mt-4 cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold rounded-xl shadow-xs transition-colors">
-                                    <UploadCloud className="w-3.5 h-3.5 text-emerald-600" />
+                                    <UploadCloud className="w-3.5 h-3.5 text-red-600" />
                                     <span>Pilih Gambar Logo</span>
                                     <input
                                         type="file"
@@ -389,7 +389,7 @@ export default function PharmacyProfile({ pharmacy }) {
                         <div className="bg-slate-900 text-white rounded-2xl shadow-md p-5 border border-slate-800">
                             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                                 <div className="flex items-center gap-2">
-                                    <Printer className="w-4 h-4 text-emerald-400" />
+                                    <Printer className="w-4 h-4 text-green-500" />
                                     <span className="text-xs font-bold tracking-wider uppercase text-slate-300">
                                         Pratinjau Struk POS
                                     </span>

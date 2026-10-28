@@ -1,7 +1,7 @@
 export default function ApplicationLogo({ name, tagline, className = '', ...props }) {
     return (
         <div className={`flex items-center gap-2.5 ${className}`} {...props}>
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white shadow-md shadow-emerald-500/20">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-md shadow-red-500/20">
                 {/* Medical Cross Icon */}
                 <svg
                     className="h-6 w-6 fill-current"
@@ -15,7 +15,7 @@ export default function ApplicationLogo({ name, tagline, className = '', ...prop
                 <span className="text-lg font-black tracking-tight text-slate-800 leading-tight">
                     {name || (
                         <>
-                            Apotek<span className="text-emerald-600">Sehat</span>
+                            Apotek<span className="text-red-600">Hibbatillah</span>
                         </>
                     )}
                 </span>

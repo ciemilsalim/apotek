@@ -111,7 +111,7 @@ export default function UsersIndex({ users, filters, roles }) {
             );
         }
         return (
-            <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-black text-emerald-700 border border-emerald-200">
+            <span className="rounded-lg bg-green-100 px-2.5 py-1 text-xs font-black text-green-700 border border-green-200">
                 Kasir
             </span>
         );
@@ -131,7 +131,7 @@ export default function UsersIndex({ users, filters, roles }) {
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 transition"
                     >
                         <UserPlus className="h-4 w-4" />
                         <span>Tambah Pengguna Baru</span>
@@ -154,7 +154,7 @@ export default function UsersIndex({ users, filters, roles }) {
                             placeholder="Cari nama atau email staf..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-4 py-2.5 text-sm font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
+                            className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-12 pr-4 py-2.5 text-sm font-semibold focus:border-red-500 focus:bg-white focus:outline-none"
                         />
                     </div>
 
@@ -169,7 +169,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-emerald-600 focus:outline-none"
+                            className="rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-red-500 focus:outline-none"
                         >
                             <option value="">Semua Peran</option>
                             <option value="admin">Admin</option>
@@ -179,7 +179,7 @@ export default function UsersIndex({ users, filters, roles }) {
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+                            className="rounded-2xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Cari
                         </button>
@@ -270,7 +270,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                         <td className="px-5 py-3.5">
                                             <span
                                                 className={`inline-block h-2 w-2 rounded-full mr-1.5 ${
-                                                    u.is_active ? 'bg-emerald-500' : 'bg-slate-400'
+                                                    u.is_active ? 'bg-green-500' : 'bg-slate-400'
                                                 }`}
                                             />
                                             <span className="font-bold text-slate-700">
@@ -282,7 +282,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => openEditModal(u)}
-                                                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 hover:text-emerald-700 transition-colors"
+                                                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 hover:text-red-700 transition-colors"
                                                     title="Ubah"
                                                 >
                                                     <Edit className="h-4 w-4" />
@@ -336,7 +336,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 placeholder="Contoh: Rian Pratama"
                                 required
                             />
@@ -350,7 +350,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                 type="email"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 placeholder="email@apotek.test"
                                 required
                             />
@@ -363,7 +363,7 @@ export default function UsersIndex({ users, filters, roles }) {
                             <select
                                 value={data.role}
                                 onChange={(e) => setData('role', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold focus:border-red-500 focus:outline-none"
                                 required
                             >
                                 <option value="kasir">Kasir (Transaksi Penjualan)</option>
@@ -380,7 +380,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                 type="password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 placeholder="Minimal 8 karakter"
                                 required={!editingUser}
                             />
@@ -394,7 +394,7 @@ export default function UsersIndex({ users, filters, roles }) {
                                 type="text"
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 placeholder="08123456789"
                             />
                         </div>
@@ -411,7 +411,7 @@ export default function UsersIndex({ users, filters, roles }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700"
+                            className="rounded-2xl bg-red-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-red-700"
                         >
                             {processing ? 'Menyimpan...' : 'Simpan Data'}
                         </button>

@@ -46,7 +46,7 @@ export default function PosHistory({ sales, filters }) {
                     </div>
                     <Link
                         href={route('pos.index')}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition"
                     >
                         <ShoppingCart className="h-4 w-4" />
                         <span>Buka Kasir</span>
@@ -69,7 +69,7 @@ export default function PosHistory({ sales, filters }) {
                             placeholder="Cari nomor faktur, nama pembeli..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
                         />
                     </div>
 
@@ -85,12 +85,12 @@ export default function PosHistory({ sales, filters }) {
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-800 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                            className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-800 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
                         />
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs"
+                            className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Filter
                         </button>
@@ -121,7 +121,7 @@ export default function PosHistory({ sales, filters }) {
                                         key={sale.id}
                                         className="hover:bg-slate-50/80 transition-colors duration-150"
                                     >
-                                        <td className="px-5 py-3.5 font-bold font-mono text-emerald-700">
+                                        <td className="px-5 py-3.5 font-bold font-mono text-red-600">
                                             {sale.invoice_number}
                                         </td>
                                         <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">
@@ -140,7 +140,7 @@ export default function PosHistory({ sales, filters }) {
                                             {sale.customer_name}
                                         </td>
                                         <td className="px-5 py-3.5">
-                                            <span className="inline-block rounded-md bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-700 border border-slate-200/60">
+                                             <span className="inline-block rounded-md bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-700 border border-slate-200/60">
                                                 {sale.payment_method}
                                             </span>
                                         </td>
@@ -153,9 +153,9 @@ export default function PosHistory({ sales, filters }) {
                                         <td className="px-5 py-3.5 text-right whitespace-nowrap">
                                             <Link
                                                 href={route('pos.receipt', sale.id)}
-                                                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-700 shadow-2xs transition"
+                                                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-red-700 shadow-2xs transition"
                                             >
-                                                <Printer className="h-3.5 w-3.5 text-emerald-600" />
+                                                <Printer className="h-3.5 w-3.5 text-red-600" />
                                                 <span>Cetak Struk</span>
                                             </Link>
                                         </td>
@@ -193,7 +193,7 @@ export default function PosHistory({ sales, filters }) {
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     className={`rounded-lg px-2.5 py-1 ${
                                         link.active
-                                            ? 'bg-emerald-600 text-white font-bold'
+                                            ? 'bg-red-600 text-white font-bold'
                                             : link.url
                                             ? 'text-slate-600 hover:bg-slate-100'
                                             : 'text-slate-300 cursor-not-allowed'

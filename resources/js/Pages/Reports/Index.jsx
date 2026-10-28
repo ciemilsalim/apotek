@@ -92,7 +92,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-emerald-700 transition"
+                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-green-700 transition"
                         >
                             <FileSpreadsheet className="h-4 w-4" />
                             <span>Unduh Excel</span>
@@ -107,7 +107,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
             <div className="mb-4 flex border-b border-slate-200 bg-white px-4 pt-2 rounded-t-xl shadow-xs">
                 <Link
                     href={route('reports.index')}
-                    className="border-b-2 border-emerald-600 px-4 py-2.5 text-xs font-bold text-emerald-700 transition"
+                    className="border-b-2 border-red-600 px-4 py-2.5 text-xs font-bold text-red-700 transition"
                 >
                     Laporan Transaksi Penjualan
                 </Link>
@@ -138,7 +138,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                         onClick={() => handleQuickPeriod(tab.id)}
                         className={`shrink-0 rounded-2xl px-4 py-2.5 text-xs font-extrabold border-2 transition ${
                             period === tab.id
-                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                ? 'bg-red-600 text-white border-red-600 shadow-xs'
                                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                         }`}
                     >
@@ -162,7 +162,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
                             />
                         </div>
                     )}
@@ -176,7 +176,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                 type="month"
                                 value={month}
                                 onChange={(e) => setMonth(e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
                             />
                         </div>
                     )}
@@ -191,7 +191,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 />
                             </div>
                             <div>
@@ -202,7 +202,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-emerald-600 focus:outline-none"
+                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
 
                     <button
                         type="submit"
-                        className="w-full sm:w-auto mt-2 sm:mt-5 rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-700 shadow-xs transition"
+                        className="w-full sm:w-auto mt-2 sm:mt-5 rounded-xl bg-red-600 px-5 py-2 text-xs font-bold text-white hover:bg-red-700 shadow-xs transition"
                     >
                         Terapkan
                     </button>
@@ -219,7 +219,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
 
             {/* Title Notice */}
             <div className="mb-3 text-xs sm:text-sm font-black text-slate-800 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-emerald-600" />
+                <Calendar className="h-4 w-4 text-red-600" />
                 <span>{title}</span>
             </div>
 
@@ -229,7 +229,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                     <span className="text-xs font-bold text-slate-500 uppercase">
                         Total Penjualan (Omset)
                     </span>
-                    <div className="mt-1 text-lg sm:text-2xl font-black text-emerald-700">
+                    <div className="mt-1 text-lg sm:text-2xl font-black text-green-700">
                         {formatCurrency(summary.totalRevenue)}
                     </div>
                 </div>
@@ -272,7 +272,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <div className="font-mono text-xs font-black text-emerald-700">
+                                    <div className="font-mono text-xs font-black text-green-700">
                                         {sale.invoice_number}
                                     </div>
                                     <div className="text-[11px] text-slate-500">
@@ -318,7 +318,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                             {sales.data && sales.data.length > 0 ? (
                                 sales.data.map((sale) => (
                                     <tr key={sale.id} className="hover:bg-slate-50 transition">
-                                        <td className="px-5 py-4 font-mono font-bold text-emerald-700">
+                                        <td className="px-5 py-4 font-mono font-bold text-red-600">
                                             {sale.invoice_number}
                                         </td>
                                         <td className="px-5 py-4 text-slate-500">
@@ -370,7 +370,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                 className={`rounded-xl px-3 py-1.5 font-bold ${
                                     link.active
-                                        ? 'bg-emerald-600 text-white'
+                                        ? 'bg-red-600 text-white'
                                         : link.url
                                         ? 'text-slate-700 hover:bg-slate-100'
                                         : 'text-slate-300 cursor-not-allowed'

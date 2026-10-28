@@ -57,12 +57,12 @@ export default function PosHistory({ sales, filters }) {
             <Head title="Riwayat Penjualan" />
 
             {/* Filter Bar (Light Theme Consistent) */}
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
-                    className="flex flex-col sm:flex-row gap-3 items-center justify-between"
+                    className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between"
                 >
-                    <div className="relative w-full sm:w-80">
+                    <div className="relative w-full sm:flex-1 sm:max-w-md">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <input
                             type="text"
@@ -73,7 +73,7 @@ export default function PosHistory({ sales, filters }) {
                         />
                     </div>
 
-                    <div className="flex w-full sm:w-auto items-center gap-2">
+                    <div className="flex w-full sm:w-auto items-center gap-2 shrink-0">
                         <input
                             type="date"
                             value={date}
@@ -85,12 +85,12 @@ export default function PosHistory({ sales, filters }) {
                                     { preserveState: true },
                                 );
                             }}
-                            className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-800 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
+                            className="w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-xs text-slate-800 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
                         />
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
+                            className="w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Filter
                         </button>
@@ -121,7 +121,7 @@ export default function PosHistory({ sales, filters }) {
                                         key={sale.id}
                                         className="hover:bg-slate-50/80 transition-colors duration-150"
                                     >
-                                        <td className="px-5 py-3.5 font-bold font-mono text-red-600">
+                                        <td className="px-5 py-3.5 font-bold font-mono text-slate-800">
                                             {sale.invoice_number}
                                         </td>
                                         <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">

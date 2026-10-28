@@ -612,16 +612,16 @@ export default function PosIndex({
                 </div>
 
                 {/* Total Bayar Banner */}
-                <div className="p-3.5 rounded-2xl bg-red-50/60 border-2 border-red-200 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-50/70 to-slate-50 border border-red-200/90 flex items-center justify-between">
                     <div>
-                        <div className="text-xs font-bold text-red-900 uppercase">
+                        <div className="text-xs font-bold text-slate-800 uppercase tracking-wide">
                             Total Tagihan
                         </div>
                         <div className="text-xs text-slate-500 font-medium">
                             {totalItemsCount} item obat ({cart.length} jenis)
                         </div>
                     </div>
-                    <div className="text-xl sm:text-2xl font-black text-red-700">
+                    <div className="text-xl sm:text-2xl font-black text-red-600">
                         {formatCurrency(totalAmount)}
                     </div>
                 </div>
@@ -800,12 +800,12 @@ export default function PosIndex({
                             type="button"
                             data-tour="pos-prescriptions-btn"
                             onClick={() => setPrescriptionModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-teal-700 shadow-xs transition active:scale-[0.98]"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-teal-200 bg-teal-50 px-3.5 py-2 text-xs font-bold text-teal-800 hover:bg-teal-100 shadow-xs transition active:scale-[0.98]"
                         >
-                            <Stethoscope className="h-4 w-4" />
+                            <Stethoscope className="h-4 w-4 text-teal-600" />
                             <span>Tebus Resep</span>
                             {readyPrescriptions.length > 0 && (
-                                <span className="rounded-full bg-white text-teal-800 text-[10px] font-black px-1.5 py-0.2">
+                                <span className="rounded-full bg-teal-600 text-white text-[10px] font-black px-1.5 py-0.2">
                                     {readyPrescriptions.length}
                                 </span>
                             )}
@@ -813,7 +813,7 @@ export default function PosIndex({
 
                         <Link
                             href={route('pos.history')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <Receipt className="h-4 w-4" />
                             <span>Riwayat Struk</span>
@@ -869,9 +869,9 @@ export default function PosIndex({
             ` }} />
 
             {/* Split Screen Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24 lg:pb-0">
-                {/* Left 7 Columns: Product Catalog & Barcode Scanner Area */}
-                <div className="lg:col-span-7 flex flex-col space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-24 md:pb-0">
+                {/* Left Columns: Product Catalog & Barcode Scanner Area (7 Cols on Tablet & Desktop) */}
+                <div className="md:col-span-7 lg:col-span-7 flex flex-col space-y-4">
                     {/* Barcode Search & Feedback Box */}
                     <div className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs space-y-3">
                         {/* Search Input with Autofocus & Barcode icon */}
@@ -1025,7 +1025,7 @@ export default function PosIndex({
 
                                         {/* Card Footer: Price & BOTH [+] and [-] Quantity Controls! */}
                                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                                            <div className="text-sm font-black text-red-600">
+                                            <div className="text-sm font-extrabold text-slate-900">
                                                 {formatCurrency(med.sell_price)}
                                             </div>
 
@@ -1088,17 +1088,17 @@ export default function PosIndex({
                     </div>
                 </div>
 
-                {/* Right Panel for Tablet & Desktop: Live Cart (5 Cols on Desktop) */}
-                <div className="hidden lg:block lg:col-span-5">
+                {/* Right Panel for Tablet & Desktop: Live Cart (5 Cols on Tablet & Desktop) */}
+                <div className="hidden md:block md:col-span-5 lg:col-span-5">
                     <div data-tour="pos-cart-panel" className="sticky top-24 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs">
                         <CartContent isModal={false} />
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Sticky Bottom Checkout Bar */}
+            {/* Mobile Sticky Bottom Checkout Bar (Hidden on Tablet & Desktop) */}
             {cart.length > 0 && (
-                <div className="fixed bottom-16 inset-x-0 z-30 lg:hidden p-3 bg-white/95 border-t border-slate-200 backdrop-blur-md shadow-lg">
+                <div className="fixed bottom-16 inset-x-0 z-30 md:hidden p-3 bg-white/95 border-t border-slate-200 backdrop-blur-md shadow-lg">
                     <div className="flex items-center justify-between gap-3 max-w-md mx-auto">
                         <div
                             onClick={() => setCartDrawerOpen(true)}

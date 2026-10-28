@@ -354,7 +354,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             Data Obat, Stok & Batch
@@ -363,11 +363,11 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             Kelola persediaan obat, kontrol nomor batch, pantau kadaluarsa, dan alur FEFO
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'medicines' } }))}
-                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                             title="Panduan Interaktif Katalog Obat"
                         >
                             <Compass className="h-4 w-4 text-red-600" />
@@ -376,7 +376,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                         <Link
                             href={route('medicines.adjustments')}
-                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
                             <ClipboardList className="h-4 w-4" />
                             <span className="hidden sm:inline">Riwayat Mutasi</span>
@@ -385,7 +385,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             type="button"
                             data-tour="med-import-btn"
                             onClick={() => setImportModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-extrabold text-red-800 hover:bg-red-100 shadow-xs transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-green-50/50 shadow-xs transition"
                         >
                             <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Import Excel</span>
@@ -393,7 +393,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         <button
                             onClick={openCreateModal}
                             data-tour="med-add-btn"
-                            className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 transition"
+                            className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-red-700 active:scale-[0.98] transition"
                         >
                             <Plus className="h-4 w-4" />
                             <span>Tambah Obat</span>
@@ -416,7 +416,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         key={tab.id}
                         type="button"
                         onClick={() => handleQuickFilter(tab.id)}
-                        className={`shrink-0 rounded-2xl px-4 py-2.5 text-xs font-extrabold border-2 transition ${
+                        className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold border-2 transition ${
                             status === tab.id
                                 ? 'bg-red-600 text-white border-red-600 shadow-xs'
                                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -428,19 +428,19 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
             </div>
 
             {/* Search and Category Filter Bar */}
-            <div data-tour="med-search" className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
+            <div data-tour="med-search" className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-3.5 sm:p-4 shadow-xs">
                 <form
                     onSubmit={handleSearch}
-                    className="flex flex-col sm:flex-row gap-3 items-center justify-between"
+                    className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between"
                 >
-                    <div className="relative w-full sm:flex-1 flex items-center">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                    <div className="relative flex-1 flex items-center">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                         <input
                             type="text"
                             placeholder="Cari nama obat, kode, nomor batch, atau lokasi rak..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-slate-300 pl-11 pr-24 py-2.5 text-xs sm:text-sm font-semibold focus:border-red-600 focus:outline-none bg-slate-50/70"
+                            className="w-full rounded-xl border border-slate-300 pl-11 pr-24 py-2.5 text-xs sm:text-sm font-semibold focus:border-red-500 focus:outline-none bg-slate-50/70"
                         />
                         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                             {search && (
@@ -459,7 +459,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                             <button
                                 type="button"
                                 onClick={() => setCameraScannerOpen(true)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 font-bold text-xs shadow-2xs transition"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 font-bold text-xs shadow-2xs transition"
                                 title="Scan Barcode via Kamera HP / Web"
                             >
                                 <Camera className="h-3.5 w-3.5 text-red-600" />
@@ -468,11 +468,11 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
                         </div>
                     </div>
 
-                    <div className="flex w-full sm:w-auto items-center gap-2">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
                         <select
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
-                            className="w-full sm:w-48 rounded-2xl border border-slate-300 px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-red-600 focus:outline-none bg-white"
+                            className="w-full sm:w-48 rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-bold text-slate-700 focus:border-red-500 focus:outline-none bg-white"
                         >
                             <option value="">Semua Kategori</option>
                             {categories.map((c) => (
@@ -484,7 +484,7 @@ export default function MedicinesIndex({ medicines, categories, filters, units }
 
                         <button
                             type="submit"
-                            className="rounded-2xl bg-red-600 px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white hover:bg-red-700 transition shadow-xs"
+                            className="w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-red-700 transition shadow-xs"
                         >
                             Filter
                         </button>

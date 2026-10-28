@@ -79,22 +79,22 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                         </p>
                     </div>
 
-                    {/* Big 1-Tap Export Buttons */}
+                    {/* Clean Soft Export Buttons */}
                     <div className="flex items-center gap-2">
                         <a
                             href={getExportUrl('pdf')}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-rose-700 transition"
+                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
-                            <FileText className="h-4 w-4" />
+                            <FileText className="h-4 w-4 text-red-600" />
                             <span>Cetak PDF</span>
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-2.5 text-xs sm:text-sm font-black text-white shadow-xs hover:bg-green-700 transition"
+                            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
                         >
-                            <FileSpreadsheet className="h-4 w-4" />
+                            <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Unduh Excel</span>
                         </a>
                     </div>
@@ -151,7 +151,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
             <div className="mb-6 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs">
                 <form
                     onSubmit={handleFilterSubmit}
-                    className="flex flex-col sm:flex-row items-center gap-3"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3"
                 >
                     {period === 'daily' && (
                         <div className="w-full sm:w-64">
@@ -162,7 +162,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                             />
                         </div>
                     )}
@@ -176,13 +176,13 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                 type="month"
                                 value={month}
                                 onChange={(e) => setMonth(e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                             />
                         </div>
                     )}
 
                     {period === 'custom' && (
-                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                             <div>
                                 <label className="block text-xs font-bold text-slate-600 mb-1">
                                     Dari Tanggal
@@ -191,7 +191,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
+                                    className="w-full sm:w-auto rounded-xl border border-slate-300 px-3 py-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 />
                             </div>
                             <div>
@@ -202,7 +202,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold focus:border-red-500 focus:outline-none"
+                                    className="w-full sm:w-auto rounded-xl border border-slate-300 px-3 py-2.5 text-xs font-semibold focus:border-red-500 focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export default function ReportsIndex({ title, sales, filters, summary }) {
 
                     <button
                         type="submit"
-                        className="w-full sm:w-auto mt-2 sm:mt-5 rounded-xl bg-red-600 px-5 py-2 text-xs font-bold text-white hover:bg-red-700 shadow-xs transition"
+                        className="w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-red-700 shadow-xs transition shrink-0"
                     >
                         Terapkan
                     </button>

@@ -218,58 +218,59 @@ export default function Dashboard({
             <Head title={`Beranda - ${pharmacy?.name || 'Apotek Sehat'}`} />
 
             <div className="py-2 sm:py-4 max-w-6xl mx-auto">
-                {/* Welcome Card Banner (Mobile First, Sleek & Precise) */}
+                {/* Welcome Card Banner (Soft Clean Healthcare Theme, Anti-Eye Fatigue) */}
                 <div
                     data-tour="dashboard-welcome"
-                    className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-red-800 text-white p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden"
+                    className="mb-5 sm:mb-6 rounded-2xl lg:rounded-3xl bg-white border border-slate-200/90 p-5 sm:p-6 shadow-xs relative overflow-hidden"
                 >
-                    <div className="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-                    <div className="absolute -left-8 -bottom-8 w-44 h-44 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+                    <div className="absolute right-0 top-0 w-80 h-full bg-gradient-to-l from-red-50/50 via-slate-50/30 to-transparent pointer-events-none" />
+                    <div className="absolute right-12 -top-12 w-48 h-48 rounded-full bg-red-100/30 blur-3xl pointer-events-none" />
 
-                    <div className="relative z-10 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
                             {pharmacy?.logo_url ? (
                                 <img
                                     src={pharmacy.logo_url}
                                     alt="Logo"
-                                    className="h-11 w-11 sm:h-13 sm:w-13 object-contain rounded-xl sm:rounded-2xl bg-white p-1 shadow-xs shrink-0 border border-white/20"
+                                    className="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-2xl bg-white p-1.5 shadow-2xs shrink-0 border border-slate-200"
                                 />
                             ) : (
-                                <div className="h-11 w-11 sm:h-13 sm:w-13 rounded-xl sm:rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0">
-                                    <Store className="h-5 w-5 sm:h-6 sm:w-6" />
+                                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+                                    <Store className="h-6 w-6" />
                                 </div>
                             )}
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border border-white/20">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-red-50 text-red-700 border border-red-200/80">
                                         {roleName}
                                     </span>
-                                    <span className="flex items-center gap-1 text-[11px] text-red-100 font-medium">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                                        Online
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold bg-green-50 text-green-700 border border-green-200/80">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                                        Sistem Online
                                     </span>
                                 </div>
-                                <h2 className="text-sm sm:lg lg:text-xl font-black text-white tracking-tight mt-0.5 truncate">
+                                <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight mt-1 truncate">
                                     Selamat Datang, {user.name}
                                 </h2>
-                                <p className="text-[11px] sm:text-xs text-red-100/90 font-medium truncate">
+                                <p className="text-xs text-slate-500 font-medium truncate">
                                     {pharmacy?.name || 'Apotek Hibbatillah'} • {todayFormatted}
                                 </p>
                             </div>
                         </div>
 
                         {/* Quick Tour Button */}
-                        <button
-                            type="button"
-                            data-tour="dashboard-tour-btn"
-                            onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'dashboard' } }))}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition backdrop-blur-xs shrink-0 active:scale-95 shadow-2xs"
-                            title="Mulai Tour & Panduan Fitur Apotek"
-                        >
-                            <Compass className="h-4 w-4 text-white" />
-                            <span className="hidden sm:inline">Tour Fitur</span>
-                            <span className="sm:hidden">Tour</span>
-                        </button>
+                        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                            <button
+                                type="button"
+                                data-tour="dashboard-tour-btn"
+                                onClick={() => window.dispatchEvent(new CustomEvent('start-spotlight-tour', { detail: { key: 'dashboard' } }))}
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 hover:text-red-600 text-xs font-bold transition shadow-2xs active:scale-95"
+                                title="Mulai Tour & Panduan Fitur Apotek"
+                            >
+                                <Compass className="h-4 w-4 text-red-600" />
+                                <span>Panduan Fitur</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

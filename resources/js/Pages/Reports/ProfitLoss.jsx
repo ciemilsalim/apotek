@@ -108,16 +108,16 @@ export default function ProfitLoss({ title, filters = {}, statement = {} }) {
                             href={getExportUrl('pdf')}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-300 bg-white px-3 py-2 text-xs font-semibold text-rose-700 shadow-sm transition hover:bg-rose-50"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-slate-50 shadow-xs transition"
                         >
-                            <FileText className="h-4 w-4" />
+                            <FileText className="h-4 w-4 text-red-600" />
                             <span>Ekspor PDF</span>
                         </a>
                         <a
                             href={getExportUrl('excel')}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-semibold text-green-700 shadow-sm transition hover:bg-green-50"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:text-green-700 hover:bg-slate-50 shadow-xs transition"
                         >
-                            <FileSpreadsheet className="h-4 w-4" />
+                            <FileSpreadsheet className="h-4 w-4 text-green-600" />
                             <span>Ekspor Excel (CSV)</span>
                         </a>
                     </div>
